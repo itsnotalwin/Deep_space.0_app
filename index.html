@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>✦ SYNC CONSTELLATION · INSANE VISUALS</title>
+  <title>✦ SYNC CONSTELLATION · MAX VISUALS</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
     html, body { width:100%; height:100%; overflow:hidden; background:#010108; }
@@ -14,36 +14,28 @@
     canvas { position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; background:#010108; }
     canvas:active { cursor:grabbing; }
 
-    /* Enhanced vignette with chromatic aberration and film grain */
     .vignette {
       position:absolute; inset:0; pointer-events:none; z-index:10;
       background:
-        radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(0,0,0,0.75) 90%);
+        radial-gradient(ellipse at 50% 50%, transparent 25%, rgba(0,0,0,0.8) 90%),
+        radial-gradient(ellipse at 30% 30%, rgba(200,120,255,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 70%, rgba(255,160,80,0.1) 0%, transparent 50%);
     }
     .vignette::after {
       content:''; position:absolute; inset:0;
-      background:
-        radial-gradient(ellipse at 30% 30%, rgba(180,100,255,0.08) 0%, transparent 60%),
-        radial-gradient(ellipse at 70% 70%, rgba(255,150,100,0.08) 0%, transparent 60%),
-        radial-gradient(ellipse at 50% 50%, transparent 20%, rgba(0,0,0,0.5) 100%);
-      mix-blend-mode: screen;
-    }
-    /* Film grain overlay */
-    .grain {
-      position:absolute; inset:0; pointer-events:none; z-index:11;
-      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-      background-size: 200px 200px;
-      opacity: 0.5;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-size: 256px 256px;
       mix-blend-mode: overlay;
+      animation: grain 8s steps(10) infinite;
     }
+    @keyframes grain { 0%,100% { transform: translate(0,0); } 10% { transform: translate(-5%,-2%); } 20% { transform: translate(3%,1%); } 30% { transform: translate(-1%,4%); } 40% { transform: translate(2%,-3%); } 50% { transform: translate(-4%,-1%); } 60% { transform: translate(1%,2%); } 70% { transform: translate(-2%,-4%); } 80% { transform: translate(3%,2%); } 90% { transform: translate(-1%,1%); } }
 
-    /* HUD (unchanged, just included for completeness) */
     .hud { position:absolute; top:max(20px, env(safe-area-inset-top)); left:24px; right:24px; display:flex; justify-content:space-between; align-items:center; z-index:100; background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); padding:10px 24px; border-radius:60px; border:0.5px solid rgba(100,120,180,0.25); box-shadow:0 8px 20px rgba(0,0,0,0.4); animation: hudGlow 4s ease-in-out infinite alternate; }
-    @keyframes hudGlow { 0% { box-shadow:0 8px 20px rgba(0,0,0,0.4), 0 0 15px rgba(100,140,220,0.2); } 100% { box-shadow:0 8px 20px rgba(0,0,0,0.4), 0 0 25px rgba(100,140,220,0.4); } }
+    @keyframes hudGlow { 0% { box-shadow:0 8px 20px rgba(0,0,0,0.4), 0 0 15px rgba(100,140,220,0.2); } 100% { box-shadow:0 8px 20px rgba(0,0,0,0.4), 0 0 30px rgba(130,160,255,0.5); } }
     .title { font-size:11px; font-weight:400; letter-spacing:0.5em; color:rgba(200,210,240,0.85); text-shadow:0 0 12px rgba(100,140,220,0.4); text-transform:uppercase; }
     .meta { font-size:11px; font-weight:450; color:rgba(180,195,230,0.8); background:rgba(0,0,0,0.35); padding:6px 16px; border-radius:40px; backdrop-filter:blur(8px); letter-spacing:0.3px; display:flex; align-items:center; gap:6px; }
     .star-count-icon { display:inline-block; width:8px; height:8px; background:#aaccff; border-radius:50%; box-shadow:0 0 8px #aaccff; margin-right:2px; animation: pulseIcon 2s ease-in-out infinite; }
-    @keyframes pulseIcon { 0%,100% { box-shadow:0 0 8px #aaccff; } 50% { box-shadow:0 0 16px #aaccff; } }
+    @keyframes pulseIcon { 0%,100% { box-shadow:0 0 8px #aaccff; } 50% { box-shadow:0 0 20px #cce0ff; } }
 
     .clear-btn { position:absolute; top:max(20px, env(safe-area-inset-top)); left:24px; width:44px; height:44px; border-radius:44px; background:rgba(15,15,30,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:0.5px solid rgba(255,100,100,0.4); color:#ffaaaa; font-size:20px; z-index:120; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 15px rgba(0,0,0,0.5); transition:all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); margin-top:60px; }
     .clear-btn:active { transform:scale(0.9); background:rgba(50,20,20,0.8); }
@@ -55,7 +47,7 @@
     input[type="range"].age-slider::-webkit-slider-thumb:active { transform:scale(1.2); }
 
     .add { position:absolute; right:28px; bottom:max(100px, calc(env(safe-area-inset-bottom) + 100px)); width:62px; height:62px; border-radius:62px; background:radial-gradient(circle at 35% 35%,rgba(90,110,170,0.7),rgba(20,20,40,0.9)); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); color:#e6f0ff; font-size:32px; border:0.5px solid rgba(140,160,220,0.3); box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 0 1px rgba(120,140,200,0.2); z-index:120; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); animation: btnGlow 3s ease-in-out infinite; }
-    @keyframes btnGlow { 0%,100% { box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 0 1px rgba(120,140,200,0.2); } 50% { box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 20px rgba(120,160,240,0.5); } }
+    @keyframes btnGlow { 0%,100% { box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 0 1px rgba(120,140,200,0.2); } 50% { box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 25px rgba(150,180,255,0.6); } }
     .add:active { transform:scale(0.9); background:radial-gradient(circle at 35% 35%,rgba(120,140,210,0.8),rgba(30,30,55,0.95)); }
     .sync-btn,.share-btn,.release-btn { position:absolute; width:48px; height:48px; border-radius:48px; background:rgba(15,15,30,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:0.5px solid rgba(100,120,180,0.3); color:#c8d6ff; font-size:20px; z-index:120; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 15px rgba(0,0,0,0.5); transition:all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); }
     .sync-btn:active,.share-btn:active,.release-btn:active { transform:scale(0.9); background:rgba(30,30,55,0.8); }
@@ -89,7 +81,6 @@
 <div id="app">
   <canvas id="cosmicCanvas"></canvas>
   <div class="vignette"></div>
-  <div class="grain"></div>
   <div class="hud"><div class="title">✦ SYNC CONSTELLATION</div><div class="meta" id="counterMeta"><span class="star-count-icon"></span> 0 stars</div></div>
   <button class="clear-btn" id="clearBtn">🗑</button>
   <div class="age-bar">
@@ -105,7 +96,6 @@
 
   <div class="modal" id="viewModal"><div class="panel"><div id="viewCreator" class="creator-info"></div><div class="viewer" id="memoryViewer"></div><div class="actions"><button id="closeViewBtn">close</button><button id="editFromViewBtn">edit</button></div></div></div>
   <div class="modal" id="editModal"><div class="panel"><div id="editCreator" class="creator-info"></div><textarea id="memoryEditor" placeholder="...a thought drifts..."></textarea><div class="actions"><button id="saveMemoryBtn">engrave</button><button id="cancelEditBtn">drift</button><button id="deleteMemoryBtn" class="delete">obliterate</button></div></div></div>
-  <div class="modal" id="clusterModal"><div class="panel"><div id="clusterNameDisplay" style="text-align:center; font-size:16px; color:#d0d8ff;"></div><div class="actions"><button id="closeClusterBtn">gaze further</button></div></div></div>
   <div class="modal" id="constellationNameModal"><div class="panel"><div style="text-align:center; color:#d0d8ff; margin-bottom:10px;">name this constellation</div><input type="text" class="name-input" id="constellationNameInput" placeholder="constellation name"><div class="actions"><button id="saveConstellationName">save</button><button id="cancelConstellationName">cancel</button></div></div></div>
   <div class="modal" id="clearConfirmModal">
     <div class="panel" style="text-align:center;">
@@ -198,73 +188,57 @@
     let ageOffset = 0;
     let birthFlashes = [];
 
-    // --- Parallax star layers ---
-    const CELL_SIZE = 400;
-    const STARS_PER_CELL = 6;
-    // Deep background stars (tiny, slow parallax)
-    let deepStars = [];
-    for (let i=0; i<300; i++) {
-      deepStars.push({
+    // --- MAX BACKGROUND LAYERS ---
+    const createStarLayer = (count, spread, minSize, maxSize, minBright, maxBright, colorRange, parallax) => {
+      let layer = [];
+      for (let i=0; i<count; i++) {
+        layer.push({
+          x: (Math.random()-0.5)*spread,
+          y: (Math.random()-0.5)*spread,
+          size: minSize + Math.random()*(maxSize-minSize),
+          brightness: minBright + Math.random()*(maxBright-minBright),
+          colorTemp: [
+            colorRange[0] + Math.random()*(colorRange[1]-colorRange[0]),
+            colorRange[2] + Math.random()*(colorRange[3]-colorRange[2]),
+            colorRange[4] + Math.random()*(colorRange[5]-colorRange[4])
+          ],
+          parallax
+        });
+      }
+      return layer;
+    };
+
+    let starLayers = [
+      createStarLayer(400, 5000, 0.2, 0.8, 0.3, 0.6, [200,255, 220,255, 240,255], 0.1),
+      createStarLayer(600, 4000, 0.4, 1.4, 0.4, 0.7, [180,255, 200,255, 220,255], 0.3),
+      createStarLayer(500, 3000, 0.6, 2.0, 0.5, 0.8, [150,240, 180,240, 200,240], 0.6),
+      createStarLayer(300, 2000, 1.0, 2.5, 0.6, 1.0, [120,220, 150,220, 180,240], 0.9)
+    ];
+
+    let dustClouds = [];
+    for (let i=0; i<60; i++) {
+      dustClouds.push({
         x: (Math.random()-0.5)*4000,
         y: (Math.random()-0.5)*4000,
-        size: Math.random()*0.8+0.2,
-        brightness: Math.random()*0.4+0.2,
-        colorTemp: [200+Math.random()*55, 220+Math.random()*35, 255],
-        parallax: 0.2
-      });
-    }
-    // Medium layer
-    let midStars = [];
-    for (let i=0; i<500; i++) {
-      midStars.push({
-        x: (Math.random()-0.5)*3000,
-        y: (Math.random()-0.5)*3000,
-        size: Math.random()*1.2+0.4,
-        brightness: Math.random()*0.5+0.3,
-        colorTemp: [180+Math.random()*75, 200+Math.random()*55, 240+Math.random()*15],
-        parallax: 0.5
-      });
-    }
-    // Foreground layer (bright, fast)
-    let nearStars = [];
-    for (let i=0; i<200; i++) {
-      nearStars.push({
-        x: (Math.random()-0.5)*2500,
-        y: (Math.random()-0.5)*2500,
-        size: Math.random()*1.5+0.5,
-        brightness: Math.random()*0.6+0.4,
-        colorTemp: [150+Math.random()*105, 180+Math.random()*75, 220+Math.random()*35],
-        parallax: 0.8
+        radius: 50 + Math.random()*200,
+        particles: Array.from({length: 30 + Math.floor(Math.random()*40)}, () => ({
+          offsetX: (Math.random()-0.5)*200,
+          offsetY: (Math.random()-0.5)*200,
+          size: Math.random()*4+1,
+          alpha: Math.random()*0.3+0.1
+        })),
+        driftX: (Math.random()-0.5)*0.2,
+        driftY: (Math.random()-0.5)*0.2,
+        color: [180+Math.random()*75, 200+Math.random()*55, 240+Math.random()*15]
       });
     }
 
-    // Cosmic dust
-    let dustParticles = [];
-    const DUST_COUNT = 120;
-    for (let i=0; i<DUST_COUNT; i++) {
-      dustParticles.push({
-        x: (Math.random()-0.5)*4000,
-        y: (Math.random()-0.5)*4000,
-        size: Math.random()*1.2+0.4,
-        brightness: Math.random()*0.25+0.05,
-        colorTemp: [180+Math.random()*75, 200+Math.random()*55, 240+Math.random()*15],
-        driftX: (Math.random()-0.5)*0.3,
-        driftY: (Math.random()-0.5)*0.3,
-        z: Math.random()*0.5+0.5
-      });
-    }
-
-    // Sparkles
     let sparkles = [];
-
-    // Comets
     let comets = [];
+    let asteroidBelts = [];
 
-    // Aurora state
-    let auroraOffset = 0;
-
-    function drawParallaxStars(stars, parallaxFactor) {
-      for (let s of stars) {
+    function drawStarLayer(layer) {
+      for (let s of layer) {
         let parallaxX = s.x - camera.x * s.parallax * 0.1;
         let parallaxY = s.y - camera.y * s.parallax * 0.1;
         const twinkle = 0.7 + 0.3 * Math.sin(Date.now()*0.001 + s.x*0.1 + s.y*0.1);
@@ -275,21 +249,40 @@
       }
     }
 
-    function drawDust() {
-      for (let p of dustParticles) {
-        let parallaxX = p.x - camera.x * p.z * 0.1;
-        let parallaxY = p.y - camera.y * p.z * 0.1;
-        p.x += p.driftX;
-        p.y += p.driftY;
-        if (p.x > 2000) p.x = -2000;
-        if (p.x < -2000) p.x = 2000;
-        if (p.y > 2000) p.y = -2000;
-        if (p.y < -2000) p.y = 2000;
-        const alpha = p.brightness * (0.7 + 0.3 * Math.sin(Date.now()*0.0005 + p.x));
-        ctx.fillStyle = `rgba(${p.colorTemp[0]},${p.colorTemp[1]},${p.colorTemp[2]},${alpha})`;
-        ctx.beginPath();
-        ctx.arc(parallaxX, parallaxY, p.size, 0, Math.PI*2);
-        ctx.fill();
+    function drawDustClouds() {
+      for (let cloud of dustClouds) {
+        for (let p of cloud.particles) {
+          let worldX = cloud.x + p.offsetX;
+          let worldY = cloud.y + p.offsetY;
+          let alpha = p.alpha * (0.6 + 0.4 * Math.sin(Date.now()*0.0003 + worldX*0.1));
+          ctx.fillStyle = `rgba(${cloud.color[0]},${cloud.color[1]},${cloud.color[2]},${alpha})`;
+          ctx.beginPath();
+          ctx.arc(worldX, worldY, p.size, 0, Math.PI*2);
+          ctx.fill();
+        }
+        cloud.x += cloud.driftX;
+        cloud.y += cloud.driftY;
+        if (cloud.x > 2500) cloud.x = -2500;
+        if (cloud.x < -2500) cloud.x = 2500;
+        if (cloud.y > 2500) cloud.y = -2500;
+        if (cloud.y < -2500) cloud.y = 2500;
+      }
+    }
+
+    function drawCosmicWeb() {
+      ctx.strokeStyle = "rgba(80,100,180,0.06)";
+      ctx.lineWidth = 1;
+      for (let i=0; i<galacticClusters.length; i++) {
+        for (let j=i+1; j<galacticClusters.length; j++) {
+          let a = galacticClusters[i], b = galacticClusters[j];
+          let dist = Math.hypot(a.x-b.x, a.y-b.y);
+          if (dist < 800) {
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
       }
     }
 
@@ -322,7 +315,15 @@
             s.eccentricity = Math.random() * 0.4;
             s.vx = 0; s.vy = 0;
             s.radius = 2 + Math.random() * 5;
+            s.hasRing = Math.random() < 0.15;
+            s.ringTilt = Math.random() * Math.PI;
+            s.ringWidth = s.radius * 1.8;
             free.splice(i, 1);
+          }
+        }
+        if (!sun._asteroidBelt) {
+          if (Math.random() < 0.3) {
+            sun._asteroidBelt = { inner: sun.radius*3, outer: sun.radius*5, count: 40 + Math.floor(Math.random()*40), particles: [] };
           }
         }
       }
@@ -349,8 +350,7 @@
               planet.eccentricity = Math.random() * 0.4;
               planet.vx = 0; planet.vy = 0;
               planet.radius = 2 + Math.random() * 5;
-              // Ring chance
-              planet.hasRing = Math.random() < 0.2;
+              planet.hasRing = Math.random() < 0.15;
               planet.ringTilt = Math.random() * Math.PI;
               planet.ringWidth = planet.radius * 1.8;
             }
@@ -394,8 +394,20 @@
       currentClusters = clusters;
     }
 
-    // Firestore CRUD (unchanged)
-    async function saveNoteToFirestore(note) { /* ... same as before ... */ }
+    async function saveNoteToFirestore(note) {
+      await notesCollection.doc(note.id).set({
+        id: note.id, created: note.created, opened: note.opened || 0, text: note.text,
+        x: note.x, y: note.y, vx: note.vx, vy: note.vy,
+        radius: note.radius, mass: note.mass,
+        orbitPhase: note.orbitPhase, pulsePhase: note.pulsePhase,
+        sentiment: note.sentiment,
+        creatorId: note.creatorId, creatorName: note.creatorName,
+        isSun: note.isSun, orbitingSunId: note.orbitingSunId,
+        orbitRadius: note.orbitRadius, orbitAngle: note.orbitAngle,
+        orbitSpeed: note.orbitSpeed, orbitDirection: note.orbitDirection,
+        eccentricity: note.eccentricity
+      });
+    }
     async function deleteNoteFromFirestore(id) { await notesCollection.doc(id).delete(); }
     async function saveConstellationNameToFirestore(constellation) {
       const docId = constellation.starIds.join(',');
@@ -431,13 +443,38 @@
       });
     }
 
-    function createMemory(text = "") { /* ... same ... */ }
+    function createMemory(text = "") {
+      let cluster = galacticClusters[Math.floor(Math.random() * galacticClusters.length)];
+      let x = cluster.x + (Math.random()-0.5)*800;
+      let y = cluster.y + (Math.random()-0.5)*800;
+      const note = {
+        id: Date.now() + Math.random().toString(36),
+        created: Date.now(),
+        opened: 0,
+        text: text.trim() === "" ? "✦ a drifting thought" : text,
+        x, y,
+        vx: (Math.random()-0.5)*0.05, vy: (Math.random()-0.5)*0.05,
+        radius: 3 + Math.random() * 3,
+        mass: 2.5,
+        orbitPhase: 0, pulsePhase: Math.random()*Math.PI*2,
+        sentiment: 0,
+        creatorId: localPeerId, creatorName: localPeerName,
+        trail: [],
+        isSun: false, orbitingSunId: null,
+        orbitRadius: 0, orbitAngle: 0, orbitSpeed: 0, orbitDirection: 1, eccentricity: 0
+      };
+      note.mass = computeMass(note);
+      notes.push(note);
+      saveNoteToFirestore(note);
+      updateCounter();
+      return note;
+    }
+
     function deleteNote(id) { notes = notes.filter(n => n.id !== id); deleteNoteFromFirestore(id); updateCounter(); }
     function clearAllNotes() { notes.forEach(n => deleteNoteFromFirestore(n.id)); notes = []; updateCounter(); showToast("constellation cleared"); }
     function updateCounter() { document.getElementById("counterMeta").innerHTML = `<span class="star-count-icon"></span> ${notes.length === 0 ? "empty sky" : `${notes.length} stars`}`; }
 
     function simulate() {
-      // (simulation logic unchanged, just added comet spawning and aurora offset)
       for (let note of notes) {
         if (!note.trail) note.trail = [];
         note.trail.push({x: note.x, y: note.y});
@@ -542,15 +579,25 @@
         c.life--;
         if (c.life <= 0) comets.splice(i,1);
       }
-
-      auroraOffset += 0.002;
     }
 
+    function drawShootingStars() {
+      for (let s of shootingStars) {
+        let headX=s.x, headY=s.y, dir=Math.hypot(s.vx,s.vy); if(dir<0.01) continue;
+        let tailX=s.x-s.vx*(s.length/dir), tailY=s.y-s.vy*(s.length/dir);
+        let grad=ctx.createLinearGradient(headX,headY,tailX,tailY);
+        grad.addColorStop(0,`rgba(255,240,200,${s.opacity})`); grad.addColorStop(1,`rgba(160,100,70,0)`);
+        ctx.beginPath(); ctx.moveTo(headX,headY); ctx.lineTo(tailX,tailY); ctx.strokeStyle=grad; ctx.lineWidth=2.2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(headX,headY,2.8,0,Math.PI*2); ctx.fillStyle=`rgba(255,220,160,${s.opacity*0.8})`; ctx.fill();
+      }
+    }
+
+    let previewStarId = null;
     function render() {
       ctx.clearRect(0,0,w,h);
-      const bgGrad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w, h) * 0.7);
-      bgGrad.addColorStop(0, "#08081a");
-      bgGrad.addColorStop(1, "#010108");
+      const bgGrad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w, h)*0.8);
+      bgGrad.addColorStop(0, "#05051a");
+      bgGrad.addColorStop(1, "#000008");
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, w, h);
 
@@ -559,33 +606,14 @@
       ctx.scale(camera.zoom, camera.zoom);
       ctx.translate(camera.x, camera.y);
 
-      // Draw parallax star layers (deep -> mid -> near)
-      drawParallaxStars(deepStars, 0.2);
-      drawParallaxStars(midStars, 0.5);
-      drawDust();
-      drawParallaxStars(nearStars, 0.8);
+      drawStarLayer(starLayers[0]);
+      drawStarLayer(starLayers[1]);
+      drawCosmicWeb();
+      drawDustClouds();
+      drawStarLayer(starLayers[2]);
+      drawStarLayer(starLayers[3]);
 
-      // Aurora (screen space ribbon, drawn before nebulae)
-      ctx.save();
-      ctx.resetTransform();
-      let auroraGrad = ctx.createLinearGradient(0, h*0.2, 0, h*0.5);
-      auroraGrad.addColorStop(0, "rgba(100,200,255,0.05)");
-      auroraGrad.addColorStop(0.5, "rgba(150,100,255,0.08)");
-      auroraGrad.addColorStop(1, "rgba(100,200,255,0)");
-      ctx.fillStyle = auroraGrad;
-      ctx.beginPath();
-      ctx.moveTo(0, h*0.3);
-      for (let x=0; x<=w; x+=20) {
-        let y = h*0.3 + Math.sin(x*0.01 + auroraOffset) * 15 + Math.sin(x*0.03 + auroraOffset*1.3) * 10;
-        ctx.lineTo(x, y);
-      }
-      ctx.lineTo(w, h);
-      ctx.lineTo(0, h);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-
-      // Nebulae (simplified)
+      // Nebulae
       for (let gc of galacticClusters) {
         let offsetX = Math.cos(Date.now()*0.0001 + gc.x*0.01) * 25;
         let offsetY = Math.sin(Date.now()*0.0001 + gc.y*0.01) * 25;
@@ -606,7 +634,24 @@
         }
       }
 
-      // Orbits (with dashed lines)
+      // Asteroid belts
+      for (let sun of notes.filter(n => n.isSun)) {
+        if (sun._asteroidBelt) {
+          let belt = sun._asteroidBelt;
+          for (let a=0; a<belt.count; a++) {
+            let angle = (a / belt.count) * Math.PI*2 + Date.now()*0.0003;
+            let radius = belt.inner + (belt.outer - belt.inner) * (a % 7)/7;
+            let x = sun.x + Math.cos(angle) * radius;
+            let y = sun.y + Math.sin(angle) * radius;
+            ctx.fillStyle = "rgba(200,180,150,0.5)";
+            ctx.beginPath();
+            ctx.arc(x, y, 0.8, 0, Math.PI*2);
+            ctx.fill();
+          }
+        }
+      }
+
+      // Orbits
       for (let sun of notes.filter(n => n.isSun)) {
         let planets = notes.filter(n => n.orbitingSunId === sun.id);
         for (let planet of planets) {
@@ -621,7 +666,7 @@
         }
       }
 
-      // Constellation lines with traveling light dots
+      // Constellation lines
       if (notes.length > 1) {
         for (let i=0; i<notes.length; i++) {
           for (let j=i+1; j<notes.length; j++) {
@@ -636,7 +681,6 @@
               ctx.strokeStyle = `rgba(140, 170, 220, ${alpha})`;
               ctx.lineWidth = isNamed ? 1.2 : 0.7;
               ctx.stroke();
-              // Traveling dot
               if (isNamed) {
                 let t = (Date.now() * 0.0005) % 1;
                 let mx = a.x + (b.x - a.x) * t;
@@ -689,7 +733,7 @@
         }
       }
 
-      // Stars with insane details
+      // Stars
       for (let star of notes) {
         let age = Math.max(0, Date.now() - star.created + ageOffset);
         let colors = starColor(age);
@@ -732,7 +776,6 @@
           }
         } else if (star.orbitingSunId) {
           size = star.radius + pulse * 0.3;
-          // Draw ring if present
           if (star.hasRing) {
             ctx.save();
             ctx.translate(star.x, star.y);
@@ -792,7 +835,6 @@
         ctx.strokeStyle = grad;
         ctx.lineWidth = 3;
         ctx.stroke();
-        // Coma
         let coma = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, 8);
         coma.addColorStop(0, "rgba(255,255,255,0.9)");
         coma.addColorStop(1, "rgba(200,200,255,0)");
@@ -804,9 +846,288 @@
       drawShootingStars();
     }
 
-    // (shooting stars, interaction, etc. remain exactly as in the previous working version)
-    // For brevity, I'm omitting the full repetition, but you would paste the complete interaction/sync code here.
-    // The full file will include everything from the previous "VISUALS++" version, just with this enhanced render function and the new visual elements.
+    function showToast(msg) { document.getElementById("toastMsg").innerText=msg; document.getElementById("toastMsg").classList.add("show"); setTimeout(()=>document.getElementById("toastMsg").classList.remove("show"),2000); }
+
+    // Interaction (unchanged from last working version)
+    function promptConstellationName(cluster) {
+      document.getElementById("constellationNameInput").value = cluster.name || "";
+      document.getElementById("constellationNameModal").style.display = "flex";
+      requestAnimationFrame(() => document.getElementById("constellationNameModal").classList.add("visible"));
+      document.getElementById("constellationNameInput").focus();
+      window._currentCluster = cluster;
+    }
+    document.getElementById("saveConstellationName").onclick = () => {
+      let name = document.getElementById("constellationNameInput").value.trim();
+      if (name && window._currentCluster) {
+        let cluster = window._currentCluster;
+        let existing = namedConstellations.findIndex(c => c.starIds.join(',') === cluster.starIds.join(','));
+        if (existing !== -1) namedConstellations[existing].name = name;
+        else namedConstellations.push({ starIds: cluster.starIds, name: name });
+        saveConstellationNameToFirestore({ starIds: cluster.starIds, name: name });
+      }
+      closeModal(document.getElementById("constellationNameModal"));
+      window._currentCluster = null;
+    };
+    document.getElementById("cancelConstellationName").onclick = () => { closeModal(document.getElementById("constellationNameModal")); window._currentCluster = null; };
+
+    function startFollowing(starId) {
+      followingStarId = starId;
+      document.getElementById("releaseBtn").classList.add("visible");
+    }
+    function stopFollowing() {
+      followingStarId = null;
+      document.getElementById("releaseBtn").classList.remove("visible");
+    }
+    document.getElementById("releaseBtn").addEventListener("click", stopFollowing);
+
+    function worldPos(px,py) { return { x:(px-w/2)/camera.zoom-camera.x, y:(py-h/2)/camera.zoom-camera.y }; }
+    function hitTest(px,py) {
+      let wp=worldPos(px,py);
+      let best=null, bestD=70;
+      for(let n of notes){
+        let d=Math.hypot(wp.x-n.x,wp.y-n.y);
+        let thresh=Math.min(80,35+n.radius*3.5);
+        if(d<thresh && d<bestD){ bestD=d; best=n; }
+      }
+      return best;
+    }
+    function hitTestConstellationCentroid(px,py) {
+      let wp = worldPos(px,py);
+      for (let cluster of currentClusters) {
+        if (cluster.starIds.length >= 3) {
+          let d = Math.hypot(wp.x - cluster.centroid.x, wp.y - cluster.centroid.y);
+          if (d < 50) return cluster;
+        }
+      }
+      return null;
+    }
+    let previewTimer=null;
+    function showPreview(star,cx,cy){
+      previewStarId=star.id;
+      let creatorInfo = (star.creatorName && star.creatorName !== localPeerName) ? `<div class="creator-tag">from ${star.creatorName}</div>` : "";
+      let short=star.text.length>85?star.text.slice(0,82)+"…":star.text;
+      document.getElementById("etherPreview").innerHTML = creatorInfo + short;
+      let left=Math.min(Math.max(cx-95,12),w-210), top=Math.min(Math.max(cy-85,28),h-100);
+      document.getElementById("etherPreview").style.left=left+"px"; document.getElementById("etherPreview").style.top=top+"px";
+      document.getElementById("etherPreview").classList.add("visible");
+      if(previewTimer) clearTimeout(previewTimer);
+      previewTimer=setTimeout(()=>{ document.getElementById("etherPreview").classList.remove("visible"); previewStarId=null; },1200);
+    }
+    function openView(id){
+      activeId=id;
+      let star=notes.find(s=>s.id===id);
+      if(star){
+        star.opened=(star.opened||0)+1; star.mass=computeMass(star);
+        document.getElementById("viewCreator").textContent = star.creatorName ? `created by ${star.creatorName}` : '';
+        document.getElementById("memoryViewer").innerText=star.text;
+        let modal=document.getElementById("viewModal");
+        modal.style.display="flex"; requestAnimationFrame(()=>modal.classList.add("visible"));
+        saveNoteToFirestore(star);
+      }
+    }
+    function openEdit(id){
+      activeId=id;
+      let star=notes.find(s=>s.id===id);
+      if(star){
+        document.getElementById("editCreator").textContent = star.creatorName ? `created by ${star.creatorName}` : '';
+        document.getElementById("memoryEditor").value=star.text;
+        let modal=document.getElementById("editModal");
+        modal.style.display="flex"; requestAnimationFrame(()=>modal.classList.add("visible"));
+        document.getElementById("memoryEditor").focus();
+      }
+    }
+    function closeModal(modal){ modal.classList.remove("visible"); setTimeout(()=>modal.style.display="none",250); }
+    function saveEdit(){
+      if(activeId){
+        let star=notes.find(s=>s.id===activeId);
+        if(star){
+          star.text=document.getElementById("memoryEditor").value;
+          if(!star.text.trim()) star.text="✦ a distant echo";
+          star.mass=computeMass(star);
+          saveNoteToFirestore(star);
+        }
+        activeId=null;
+      }
+      closeModal(document.getElementById("editModal"));
+    }
+
+    document.getElementById("novaBtn").onclick = () => { let newStar = createMemory(""); openEdit(newStar.id); };
+    document.getElementById("saveMemoryBtn").onclick = saveEdit;
+    document.getElementById("cancelEditBtn").onclick = () => closeModal(document.getElementById("editModal"));
+    document.getElementById("deleteMemoryBtn").onclick = () => { if(activeId){ deleteNote(activeId); activeId=null; closeModal(document.getElementById("editModal")); } };
+    document.getElementById("closeViewBtn").onclick = () => closeModal(document.getElementById("viewModal"));
+    document.getElementById("editFromViewBtn").onclick = () => { closeModal(document.getElementById("viewModal")); setTimeout(()=>{ if(activeId) openEdit(activeId); },100); };
+    document.getElementById("shareBtn").onclick = () => { navigator.clipboard.writeText(window.location.href); showToast("✨ galaxy link copied — share this page!"); };
+    document.getElementById("clearBtn").onclick = () => {
+      document.getElementById("clearConfirmModal").style.display = "flex";
+      requestAnimationFrame(() => document.getElementById("clearConfirmModal").classList.add("visible"));
+    };
+    document.getElementById("confirmClearBtn").onclick = () => { clearAllNotes(); closeModal(document.getElementById("clearConfirmModal")); };
+    document.getElementById("cancelClearBtn").onclick = () => closeModal(document.getElementById("clearConfirmModal"));
+
+    const ageSlider = document.getElementById("ageSlider");
+    const ageLabel = document.getElementById("ageLabel");
+    ageSlider.addEventListener("input", () => {
+      const val = parseFloat(ageSlider.value);
+      ageOffset = (1 - val) * MAX_AGE_MS;
+      if (val > 0.9) ageLabel.textContent = "newborn";
+      else if (val > 0.5) ageLabel.textContent = "young";
+      else if (val > 0.2) ageLabel.textContent = "aging";
+      else ageLabel.textContent = "ancient";
+    });
+
+    // Pan / zoom
+    let isPanning = false, panStart = {x:0,y:0}, panCameraStart = {x:0,y:0};
+    let isMousePanning = false, mousePanStart = {x:0,y:0}, mouseCameraStart = {x:0,y:0};
+    let longPressTimer=null, lastTap=0;
+    let pinchDist = null;
+
+    canvas.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      let delta = e.deltaY > 0 ? 0.9 : 1.1;
+      camera.targetZoom = Math.min(2.5, Math.max(0.45, camera.targetZoom * delta));
+    }, { passive: false });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+      const step = 30 / camera.zoom;
+      if (e.key === "ArrowUp") { camera.y += step; e.preventDefault(); }
+      if (e.key === "ArrowDown") { camera.y -= step; e.preventDefault(); }
+      if (e.key === "ArrowLeft") { camera.x += step; e.preventDefault(); }
+      if (e.key === "ArrowRight") { camera.x -= step; e.preventDefault(); }
+    });
+
+    function startPan(cx,cy) { isPanning=true; panStart={x:cx,y:cy}; panCameraStart={x:camera.x,y:camera.y}; }
+    function movePan(cx,cy) { if(!isPanning)return; let dx=cx-panStart.x, dy=cy-panStart.y; camera.x=panCameraStart.x+dx/camera.zoom; camera.y=panCameraStart.y+dy/camera.zoom; }
+    function endPan() { isPanning=false; }
+    function startMousePan(cx,cy) { isMousePanning=true; mousePanStart={x:cx,y:cy}; mouseCameraStart={x:camera.x,y:camera.y}; }
+    function moveMousePan(cx,cy) { if(!isMousePanning)return; let dx=cx-mousePanStart.x, dy=cy-mousePanStart.y; camera.x=mouseCameraStart.x+dx/camera.zoom; camera.y=mouseCameraStart.y+dy/camera.zoom; }
+    function endMousePan() { isMousePanning=false; }
+
+    canvas.addEventListener("touchstart",(e)=>{
+      e.preventDefault();
+      if(e.touches.length!==1){ endPan(); return; }
+      let touch = e.touches[0];
+      let star = hitTest(touch.clientX, touch.clientY);
+      let constellation = hitTestConstellationCentroid(touch.clientX, touch.clientY);
+      if (constellation && constellation.starIds.length>=3) {
+        promptConstellationName(constellation); endPan(); return;
+      }
+      if(star){
+        showPreview(star, touch.clientX, touch.clientY);
+        let now = Date.now();
+        if(now-lastTap<300){
+          clearTimeout(longPressTimer);
+          openEdit(star.id);
+          lastTap=0;
+        }else{
+          lastTap=now;
+          longPressTimer=setTimeout(()=>{
+            startFollowing(star.id);
+            longPressTimer=null;
+          },500);
+        }
+        endPan();
+      }else{
+        startPan(touch.clientX, touch.clientY);
+        lastTap=0;
+      }
+    });
+
+    canvas.addEventListener("touchmove",(e)=>{
+      e.preventDefault();
+      if(e.touches.length===2){
+        let dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY;
+        let dist=Math.hypot(dx,dy);
+        if(pinchDist===null) pinchDist=dist;
+        else{ let scale=dist/pinchDist; camera.targetZoom=Math.min(2.5,Math.max(0.45,camera.targetZoom*scale)); pinchDist=dist; }
+        endPan();
+      }else if(e.touches.length===1&&isPanning){
+        movePan(e.touches[0].clientX,e.touches[0].clientY);
+        if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer=null; }
+      }
+      if(e.touches.length!==2) pinchDist=null;
+    });
+
+    canvas.addEventListener("touchend",(e)=>{
+      e.preventDefault();
+      if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer=null; }
+      endPan(); pinchDist=null;
+    });
+
+    canvas.addEventListener("touchcancel",()=>{ if(longPressTimer)clearTimeout(longPressTimer); endPan(); pinchDist=null; });
+
+    // Mouse handlers
+    let lastMouseDownStar = null;
+    let lastMouseDownTime = 0;
+    let mouseLongPressTimer = null;
+
+    canvas.addEventListener("mousedown",(e)=>{
+      let star = hitTest(e.clientX, e.clientY);
+      if(star){
+        showPreview(star, e.clientX, e.clientY);
+        if (lastMouseDownStar && lastMouseDownStar.id === star.id && Date.now() - lastMouseDownTime < 300) {
+          clearTimeout(mouseLongPressTimer);
+          mouseLongPressTimer = null;
+          openEdit(star.id);
+          lastMouseDownStar = null;
+          endMousePan();
+          return;
+        }
+        if (mouseLongPressTimer) clearTimeout(mouseLongPressTimer);
+        mouseLongPressTimer = setTimeout(() => {
+          startFollowing(star.id);
+          mouseLongPressTimer = null;
+        }, 500);
+        lastMouseDownStar = star;
+        lastMouseDownTime = Date.now();
+        endMousePan();
+      } else {
+        startMousePan(e.clientX, e.clientY);
+        lastMouseDownStar = null;
+        if (mouseLongPressTimer) { clearTimeout(mouseLongPressTimer); mouseLongPressTimer = null; }
+      }
+    });
+
+    window.addEventListener("mousemove",(e)=>{
+      if (isMousePanning) {
+        moveMousePan(e.clientX, e.clientY);
+        if (mouseLongPressTimer) { clearTimeout(mouseLongPressTimer); mouseLongPressTimer = null; }
+      }
+    });
+
+    window.addEventListener("mouseup",()=>{
+      if (mouseLongPressTimer) {
+        clearTimeout(mouseLongPressTimer);
+        mouseLongPressTimer = null;
+      }
+      endMousePan();
+    });
+
+    canvas.addEventListener("dragstart",e=>e.preventDefault());
+
+    function resize() {
+      w=innerWidth; h=innerHeight;
+      canvas.width=w*devicePixelRatio; canvas.height=h*devicePixelRatio;
+      canvas.style.width=w+"px"; canvas.style.height=h+"px";
+      ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+    }
+    window.addEventListener("resize",resize);
+
+    function animate(){
+      simulate();
+      render();
+      requestAnimationFrame(animate);
+    }
+
+    function init() {
+      resize();
+      listenToFirestore();
+      updateCounter();
+      nextShootingStar = 60;
+    }
+    init();
+    animate();
   }
 </script>
 </body>
