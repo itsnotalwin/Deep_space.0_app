@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>✦ SYNC CONSTELLATION · MAX VISUALS</title>
+  <title>✦ SYNC CONSTELLATION · CLEAN UI</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
     html, body { width:100%; height:100%; overflow:hidden; background:#010108; }
@@ -14,12 +14,84 @@
     canvas { position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; background:#010108; }
     canvas:active { cursor:grabbing; }
 
+    /* UI visibility toggled via .ui-hidden on #app */
+    #app.ui-hidden .hud,
+    #app.ui-hidden .age-bar,
+    #app.ui-hidden .add,
+    #app.ui-hidden .release-btn,
+    #app.ui-hidden .vignette,
+    #app.ui-hidden .notification,
+    #app.ui-hidden .preview {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    /* Keep the release button hidden unless following, even when UI is shown */
+    .release-btn { display:none; }
+    .release-btn.visible { display:flex; }
+
+    /* HUD */
+    .hud {
+      position:absolute; top:max(20px, env(safe-area-inset-top)); left:24px; right:24px;
+      display:flex; justify-content:space-between; align-items:center; z-index:100;
+      background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+      padding:10px 24px; border-radius:60px; border:0.5px solid rgba(100,120,180,0.25);
+      box-shadow:0 8px 20px rgba(0,0,0,0.4);
+      transition: opacity 0.3s ease;
+      cursor: pointer; /* make whole HUD clickable for toggle */
+    }
+    .title { font-size:11px; font-weight:400; letter-spacing:0.5em; color:rgba(200,210,240,0.85); text-shadow:0 0 12px rgba(100,140,220,0.4); text-transform:uppercase; }
+    .meta { font-size:11px; font-weight:450; color:rgba(180,195,230,0.8); background:rgba(0,0,0,0.35); padding:6px 16px; border-radius:40px; backdrop-filter:blur(8px); letter-spacing:0.3px; display:flex; align-items:center; gap:6px; }
+    .star-count-icon { display:inline-block; width:8px; height:8px; background:#aaccff; border-radius:50%; box-shadow:0 0 8px #aaccff; margin-right:2px; animation: pulseIcon 2s ease-in-out infinite; }
+    @keyframes pulseIcon { 0%,100% { box-shadow:0 0 8px #aaccff; } 50% { box-shadow:0 0 20px #cce0ff; } }
+
+    /* Age bar */
+    .age-bar {
+      position:absolute; bottom:max(30px, env(safe-area-inset-bottom, 30px)); left:50%; transform:translateX(-50%);
+      z-index:98; background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
+      border-radius:60px; padding:6px 16px; display:flex; align-items:center; gap:10px;
+      border:0.5px solid rgba(100,120,180,0.2); box-shadow:0 8px 20px rgba(0,0,0,0.3);
+      transition: opacity 0.3s ease;
+    }
+    .age-label { font-size:9px; color:rgba(180,190,230,0.9); white-space:nowrap; min-width:70px; text-align:center; letter-spacing:0.3px; }
+    input[type="range"].age-slider { width:120px; height:4px; -webkit-appearance:none; background:rgba(255,255,255,0.08); border-radius:4px; outline:none; }
+    input[type="range"].age-slider::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#c0d0ff,#3a4a6a); border:1px solid rgba(255,255,255,0.2); box-shadow:0 0 15px rgba(120,160,255,0.5); cursor:pointer; transition:transform 0.1s; }
+    input[type="range"].age-slider::-webkit-slider-thumb:active { transform:scale(1.2); }
+
+    /* Add button */
+    .add {
+      position:absolute; right:28px; bottom:max(100px, calc(env(safe-area-inset-bottom) + 100px));
+      width:62px; height:62px; border-radius:62px;
+      background:radial-gradient(circle at 35% 35%,rgba(90,110,170,0.7),rgba(20,20,40,0.9));
+      backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); color:#e6f0ff; font-size:32px;
+      border:0.5px solid rgba(140,160,220,0.3); box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 0 1px rgba(120,140,200,0.2);
+      z-index:120; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1), opacity 0.3s ease;
+      animation: btnGlow 3s ease-in-out infinite;
+    }
+    @keyframes btnGlow { 0%,100% { box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 0 1px rgba(120,140,200,0.2); } 50% { box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 25px rgba(150,180,255,0.6); } }
+    .add:active { transform:scale(0.9); background:radial-gradient(circle at 35% 35%,rgba(120,140,210,0.8),rgba(30,30,55,0.95)); }
+
+    /* Release button */
+    .release-btn {
+      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      width:48px; height:48px; border-radius:48px;
+      background:rgba(15,15,30,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+      border:0.5px solid rgba(100,120,180,0.3); color:#c8d6ff; font-size:20px;
+      z-index:150; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      box-shadow:0 6px 15px rgba(0,0,0,0.5);
+      transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1), opacity 0.3s ease;
+    }
+    .release-btn:active { transform:translate(-50%,-50%) scale(0.9); background:rgba(30,30,55,0.8); }
+
+    /* Vignette */
     .vignette {
       position:absolute; inset:0; pointer-events:none; z-index:10;
       background:
         radial-gradient(ellipse at 50% 50%, transparent 25%, rgba(0,0,0,0.8) 90%),
         radial-gradient(ellipse at 30% 30%, rgba(200,120,255,0.15) 0%, transparent 50%),
         radial-gradient(ellipse at 70% 70%, rgba(255,160,80,0.1) 0%, transparent 50%);
+      transition: opacity 0.3s ease;
     }
     .vignette::after {
       content:''; position:absolute; inset:0;
@@ -30,32 +102,7 @@
     }
     @keyframes grain { 0%,100% { transform: translate(0,0); } 10% { transform: translate(-5%,-2%); } 20% { transform: translate(3%,1%); } 30% { transform: translate(-1%,4%); } 40% { transform: translate(2%,-3%); } 50% { transform: translate(-4%,-1%); } 60% { transform: translate(1%,2%); } 70% { transform: translate(-2%,-4%); } 80% { transform: translate(3%,2%); } 90% { transform: translate(-1%,1%); } }
 
-    .hud { position:absolute; top:max(20px, env(safe-area-inset-top)); left:24px; right:24px; display:flex; justify-content:space-between; align-items:center; z-index:100; background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); padding:10px 24px; border-radius:60px; border:0.5px solid rgba(100,120,180,0.25); box-shadow:0 8px 20px rgba(0,0,0,0.4); animation: hudGlow 4s ease-in-out infinite alternate; }
-    @keyframes hudGlow { 0% { box-shadow:0 8px 20px rgba(0,0,0,0.4), 0 0 15px rgba(100,140,220,0.2); } 100% { box-shadow:0 8px 20px rgba(0,0,0,0.4), 0 0 30px rgba(130,160,255,0.5); } }
-    .title { font-size:11px; font-weight:400; letter-spacing:0.5em; color:rgba(200,210,240,0.85); text-shadow:0 0 12px rgba(100,140,220,0.4); text-transform:uppercase; }
-    .meta { font-size:11px; font-weight:450; color:rgba(180,195,230,0.8); background:rgba(0,0,0,0.35); padding:6px 16px; border-radius:40px; backdrop-filter:blur(8px); letter-spacing:0.3px; display:flex; align-items:center; gap:6px; }
-    .star-count-icon { display:inline-block; width:8px; height:8px; background:#aaccff; border-radius:50%; box-shadow:0 0 8px #aaccff; margin-right:2px; animation: pulseIcon 2s ease-in-out infinite; }
-    @keyframes pulseIcon { 0%,100% { box-shadow:0 0 8px #aaccff; } 50% { box-shadow:0 0 20px #cce0ff; } }
-
-    .clear-btn { position:absolute; top:max(20px, env(safe-area-inset-top)); left:24px; width:44px; height:44px; border-radius:44px; background:rgba(15,15,30,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:0.5px solid rgba(255,100,100,0.4); color:#ffaaaa; font-size:20px; z-index:120; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 15px rgba(0,0,0,0.5); transition:all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); margin-top:60px; }
-    .clear-btn:active { transform:scale(0.9); background:rgba(50,20,20,0.8); }
-
-    .age-bar { position:absolute; bottom:max(30px, env(safe-area-inset-bottom, 30px)); left:50%; transform:translateX(-50%); z-index:98; background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-radius:60px; padding:6px 16px; display:flex; align-items:center; gap:10px; border:0.5px solid rgba(100,120,180,0.2); box-shadow:0 8px 20px rgba(0,0,0,0.3); }
-    .age-label { font-size:9px; color:rgba(180,190,230,0.9); white-space:nowrap; min-width:70px; text-align:center; letter-spacing:0.3px; }
-    input[type="range"].age-slider { width:120px; height:4px; -webkit-appearance:none; background:rgba(255,255,255,0.08); border-radius:4px; outline:none; }
-    input[type="range"].age-slider::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#c0d0ff,#3a4a6a); border:1px solid rgba(255,255,255,0.2); box-shadow:0 0 15px rgba(120,160,255,0.5); cursor:pointer; transition:transform 0.1s; }
-    input[type="range"].age-slider::-webkit-slider-thumb:active { transform:scale(1.2); }
-
-    .add { position:absolute; right:28px; bottom:max(100px, calc(env(safe-area-inset-bottom) + 100px)); width:62px; height:62px; border-radius:62px; background:radial-gradient(circle at 35% 35%,rgba(90,110,170,0.7),rgba(20,20,40,0.9)); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); color:#e6f0ff; font-size:32px; border:0.5px solid rgba(140,160,220,0.3); box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 0 1px rgba(120,140,200,0.2); z-index:120; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); animation: btnGlow 3s ease-in-out infinite; }
-    @keyframes btnGlow { 0%,100% { box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 0 1px rgba(120,140,200,0.2); } 50% { box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 25px rgba(150,180,255,0.6); } }
-    .add:active { transform:scale(0.9); background:radial-gradient(circle at 35% 35%,rgba(120,140,210,0.8),rgba(30,30,55,0.95)); }
-    .sync-btn,.share-btn,.release-btn { position:absolute; width:48px; height:48px; border-radius:48px; background:rgba(15,15,30,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:0.5px solid rgba(100,120,180,0.3); color:#c8d6ff; font-size:20px; z-index:120; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 15px rgba(0,0,0,0.5); transition:all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); }
-    .sync-btn:active,.share-btn:active,.release-btn:active { transform:scale(0.9); background:rgba(30,30,55,0.8); }
-    .sync-btn { right:28px; top:100px; display:none; }
-    .share-btn { right:28px; bottom:max(180px, calc(env(safe-area-inset-bottom) + 180px)); }
-    .release-btn { top:50%; left:50%; transform:translate(-50%,-50%); display:none; font-size:18px; pointer-events:all; z-index:150; }
-    .release-btn.visible { display:flex; }
-
+    /* Modals (unchanged) */
     .modal { position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,2,12,0.75); backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px); z-index:300; opacity:0; transition:opacity 0.35s cubic-bezier(0.2,0.95,0.4,1); }
     .modal.visible { opacity:1; }
     .panel { width:86%; max-width:440px; background:rgba(8,8,22,0.8); backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); border:1px solid rgba(100,120,180,0.3); border-radius:52px; padding:30px 26px; transform:scale(0.96); transition:transform 0.35s cubic-bezier(0.16,1,0.3,1); box-shadow:0 25px 50px rgba(0,0,0,0.7); }
@@ -81,19 +128,21 @@
 <div id="app">
   <canvas id="cosmicCanvas"></canvas>
   <div class="vignette"></div>
-  <div class="hud"><div class="title">✦ SYNC CONSTELLATION</div><div class="meta" id="counterMeta"><span class="star-count-icon"></span> 0 stars</div></div>
-  <button class="clear-btn" id="clearBtn">🗑</button>
+  <!-- HUD is now the only top bar, and it toggles UI visibility when clicked -->
+  <div class="hud" id="hudToggle">
+    <div class="title">✦ SYNC CONSTELLATION</div>
+    <div class="meta" id="counterMeta"><span class="star-count-icon"></span> 0 stars</div>
+  </div>
   <div class="age-bar">
     <span class="age-label" id="ageLabel">newborn</span>
     <input type="range" class="age-slider" id="ageSlider" min="0" max="1" step="0.01" value="1">
   </div>
   <button class="add" id="novaBtn">✧</button>
-  <button class="sync-btn" id="syncBtn">🔁</button>
-  <button class="share-btn" id="shareBtn">🔗</button>
   <button class="release-btn" id="releaseBtn">⟳</button>
   <div class="preview" id="etherPreview"></div>
   <div class="notification" id="toastMsg"></div>
 
+  <!-- Modals (unchanged) -->
   <div class="modal" id="viewModal"><div class="panel"><div id="viewCreator" class="creator-info"></div><div class="viewer" id="memoryViewer"></div><div class="actions"><button id="closeViewBtn">close</button><button id="editFromViewBtn">edit</button></div></div></div>
   <div class="modal" id="editModal"><div class="panel"><div id="editCreator" class="creator-info"></div><textarea id="memoryEditor" placeholder="...a thought drifts..."></textarea><div class="actions"><button id="saveMemoryBtn">engrave</button><button id="cancelEditBtn">drift</button><button id="deleteMemoryBtn" class="delete">obliterate</button></div></div></div>
   <div class="modal" id="constellationNameModal"><div class="panel"><div style="text-align:center; color:#d0d8ff; margin-bottom:10px;">name this constellation</div><input type="text" class="name-input" id="constellationNameInput" placeholder="constellation name"><div class="actions"><button id="saveConstellationName">save</button><button id="cancelConstellationName">cancel</button></div></div></div>
@@ -159,6 +208,24 @@
   }
 
   function initApp() {
+    // UI toggle
+    const app = document.getElementById('app');
+    const hudToggle = document.getElementById('hudToggle');
+    let uiHidden = false;
+    hudToggle.addEventListener('click', (e) => {
+      // Don't toggle if clicking on the counter meta itself (to allow future interactions)
+      if (e.target.closest('.meta')) return;
+      uiHidden = !uiHidden;
+      if (uiHidden) {
+        app.classList.add('ui-hidden');
+      } else {
+        app.classList.remove('ui-hidden');
+      }
+    });
+
+    // Clear button removed; if needed, we can keep the modal for clearing via another method, but the button is gone.
+    // Share button removed.
+
     let notes = [];
     let activeId = null;
     let camera = { x: 0, y: 0, zoom: 1.0, targetZoom: 1.0 };
@@ -188,7 +255,7 @@
     let ageOffset = 0;
     let birthFlashes = [];
 
-    // --- MAX BACKGROUND LAYERS ---
+    // --- MAX BACKGROUND LAYERS (unchanged) ---
     const createStarLayer = (count, spread, minSize, maxSize, minBright, maxBright, colorRange, parallax) => {
       let layer = [];
       for (let i=0; i<count; i++) {
@@ -235,7 +302,6 @@
 
     let sparkles = [];
     let comets = [];
-    let asteroidBelts = [];
 
     function drawStarLayer(layer) {
       for (let s of layer) {
@@ -323,7 +389,7 @@
         }
         if (!sun._asteroidBelt) {
           if (Math.random() < 0.3) {
-            sun._asteroidBelt = { inner: sun.radius*3, outer: sun.radius*5, count: 40 + Math.floor(Math.random()*40), particles: [] };
+            sun._asteroidBelt = { inner: sun.radius*3, outer: sun.radius*5, count: 40 + Math.floor(Math.random()*40) };
           }
         }
       }
@@ -551,7 +617,6 @@
         } else { stopFollowing(); }
       }
 
-      // Sparkle update
       for (let i=sparkles.length-1; i>=0; i--) {
         sparkles[i].timeLeft -= 0.016;
         if (sparkles[i].timeLeft <= 0) sparkles.splice(i,1);
@@ -561,7 +626,6 @@
         sparkles.push({ x: star.x, y: star.y, timeLeft: 0.5 + Math.random()*0.5 });
       }
 
-      // Comet spawning
       if (Math.random() < 0.001) {
         let angle = Math.random() * Math.PI * 2;
         let speed = 2 + Math.random() * 3;
@@ -613,7 +677,6 @@
       drawStarLayer(starLayers[2]);
       drawStarLayer(starLayers[3]);
 
-      // Nebulae
       for (let gc of galacticClusters) {
         let offsetX = Math.cos(Date.now()*0.0001 + gc.x*0.01) * 25;
         let offsetY = Math.sin(Date.now()*0.0001 + gc.y*0.01) * 25;
@@ -634,7 +697,6 @@
         }
       }
 
-      // Asteroid belts
       for (let sun of notes.filter(n => n.isSun)) {
         if (sun._asteroidBelt) {
           let belt = sun._asteroidBelt;
@@ -649,10 +711,6 @@
             ctx.fill();
           }
         }
-      }
-
-      // Orbits
-      for (let sun of notes.filter(n => n.isSun)) {
         let planets = notes.filter(n => n.orbitingSunId === sun.id);
         for (let planet of planets) {
           ctx.beginPath();
@@ -666,7 +724,6 @@
         }
       }
 
-      // Constellation lines
       if (notes.length > 1) {
         for (let i=0; i<notes.length; i++) {
           for (let j=i+1; j<notes.length; j++) {
@@ -714,7 +771,6 @@
         ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(flash.x, flash.y, radius, 0, Math.PI*2); ctx.fill();
       }
 
-      // Star trails
       for (let star of notes) {
         if (star.trail && star.trail.length > 1) {
           let age = Math.max(0, Date.now() - star.created + ageOffset);
@@ -733,7 +789,6 @@
         }
       }
 
-      // Stars
       for (let star of notes) {
         let age = Math.max(0, Date.now() - star.created + ageOffset);
         let colors = starColor(age);
@@ -742,7 +797,6 @@
         if (star.isSun) {
           size = star.radius + pulse * 3;
           colors = { core:"#fff8e0", glow:"rgba(255,240,180,0.8)" };
-          // Volumetric rays
           ctx.save();
           ctx.globalAlpha = 0.15;
           for (let ray=0; ray<8; ray++) {
@@ -763,7 +817,6 @@
             ctx.fill();
           }
           ctx.restore();
-          // Shimmer motes
           if (camera.zoom > 0.8) {
             for (let m=0; m<3; m++) {
               let angle = Date.now()*0.002 + m*2.0;
@@ -807,7 +860,6 @@
         }
       }
 
-      // Sparkles
       for (let spark of sparkles) {
         let alpha = spark.timeLeft * 0.9;
         let radius = 2 + spark.timeLeft * 2;
@@ -821,7 +873,6 @@
         ctx.fill();
       }
 
-      // Comets
       for (let c of comets) {
         let tailX = c.x - c.vx * c.tailLength * 0.1;
         let tailY = c.y - c.vy * c.tailLength * 0.1;
@@ -848,7 +899,6 @@
 
     function showToast(msg) { document.getElementById("toastMsg").innerText=msg; document.getElementById("toastMsg").classList.add("show"); setTimeout(()=>document.getElementById("toastMsg").classList.remove("show"),2000); }
 
-    // Interaction (unchanged from last working version)
     function promptConstellationName(cluster) {
       document.getElementById("constellationNameInput").value = cluster.name || "";
       document.getElementById("constellationNameModal").style.display = "flex";
@@ -957,13 +1007,10 @@
     document.getElementById("deleteMemoryBtn").onclick = () => { if(activeId){ deleteNote(activeId); activeId=null; closeModal(document.getElementById("editModal")); } };
     document.getElementById("closeViewBtn").onclick = () => closeModal(document.getElementById("viewModal"));
     document.getElementById("editFromViewBtn").onclick = () => { closeModal(document.getElementById("viewModal")); setTimeout(()=>{ if(activeId) openEdit(activeId); },100); };
-    document.getElementById("shareBtn").onclick = () => { navigator.clipboard.writeText(window.location.href); showToast("✨ galaxy link copied — share this page!"); };
-    document.getElementById("clearBtn").onclick = () => {
-      document.getElementById("clearConfirmModal").style.display = "flex";
-      requestAnimationFrame(() => document.getElementById("clearConfirmModal").classList.add("visible"));
-    };
-    document.getElementById("confirmClearBtn").onclick = () => { clearAllNotes(); closeModal(document.getElementById("clearConfirmModal")); };
-    document.getElementById("cancelClearBtn").onclick = () => closeModal(document.getElementById("clearConfirmModal"));
+
+    // Clear confirmation modal is still accessible from a hidden button? We removed the clear button,
+    // but we can keep the modal and maybe later add a way to clear. For now, we just keep the modal but no trigger.
+    // We'll leave the confirmClearBtn etc. in the DOM but not accessible. That's fine.
 
     const ageSlider = document.getElementById("ageSlider");
     const ageLabel = document.getElementById("ageLabel");
@@ -1057,7 +1104,6 @@
 
     canvas.addEventListener("touchcancel",()=>{ if(longPressTimer)clearTimeout(longPressTimer); endPan(); pinchDist=null; });
 
-    // Mouse handlers
     let lastMouseDownStar = null;
     let lastMouseDownTime = 0;
     let mouseLongPressTimer = null;
