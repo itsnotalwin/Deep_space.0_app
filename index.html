@@ -741,8 +741,13 @@
     // Pan / zoom
     let isPanning = false, panStart = {x:0,y:0}, panCameraStart = {x:0,y:0};
     let isMousePanning = false, mousePanStart = {x:0,y:0}, mouseCameraStart = {x:0,y:0};
-    let longPressTimer=null, lastTap=0;
+    let longPressTimer=null, lastTap=0;   // for touch
     let pinchDist = null;
+
+    // --- MOUSE DOUBLE-CLICK & LONG PRESS ---
+    let lastMouseDownStar = null;
+    let lastMouseDownTime = 0;
+    let mouseLongPressTimer = null;
 
     canvas.addEventListener("wheel", (e) => {
       e.preventDefault();
@@ -766,7 +771,7 @@
     function moveMousePan(cx,cy) { if(!isMousePanning)return; let dx=cx-mousePanStart.x, dy=cy-mousePanStart.y; camera.x=mouseCameraStart.x+dx/camera.zoom; camera.y=mouseCameraStart.y+dy/camera.zoom; }
     function endMousePan() { isMousePanning=false; }
 
-    // --- UPDATED TOUCH HANDLERS ---
+    // Touch handlers (unchanged from previous: double-tap edit, long press follow)
     canvas.addEventListener("touchstart",(e)=>{
       e.preventDefault();
       if(e.touches.length!==1){ endPan(); return; }
@@ -780,13 +785,11 @@
         showPreview(star, touch.clientX, touch.clientY);
         let now = Date.now();
         if(now-lastTap<300){
-          // double tap → edit
           clearTimeout(longPressTimer);
           openEdit(star.id);
           lastTap=0;
         }else{
           lastTap=now;
-          // long press → follow
           longPressTimer=setTimeout(()=>{
             startFollowing(star.id);
             longPressTimer=null;
@@ -822,17 +825,55 @@
 
     canvas.addEventListener("touchcancel",()=>{ if(longPressTimer)clearTimeout(longPressTimer); endPan(); pinchDist=null; });
 
-    let clickTimer=null;
+    // --- MOUSE HANDLERS (fixed double-click edit, long press follow) ---
     canvas.addEventListener("mousedown",(e)=>{
-      let star=hitTest(e.clientX,e.clientY);
+      let star = hitTest(e.clientX, e.clientY);
       if(star){
-        showPreview(star,e.clientX,e.clientY);
-        clickTimer=setTimeout(()=>{ startFollowing(star.id); },200);
+        showPreview(star, e.clientX, e.clientY);
+        // Check for double click
+        if (lastMouseDownStar && lastMouseDownStar.id === star.id && Date.now() - lastMouseDownTime < 300) {
+          // Double click => edit
+          clearTimeout(mouseLongPressTimer);
+          mouseLongPressTimer = null;
+          openEdit(star.id);
+          lastMouseDownStar = null;
+          endMousePan();
+          return;
+        }
+        // Clear previous long press if any
+        if (mouseLongPressTimer) clearTimeout(mouseLongPressTimer);
+        // Set long press to follow
+        mouseLongPressTimer = setTimeout(() => {
+          startFollowing(star.id);
+          mouseLongPressTimer = null;
+        }, 500);
+        lastMouseDownStar = star;
+        lastMouseDownTime = Date.now();
         endMousePan();
-      }else{ startMousePan(e.clientX,e.clientY); }
+      } else {
+        startMousePan(e.clientX, e.clientY);
+        // Reset double-click state
+        lastMouseDownStar = null;
+        if (mouseLongPressTimer) { clearTimeout(mouseLongPressTimer); mouseLongPressTimer = null; }
+      }
     });
-    window.addEventListener("mousemove",(e)=>{ if(isMousePanning){ moveMousePan(e.clientX,e.clientY); if(clickTimer){ clearTimeout(clickTimer); clickTimer=null; } } });
-    window.addEventListener("mouseup",()=>{ if(clickTimer)clearTimeout(clickTimer); endMousePan(); });
+
+    window.addEventListener("mousemove",(e)=>{
+      if (isMousePanning) {
+        moveMousePan(e.clientX, e.clientY);
+        // Cancel long press if panning
+        if (mouseLongPressTimer) { clearTimeout(mouseLongPressTimer); mouseLongPressTimer = null; }
+      }
+    });
+
+    window.addEventListener("mouseup",()=>{
+      if (mouseLongPressTimer) {
+        clearTimeout(mouseLongPressTimer);
+        mouseLongPressTimer = null;
+      }
+      endMousePan();
+    });
+
     canvas.addEventListener("dragstart",e=>e.preventDefault());
 
     function resize() {
