@@ -32,8 +32,6 @@
     .share-btn { right:28px; bottom:180px; }
     .release-btn { top:50%; left:50%; transform:translate(-50%,-50%); display:none; font-size:18px; pointer-events:all; z-index:150; }
     .release-btn.visible { display:flex; }
-    .instructions { position:absolute; bottom:100px; right:100px; font-size:9px; color:rgba(160,170,210,0.6); background:rgba(0,0,0,0.45); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); padding:8px 16px; border-radius:30px; pointer-events:none; letter-spacing:0.3px; border:0.5px solid rgba(100,120,180,0.15); z-index:99; transition:all 0.4s; }
-    .instructions.following { color:rgba(210,190,250,0.9); background:rgba(30,20,50,0.7); }
 
     .modal { position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,2,12,0.75); backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px); z-index:300; opacity:0; transition:opacity 0.35s cubic-bezier(0.2,0.95,0.4,1); }
     .modal.visible { opacity:1; }
@@ -66,7 +64,6 @@
     <span class="age-label" id="ageLabel">newborn</span>
     <input type="range" class="age-slider" id="ageSlider" min="0" max="1" step="0.01" value="1">
   </div>
-  <div class="instructions" id="instructionsBar">drag → pan • tap → glimpse • double‑tap → follow • long‑press → edit</div>
   <button class="add" id="novaBtn">✧</button>
   <button class="sync-btn" id="syncBtn">🔁</button>
   <button class="share-btn" id="shareBtn">🔗</button>
@@ -635,14 +632,10 @@
     function startFollowing(starId) {
       followingStarId = starId;
       document.getElementById("releaseBtn").classList.add("visible");
-      document.getElementById("instructionsBar").classList.add("following");
-      document.getElementById("instructionsBar").innerText = "following star · tap ⟳ to release";
     }
     function stopFollowing() {
       followingStarId = null;
       document.getElementById("releaseBtn").classList.remove("visible");
-      document.getElementById("instructionsBar").classList.remove("following");
-      document.getElementById("instructionsBar").innerText = "drag → pan • tap → glimpse • double‑tap → follow • long‑press → edit";
     }
     document.getElementById("releaseBtn").addEventListener("click", stopFollowing);
 
@@ -749,7 +742,7 @@
     let isPanning = false, panStart = {x:0,y:0}, panCameraStart = {x:0,y:0};
     let isMousePanning = false, mousePanStart = {x:0,y:0}, mouseCameraStart = {x:0,y:0};
     let longPressTimer=null, lastTap=0;
-    let pinchDist = null;  // <-- FIXED: added declaration
+    let pinchDist = null;
 
     canvas.addEventListener("wheel", (e) => {
       e.preventDefault();
@@ -773,6 +766,7 @@
     function moveMousePan(cx,cy) { if(!isMousePanning)return; let dx=cx-mousePanStart.x, dy=cy-mousePanStart.y; camera.x=mouseCameraStart.x+dx/camera.zoom; camera.y=mouseCameraStart.y+dy/camera.zoom; }
     function endMousePan() { isMousePanning=false; }
 
+    // --- UPDATED TOUCH HANDLERS ---
     canvas.addEventListener("touchstart",(e)=>{
       e.preventDefault();
       if(e.touches.length!==1){ endPan(); return; }
@@ -786,13 +780,17 @@
         showPreview(star, touch.clientX, touch.clientY);
         let now = Date.now();
         if(now-lastTap<300){
+          // double tap → edit
           clearTimeout(longPressTimer);
-          if(followingStarId===star.id) stopFollowing();
-          else startFollowing(star.id);
+          openEdit(star.id);
           lastTap=0;
         }else{
           lastTap=now;
-          longPressTimer=setTimeout(()=>{ openEdit(star.id); longPressTimer=null; },500);
+          // long press → follow
+          longPressTimer=setTimeout(()=>{
+            startFollowing(star.id);
+            longPressTimer=null;
+          },500);
         }
         endPan();
       }else{
@@ -829,7 +827,7 @@
       let star=hitTest(e.clientX,e.clientY);
       if(star){
         showPreview(star,e.clientX,e.clientY);
-        clickTimer=setTimeout(()=>{ if(followingStarId===star.id) stopFollowing(); else startFollowing(star.id); },200);
+        clickTimer=setTimeout(()=>{ startFollowing(star.id); },200);
         endMousePan();
       }else{ startMousePan(e.clientX,e.clientY); }
     });
