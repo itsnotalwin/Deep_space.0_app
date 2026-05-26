@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>✦ SYNC CONSTELLATION · FIXED</title>
+  <title>✦ SYNC CONSTELLATION · FINAL</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
     body { width:100%; height:100%; overflow:hidden; background:#03030a; font-family:'Segoe UI',system-ui,-apple-system,sans-serif; position:fixed; inset:0; }
@@ -18,19 +18,19 @@
     .clear-btn { position:absolute; top:20px; left:24px; width:44px; height:44px; border-radius:44px; background:rgba(15,15,30,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:0.5px solid rgba(255,100,100,0.4); color:#ffaaaa; font-size:20px; z-index:120; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 15px rgba(0,0,0,0.5); transition:all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); margin-top:60px; }
     .clear-btn:active { transform:scale(0.9); background:rgba(50,20,20,0.8); }
 
-    .controls { position:absolute; bottom:30px; left:50%; transform:translateX(-50%); z-index:98; pointer-events:none; }
-    .timeline-container { background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-radius:60px; padding:8px 20px; pointer-events:auto; border:0.5px solid rgba(100,120,180,0.2); box-shadow:0 8px 20px rgba(0,0,0,0.3); display:flex; align-items:center; gap:12px; width:fit-content; }
-    .timeline-label { font-size:9px; font-weight:500; color:rgba(180,190,230,0.8); white-space:nowrap; letter-spacing:0.3px; }
-    input[type="range"] { width:160px; height:4px; -webkit-appearance:none; background:rgba(255,255,255,0.08); border-radius:4px; outline:none; }
-    input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#c0d0ff,#3a4a6a); border:1px solid rgba(255,255,255,0.2); box-shadow:0 0 15px rgba(120,160,255,0.5); cursor:pointer; transition:transform 0.1s; }
-    input[type="range"]::-webkit-slider-thumb:active { transform:scale(1.2); }
+    /* new age slider bar */
+    .age-bar { position:absolute; bottom:30px; left:50%; transform:translateX(-50%); z-index:98; background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-radius:60px; padding:6px 16px; display:flex; align-items:center; gap:10px; border:0.5px solid rgba(100,120,180,0.2); box-shadow:0 8px 20px rgba(0,0,0,0.3); }
+    .age-label { font-size:9px; color:rgba(180,190,230,0.9); white-space:nowrap; min-width:70px; text-align:center; letter-spacing:0.3px; }
+    input[type="range"].age-slider { width:120px; height:4px; -webkit-appearance:none; background:rgba(255,255,255,0.08); border-radius:4px; outline:none; }
+    input[type="range"].age-slider::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#c0d0ff,#3a4a6a); border:1px solid rgba(255,255,255,0.2); box-shadow:0 0 15px rgba(120,160,255,0.5); cursor:pointer; transition:transform 0.1s; }
+    input[type="range"].age-slider::-webkit-slider-thumb:active { transform:scale(1.2); }
 
     .add { position:absolute; right:28px; bottom:100px; width:62px; height:62px; border-radius:62px; background:radial-gradient(circle at 35% 35%,rgba(90,110,170,0.7),rgba(20,20,40,0.9)); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); color:#e6f0ff; font-size:32px; border:0.5px solid rgba(140,160,220,0.3); box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 0 1px rgba(120,140,200,0.2); z-index:120; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); }
     .add:active { transform:scale(0.9); background:radial-gradient(circle at 35% 35%,rgba(120,140,210,0.8),rgba(30,30,55,0.95)); }
-    .sync-btn,.share-link-btn,.release-btn { position:absolute; width:48px; height:48px; border-radius:48px; background:rgba(15,15,30,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:0.5px solid rgba(100,120,180,0.3); color:#c8d6ff; font-size:20px; z-index:120; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 15px rgba(0,0,0,0.5); transition:all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); }
-    .sync-btn:active,.share-link-btn:active,.release-btn:active { transform:scale(0.9); background:rgba(30,30,55,0.8); }
+    .sync-btn,.share-btn,.release-btn { position:absolute; width:48px; height:48px; border-radius:48px; background:rgba(15,15,30,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:0.5px solid rgba(100,120,180,0.3); color:#c8d6ff; font-size:20px; z-index:120; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 15px rgba(0,0,0,0.5); transition:all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); }
+    .sync-btn:active,.share-btn:active,.release-btn:active { transform:scale(0.9); background:rgba(30,30,55,0.8); }
     .sync-btn { right:28px; top:100px; display:none; }
-    .share-link-btn { left:28px; bottom:100px; }
+    .share-btn { right:28px; bottom:180px; } /* moved share here */
     .release-btn { top:50%; left:50%; transform:translate(-50%,-50%); display:none; font-size:18px; pointer-events:all; z-index:150; }
     .release-btn.visible { display:flex; }
     .instructions { position:absolute; bottom:100px; right:100px; font-size:9px; color:rgba(160,170,210,0.6); background:rgba(0,0,0,0.45); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); padding:8px 16px; border-radius:30px; pointer-events:none; letter-spacing:0.3px; border:0.5px solid rgba(100,120,180,0.15); z-index:99; transition:all 0.4s; }
@@ -63,11 +63,14 @@
   <div class="vignette"></div>
   <div class="hud"><div class="title">✦ SYNC CONSTELLATION</div><div class="meta" id="counterMeta"><span class="star-count-icon"></span> 0 stars</div></div>
   <button class="clear-btn" id="clearBtn">🗑</button>
-  <div class="controls"><div class="timeline-container"><div class="timeline-label" id="sliderLabel">star age: newborn</div><input type="range" id="timelineSlider" min="0" max="1" step="0.001" value="1"></div></div>
+  <div class="age-bar">
+    <span class="age-label" id="ageLabel">newborn</span>
+    <input type="range" class="age-slider" id="ageSlider" min="0" max="1" step="0.01" value="1">
+  </div>
   <div class="instructions" id="instructionsBar">drag → pan • tap → glimpse • double‑tap → follow • long‑press → edit</div>
   <button class="add" id="novaBtn">✧</button>
   <button class="sync-btn" id="syncBtn">🔁</button>
-  <button class="share-link-btn" id="shareLinkBtn">🔗</button>
+  <button class="share-btn" id="shareBtn">🔗</button>
   <button class="release-btn" id="releaseBtn">⟳</button>
   <div class="preview" id="etherPreview"></div>
   <div class="notification" id="toastMsg"></div>
@@ -118,7 +121,6 @@
     const canvas = document.getElementById("cosmicCanvas");
     const ctx = canvas.getContext("2d");
 
-    let peerColors = {};
     let followingStarId = null;
     let showerActive = false;
     let currentClusters = [];
@@ -202,7 +204,7 @@
     }
 
     function computeMass(note) {
-      if (note.isSun) return 15; // even heavier suns
+      if (note.isSun) return 15;
       return Math.min(10, (note.text?.length||12)/40 + Math.min(2.5, (note.opened||0)/10));
     }
 
@@ -221,7 +223,7 @@
             s.orbitDirection = Math.random() > 0.5 ? 1 : -1;
             s.eccentricity = Math.random() * 0.4;
             s.vx = 0; s.vy = 0;
-            s.radius = 2 + Math.random() * 5; // planets 2–7
+            s.radius = 2 + Math.random() * 5;
             free.splice(i, 1);
           }
         }
@@ -235,7 +237,7 @@
           if (!oldest.isSun) {
             oldest.isSun = true;
             oldest.mass = 15;
-            oldest.radius = 10 + Math.random() * 4; // sun radius 10–14
+            oldest.radius = 10 + Math.random() * 4;
             birthFlashes.push({ x: oldest.x, y: oldest.y, progress: 0 });
             for (let i=1; i<clusterNotes.length; i++) {
               let planet = clusterNotes[i];
@@ -248,7 +250,7 @@
               planet.orbitDirection = Math.random() > 0.5 ? 1 : -1;
               planet.eccentricity = Math.random() * 0.4;
               planet.vx = 0; planet.vy = 0;
-              planet.radius = 2 + Math.random() * 5; // planets 2–7
+              planet.radius = 2 + Math.random() * 5;
             }
           }
         }
@@ -290,7 +292,7 @@
       currentClusters = clusters;
     }
 
-    // Firestore CRUD
+    // Firestore CRUD (unchanged)
     async function saveNoteToFirestore(note) {
       await notesCollection.doc(note.id).set({
         id: note.id, created: note.created, opened: note.opened || 0, text: note.text,
@@ -351,7 +353,7 @@
         text: text.trim() === "" ? "✦ a drifting thought" : text,
         x, y,
         vx: (Math.random()-0.5)*0.05, vy: (Math.random()-0.5)*0.05,
-        radius: 3 + Math.random() * 3, // free stars 3–6
+        radius: 3 + Math.random() * 3,
         mass: 2.5,
         orbitPhase: 0, pulsePhase: Math.random()*Math.PI*2,
         sentiment: 0,
@@ -371,7 +373,7 @@
     function clearAllNotes() { notes.forEach(n => deleteNoteFromFirestore(n.id)); notes = []; updateCounter(); showToast("constellation cleared"); }
     function updateCounter() { document.getElementById("counterMeta").innerHTML = `<span class="star-count-icon"></span> ${notes.length === 0 ? "empty sky" : `${notes.length} stars`}`; }
 
-    // Simulation
+    // Simulation (unchanged from working version)
     function simulate() {
       for (let note of notes) {
         if (!note.trail) note.trail = [];
@@ -450,11 +452,41 @@
       }
     }
 
-    // Shooting stars (unchanged)
     function spawnShootingStar(angle, speed, len, op, x, y) { shootingStars.push({ x, y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, length: len, opacity: op }); }
-    function triggerMeteorShower() { /* identical to previous */ }
-    function updateShootingStars() { /* identical */ }
-    function drawShootingStars() { /* identical */ }
+    function triggerMeteorShower() {
+      if (showerActive) return; showerActive = true;
+      let edge = Math.floor(Math.random()*4), baseX, baseY;
+      if (edge===0) { baseX=-50; baseY=Math.random()*h; } else if (edge===2) { baseX=w+50; baseY=Math.random()*h; }
+      else if (edge===1) { baseX=Math.random()*w; baseY=-50; } else { baseX=Math.random()*w; baseY=h+50; }
+      let baseAngle = Math.random()*Math.PI*2, count = 5 + Math.floor(Math.random()*6);
+      for (let i=0;i<count;i++) {
+        let angle = baseAngle + (Math.random()-0.5)*0.6, speed = 7+Math.random()*10, len = 60+Math.random()*80, op = 0.5+Math.random()*0.5;
+        spawnShootingStar(angle, speed, len, op, baseX, baseY);
+      }
+      showerActive = false;
+    }
+    function updateShootingStars() {
+      for (let i=0;i<shootingStars.length;i++) { let s=shootingStars[i]; s.x+=s.vx; s.y+=s.vy; if(s.x+s.length<0||s.x-s.length>w||s.y+s.length<0||s.y-s.length>h) shootingStars.splice(i--,1); }
+      if (--nextShootingStar<=0) {
+        let angle = Math.random()*Math.PI*2, speed = 5+Math.random()*8, len = 50+Math.random()*70, op = 0.4+Math.random()*0.5;
+        let edge = Math.floor(Math.random()*4), x,y;
+        if (edge===0) { x=-len*0.5; y=Math.random()*h; } else if (edge===2) { x=w+len*0.5; y=Math.random()*h; }
+        else if (edge===1) { x=Math.random()*w; y=-len*0.5; } else { x=Math.random()*w; y=h+len*0.5; }
+        spawnShootingStar(angle, speed, len, op, x, y);
+        nextShootingStar = Math.floor(150+Math.random()*400);
+      }
+      if (Math.random()<0.0003 && !showerActive) triggerMeteorShower();
+    }
+    function drawShootingStars() {
+      for (let s of shootingStars) {
+        let headX=s.x, headY=s.y, dir=Math.hypot(s.vx,s.vy); if(dir<0.01) continue;
+        let tailX=s.x-s.vx*(s.length/dir), tailY=s.y-s.vy*(s.length/dir);
+        let grad=ctx.createLinearGradient(headX,headY,tailX,tailY);
+        grad.addColorStop(0,`rgba(255,240,200,${s.opacity})`); grad.addColorStop(1,`rgba(160,100,70,0)`);
+        ctx.beginPath(); ctx.moveTo(headX,headY); ctx.lineTo(tailX,tailY); ctx.strokeStyle=grad; ctx.lineWidth=2.2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(headX,headY,2.8,0,Math.PI*2); ctx.fillStyle=`rgba(255,220,160,${s.opacity*0.8})`; ctx.fill();
+      }
+    }
 
     let previewStarId = null;
     function render() {
@@ -549,7 +581,7 @@
         let pulse = Math.sin(star.pulsePhase)*0.6;
         let size = Math.max(2.5, star.radius + pulse);
         if (star.isSun) {
-          size = star.radius + pulse * 3; // much larger suns
+          size = star.radius + pulse * 3;
           colors = { core:"#fff8e0", glow:"rgba(255,240,180,0.8)" };
         } else if (star.orbitingSunId) {
           size = star.radius + pulse * 0.3;
@@ -571,31 +603,16 @@
           ctx.strokeStyle = "rgba(220, 230, 255, 0.8)"; ctx.lineWidth = 2;
           ctx.shadowColor = "rgba(180, 200, 255, 0.6)"; ctx.shadowBlur = 10; ctx.stroke(); ctx.shadowBlur = 0;
         }
-        // Peer presence ring – only if creatorId differs from persistent localPeerId
-        if (star.creatorId && star.creatorId !== localPeerId) {
-          let peerColor = peerColors[star.creatorId] || getPeerColor(star.creatorId);
-          ctx.beginPath(); ctx.arc(star.x, star.y, size*2.2, 0, Math.PI*2);
-          ctx.strokeStyle = peerColor; ctx.lineWidth = 1.8; ctx.stroke();
-        }
+        // No peer ring
       }
 
       ctx.restore();
       drawShootingStars();
     }
 
-    function getPeerColor(peerId) {
-      if (!peerColors[peerId]) {
-        let hash = 0;
-        for (let i=0; i<peerId.length; i++) hash = peerId.charCodeAt(i) + ((hash << 5) - hash);
-        let hue = hash % 360;
-        peerColors[peerId] = `hsl(${hue}, 70%, 70%)`;
-      }
-      return peerColors[peerId];
-    }
-
     function showToast(msg) { document.getElementById("toastMsg").innerText=msg; document.getElementById("toastMsg").classList.add("show"); setTimeout(()=>document.getElementById("toastMsg").classList.remove("show"),2000); }
 
-    // Constellation naming (unchanged)
+    // Constellation naming
     function promptConstellationName(cluster) {
       document.getElementById("constellationNameInput").value = cluster.name || "";
       document.getElementById("constellationNameModal").style.display = "flex";
@@ -656,8 +673,7 @@
     let previewTimer=null;
     function showPreview(star,cx,cy){
       previewStarId=star.id;
-      let creatorInfo = (star.creatorId && star.creatorId !== localPeerId) ?
-        `<div class="creator-tag">from ${star.creatorName||'guest'}</div>` : "";
+      let creatorInfo = (star.creatorName && star.creatorName !== "me") ? `<div class="creator-tag">from ${star.creatorName}</div>` : "";
       let short=star.text.length>85?star.text.slice(0,82)+"…":star.text;
       document.getElementById("etherPreview").innerHTML = creatorInfo + short;
       let left=Math.min(Math.max(cx-95,12),w-210), top=Math.min(Math.max(cy-85,28),h-100);
@@ -708,7 +724,11 @@
     document.getElementById("deleteMemoryBtn").onclick = () => { if(activeId){ deleteNote(activeId); activeId=null; closeModal(document.getElementById("editModal")); } };
     document.getElementById("closeViewBtn").onclick = () => closeModal(document.getElementById("viewModal"));
     document.getElementById("editFromViewBtn").onclick = () => { closeModal(document.getElementById("viewModal")); setTimeout(()=>{ if(activeId) openEdit(activeId); },100); };
-    document.getElementById("shareLinkBtn").onclick = () => { showToast("✨ Constellation is live‑synced via Firebase — just share this page!"); };
+    // Share button now copies URL
+    document.getElementById("shareBtn").onclick = () => {
+      navigator.clipboard.writeText(window.location.href);
+      showToast("✨ galaxy link copied — share this page!");
+    };
     document.getElementById("clearBtn").onclick = () => {
       document.getElementById("clearConfirmModal").style.display = "flex";
       requestAnimationFrame(() => document.getElementById("clearConfirmModal").classList.add("visible"));
@@ -716,16 +736,17 @@
     document.getElementById("confirmClearBtn").onclick = () => { clearAllNotes(); closeModal(document.getElementById("clearConfirmModal")); };
     document.getElementById("cancelClearBtn").onclick = () => closeModal(document.getElementById("clearConfirmModal"));
 
-    document.getElementById("timelineSlider").oninput = (e) => {
-      let val = parseFloat(e.target.value);
+    // New age slider handling
+    const ageSlider = document.getElementById("ageSlider");
+    const ageLabel = document.getElementById("ageLabel");
+    ageSlider.addEventListener("input", () => {
+      const val = parseFloat(ageSlider.value);
       ageOffset = (1 - val) * MAX_AGE_MS;
-      let label;
-      if (val > 0.9) label = "star age: newborn";
-      else if (val > 0.5) label = "star age: young";
-      else if (val > 0.2) label = "star age: aging";
-      else label = "star age: ancient";
-      document.getElementById("sliderLabel").innerText = label;
-    };
+      if (val > 0.9) ageLabel.textContent = "newborn";
+      else if (val > 0.5) ageLabel.textContent = "young";
+      else if (val > 0.2) ageLabel.textContent = "aging";
+      else ageLabel.textContent = "ancient";
+    });
 
     // Pan / zoom (unchanged)
     let isPanning = false, panStart = {x:0,y:0}, panCameraStart = {x:0,y:0};
