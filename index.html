@@ -12,7 +12,11 @@
     canvas { position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; background:#010108; }
     canvas:active { cursor:grabbing; }
 
-    #app.ui-hidden .hud,
+    #app.ui-hidden .hud {
+  opacity: 0;
+  /* pointer-events: none;  ← remove or comment out this line */
+  transition: opacity 0.3s ease;
+},
     #app.ui-hidden .age-bar,
     #app.ui-hidden .add,
     #app.ui-hidden .release-btn,
