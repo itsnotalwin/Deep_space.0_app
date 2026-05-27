@@ -12,7 +12,8 @@
     canvas { position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; background:#010108; }
     canvas:active { cursor:grabbing; }
     #app.ui-hidden .hud, #app.ui-hidden .add, #app.ui-hidden .release-btn,
-    #app.ui-hidden .vignette, #app.ui-hidden .notification, #app.ui-hidden .preview {
+    #app.ui-hidden .vignette, #app.ui-hidden .notification, #app.ui-hidden .preview,
+    #app.ui-hidden .clear-btn {
       opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     }
     .release-btn { display:none; }
@@ -24,7 +25,7 @@
     @keyframes pulseIcon { 0%,100% { box-shadow:0 0 8px #aaccff; } 50% { box-shadow:0 0 20px #cce0ff; } }
     #streakDisplay { margin-left:12px; font-size:11px; background:rgba(0,0,0,0.4); padding:4px 8px; border-radius:40px; }
 
-    /* REDESIGNED ADD BUTTON (no emoji) */
+    /* REDESIGNED ADD STAR BUTTON */
     .add {
       position: absolute;
       right: 28px;
@@ -64,6 +65,34 @@
       transition: 0.05s;
     }
 
+    /* Clear button (testing) */
+    .clear-btn {
+      position: absolute;
+      left: 28px;
+      bottom: max(100px, calc(env(safe-area-inset-bottom) + 100px));
+      padding: 10px 18px;
+      border-radius: 40px;
+      background: rgba(20, 20, 35, 0.6);
+      backdrop-filter: blur(12px);
+      border: 0.5px solid rgba(200, 120, 120, 0.3);
+      color: #ffaa99;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      z-index: 120;
+      transition: all 0.2s ease;
+      font-family: monospace;
+    }
+    .clear-btn:hover {
+      background: rgba(60, 20, 20, 0.7);
+      border-color: rgba(255, 120, 100, 0.6);
+      color: #ffccbb;
+    }
+    .clear-btn:active {
+      transform: scale(0.96);
+    }
+
     .release-btn { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:48px; height:48px; border-radius:48px; background:rgba(15,15,30,0.6); backdrop-filter:blur(16px); border:0.5px solid rgba(100,120,180,0.3); color:#c8d6ff; font-size:20px; z-index:150; cursor:pointer; align-items:center; justify-content:center; box-shadow:0 6px 15px rgba(0,0,0,0.5); transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); }
     .release-btn:active { transform:translate(-50%,-50%) scale(0.9); background:rgba(30,30,55,0.8); }
     .vignette { position:absolute; inset:0; pointer-events:none; z-index:10; background: radial-gradient(ellipse at 50% 50%, transparent 25%, rgba(0,0,0,0.8) 90%), radial-gradient(ellipse at 30% 30%, rgba(200,120,255,0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(255,160,80,0.1) 0%, transparent 50%); transition: opacity 0.3s ease; }
@@ -96,12 +125,13 @@
     <div class="meta" id="counterMeta"><span class="star-count-icon"></span> 0 stars</div>
   </div>
   <button class="add" id="novaBtn">+</button>
+  <button class="clear-btn" id="clearAllBtn">clear all</button>
   <button class="release-btn" id="releaseBtn">↺</button>
   <div class="preview" id="etherPreview"></div><div class="notification" id="toastMsg"></div>
   <div class="modal" id="viewModal"><div class="panel"><div id="viewCreator" class="creator-info"></div><div class="viewer" id="memoryViewer"></div><div class="actions"><button id="closeViewBtn">close</button><button id="editFromViewBtn">edit</button></div></div></div>
   <div class="modal" id="editModal"><div class="panel"><div id="editCreator" class="creator-info"></div><textarea id="memoryEditor" placeholder="...a thought drifts..."></textarea><div class="actions"><button id="saveMemoryBtn">engrave</button><button id="cancelEditBtn">drift</button><button id="deleteMemoryBtn" class="delete">obliterate</button></div></div></div>
   <div class="modal" id="constellationNameModal"><div class="panel"><div style="text-align:center; color:#d0d8ff;">name the constellation</div><input type="text" class="name-input" id="constellationNameInput" placeholder="constellation name"><div class="actions"><button id="saveConstellationName">engrave</button><button id="cancelConstellationName">drift</button></div></div></div>
-  <div class="modal" id="clearConfirmModal"><div class="panel"><div style="color:#ffcccc;">clear all stars?</div><div class="actions"><button id="confirmClearBtn" class="delete">yes</button><button id="cancelClearBtn">cancel</button></div></div></div>
+  <div class="modal" id="clearConfirmModal"><div class="panel"><div style="color:#ffcccc;">clear all stars?</div><div class="actions"><button id="confirmClearBtn" class="delete">yes, clear</button><button id="cancelClearBtn">cancel</button></div></div></div>
   <div class="modal" id="nameModal"><div class="panel"><div style="color:#d0d8ff;">who are you, stargazer?</div><input type="text" id="nameInput" placeholder="cosmic name" maxlength="20" style="width:100%; background:rgba(2,2,10,0.6); border-radius:40px; padding:12px 20px; color:#fff; text-align:center;"><div class="actions"><button id="saveNameBtn">enter nebula</button></div></div></div>
 </div>
 
@@ -145,7 +175,6 @@
       "a fragment of a forgotten hymn", "the color of three am", "an unfinished constellation",
       "the ghost of a supernova", "a stray frequency from a dead world", "the memory of a raindrop on a far moon",
       "a knot of spacetime", "the perfume of ancient nebulae", "a half‑open door to elsewhere",
-      // Chinese proverbs (in English)
       "A journey of a thousand miles begins with a single step.",
       "A book holds a house of gold.",
       "He who asks is a fool for five minutes; he who does not ask remains a fool forever.",
@@ -216,33 +245,27 @@
       "If you bow at all, bow low.",
       "A little wind kindles, much puts out the fire.",
       "A man's heart is like a field; whatever you plant, you will reap.",
-      "A single conversation across the table is worth ten years of correspondence.",
       "A thousand cups of wine are not too many, but half a sentence is too much when hearts are not in tune.",
       "A wise man makes his own decisions; an ignorant man follows public opinion.",
-      "An inch of time is an inch of gold, but you can't buy an inch of time with an inch of gold.",
       "Better a diamond with a flaw than a pebble without.",
       "Better to light a candle than to curse the darkness.",
       "Do not use a cannon to kill a mosquito.",
       "Don't let yesterday use up too much of today.",
       "Experience is a comb that nature gives us after we are bald.",
-      "He who asks is a fool for five minutes; he who does not ask remains a fool forever.",
       "He who blames others has a long way to go on his journey; he who blames himself is halfway there; he who blames no one has arrived.",
       "He who knows others is clever; he who knows himself has true wisdom.",
       "I hear and I forget; I see and I remember; I do and I understand.",
       "If you want to find the truth, stop believing good and evil.",
       "It is easy to dodge an arrow in the open, but hard to guard against a dagger in the dark.",
-      "It is only when the mosquito lands on your testicles that you realise there is always a way to solve problems without using violence.",
       "Keep your broken arm inside your sleeve.",
       "Living in a small house is a blessing; you can watch the seasons pass through a single window.",
       "Many a little makes a mickle.",
-      "One joy scatters a hundred griefs.",
       "One minute of patience can bring ten years of peace.",
       "One picture is worth ten thousand words.",
       "Only when the last tree has died and the last river has been poisoned and the last fish has been caught will we realise that we cannot eat money.",
       "Patience is power; with time and patience the mulberry leaf becomes a silk gown.",
       "Pearls are not thrown to the pigs.",
       "Rivers are low when the rains are late.",
-      "Shallow men believe in luck, strong men believe in cause and effect.",
       "Stars are not afraid to twinkle in the dark.",
       "The air of a new day is fresh with the scent of possibility.",
       "The butterfly counts not months but moments, and has time enough.",
@@ -261,10 +284,7 @@
       "You will never reach your destination if you stop and throw stones at every dog that barks.",
       "A single seed of kindness can grow a garden of peace."
     ];
-    // ensure we have >300 items by adding more generic cosmic lines if needed
-    while(regularQuotes.length < 300) {
-      regularQuotes.push("a silent galaxy turns", "the space between breaths", "a thought that forgets its shape");
-    }
+    while(regularQuotes.length < 300) regularQuotes.push("a silent galaxy turns", "the space between breaths", "a thought that forgets its shape");
 
     const specialQuotes = [
       "A star that remembers every sky it ever burned in.",
@@ -322,7 +342,7 @@
       showToast("+1 streak from the special star!");
     }
 
-    // ----------------------------- DAILY RESET NOTIFICATION (no emoji) -----------------------------
+    // ----------------------------- DAILY RESET NOTIFICATION -----------------------------
     function checkDailyNotification() {
       const lastNotif = localStorage.getItem('last_notification_date');
       const today = new Date().toDateString();
@@ -502,7 +522,7 @@
       "Omen of Dust", "The Still Pyre", "Hollow Sigil", "Weeping Prism", "Last Accord"
     ];
 
-    // Flow field (unchanged)
+    // Flow field
     const flowGrid = { cellSize: 90, cols: 60, rows: 60, angles: [] };
     function updateFlowField(t) {
       for (let i=0; i<flowGrid.cols; i++) {
@@ -605,16 +625,16 @@
     }
 
     function updateNebulaColors() { /* same as before */ for (let neb of nebulaLayers) { let influenceR=0,influenceG=0,influenceB=0,totalWeight=0; for (let star of notes) { let dx=star.x-neb.x, dy=star.y-neb.y, dist=Math.hypot(dx,dy); if(dist<300){ let weight=(1-dist/300)*(star.mass||2); let age=Math.max(0,Date.now()-star.created); let day=86400000,week=day*7; let r,g,b; if(age<week){r=120;g=180;b=255;} else if(age<week*4){r=255;g=200;b=120;} else{r=255;g=120;b=100;} influenceR+=r*weight; influenceG+=g*weight; influenceB+=b*weight; totalWeight+=weight; } } if(totalWeight>0.1){ let tR=influenceR/totalWeight, tG=influenceG/totalWeight, tB=influenceB/totalWeight; neb.color1=[Math.floor(neb.baseColor1[0]*0.3+tR*0.7),Math.floor(neb.baseColor1[1]*0.3+tG*0.7),Math.floor(neb.baseColor1[2]*0.3+tB*0.7)]; neb.color2=[Math.floor(neb.baseColor2[0]*0.3+tR*0.7),Math.floor(neb.baseColor2[1]*0.3+tG*0.7),Math.floor(neb.baseColor2[2]*0.3+tB*0.7)]; neb.color3=[Math.floor(neb.baseColor3[0]*0.3+tR*0.7),Math.floor(neb.baseColor3[1]*0.3+tG*0.7),Math.floor(neb.baseColor3[2]*0.3+tB*0.7)]; } else { neb.color1=[...neb.baseColor1]; neb.color2=[...neb.baseColor2]; neb.color3=[...neb.baseColor3]; } } }
-    function updateOrganic(t) { /* same as before, omitted for brevity but fully functional */ for(let layer of starLayers) for(let s of layer){ let angle=noise.noise3(s.x*0.0003,s.y*0.0003,t*0.00025)*Math.PI*2; let speed=0.12; s.x+=Math.cos(angle)*speed; s.y+=Math.sin(angle)*speed; if(s.x>3600) s.x=-3600; if(s.x<-3600) s.x=3600; if(s.y>2800) s.y=-2800; if(s.y<-2800) s.y=2800; } for(let cloud of dustClouds){ let angle=noise.noise3(cloud.x*0.0012,cloud.y*0.0012,t*0.00018)*Math.PI*2; let speed=0.18; cloud.x+=Math.cos(angle)*speed; cloud.y+=Math.sin(angle)*speed; if(cloud.x>3600) cloud.x=-3600; if(cloud.x<-3600) cloud.x=3600; if(cloud.y>3600) cloud.y=-3600; if(cloud.y<-3600) cloud.y=3600; } for(let neb of nebulaLayers){ let angle=noise.noise3(neb.x*0.0005,neb.y*0.0005,t*0.0001)*Math.PI*2; neb.x+=Math.cos(angle)*0.08; neb.y+=Math.sin(angle)*0.08; if(neb.x>3200) neb.x=-3200; if(neb.x<-3200) neb.x=3200; if(neb.y>3200) neb.y=-3200; if(neb.y<-3200) neb.y=3200; neb.phase=(neb.phase||0)+0.005; } }
+    function updateOrganic(t) { for(let layer of starLayers) for(let s of layer){ let angle=noise.noise3(s.x*0.0003,s.y*0.0003,t*0.00025)*Math.PI*2; let speed=0.12; s.x+=Math.cos(angle)*speed; s.y+=Math.sin(angle)*speed; if(s.x>3600) s.x=-3600; if(s.x<-3600) s.x=3600; if(s.y>2800) s.y=-2800; if(s.y<-2800) s.y=2800; } for(let cloud of dustClouds){ let angle=noise.noise3(cloud.x*0.0012,cloud.y*0.0012,t*0.00018)*Math.PI*2; let speed=0.18; cloud.x+=Math.cos(angle)*speed; cloud.y+=Math.sin(angle)*speed; if(cloud.x>3600) cloud.x=-3600; if(cloud.x<-3600) cloud.x=3600; if(cloud.y>3600) cloud.y=-3600; if(cloud.y<-3600) cloud.y=3600; } for(let neb of nebulaLayers){ let angle=noise.noise3(neb.x*0.0005,neb.y*0.0005,t*0.0001)*Math.PI*2; neb.x+=Math.cos(angle)*0.08; neb.y+=Math.sin(angle)*0.08; if(neb.x>3200) neb.x=-3200; if(neb.x<-3200) neb.x=3200; if(neb.y>3200) neb.y=-3200; if(neb.y<-3200) neb.y=3200; neb.phase=(neb.phase||0)+0.005; } }
     function updateFlowParticles() { for(let p of flowParticles){ let angle=getFlowAngle(p.x,p.y); p.vx+=Math.cos(angle)*0.035; p.vy+=Math.sin(angle)*0.035; let spd=Math.hypot(p.vx,p.vy); if(spd>2.8){ p.vx*=0.97; p.vy*=0.97; } p.x+=p.vx; p.y+=p.vy; if(Math.abs(p.x)>4200||Math.abs(p.y)>4200){ p.x=(Math.random()-0.5)*4800; p.y=(Math.random()-0.5)*4800; p.vx=(Math.random()-0.5)*0.5; p.vy=(Math.random()-0.5)*0.5; } p.life=(p.life+0.4)%100; } }
 
-    // Star type differentiation (unchanged)
+    // Star type differentiation
     function getStarVisuals(star) { const age=Math.max(0,Date.now()-star.created); const day=86400000,week=day*7,month=day*30; const mass=star.mass||2.5; let sizeFactor=1.0, coreColor="#ffddaa", glowColor="rgba(255,221,170,0.5)", pulseSpeed=0.008, isWhiteDwarf=false; if(mass<1.5&&age>month){ isWhiteDwarf=true; sizeFactor=0.55; coreColor="#ffffff"; glowColor="rgba(255,255,255,0.8)"; pulseSpeed=0.02; } else if(age<day*3){ sizeFactor=0.8; coreColor="#c0e0ff"; glowColor="rgba(180,220,255,0.7)"; pulseSpeed=0.015; } else if(age>month){ sizeFactor=1.4; coreColor="#ffaa77"; glowColor="rgba(255,170,119,0.6)"; pulseSpeed=0.005; } return {sizeFactor,coreColor,glowColor,pulseSpeed,isWhiteDwarf}; }
     function getPulseFactor(star,customSpeed=null){ let speed=customSpeed!==null?customSpeed:0.008; let phase=(star.pulsePhase||0)+time*speed; let raw=Math.sin(phase); return 0.6+0.5*raw*raw; }
     function addBirthSparks(x,y){ for(let i=0;i<60;i++){ let angle=Math.random()*Math.PI*2; let speed=0.5+Math.random()*2.5; sparks.push({x:x,y:y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:0.8+Math.random()*1.2,color:`hsl(${30+Math.random()*60},100%,60%)`}); } }
     function updateSparks(deltaTime){ for(let i=sparks.length-1;i>=0;i--){ let s=sparks[i]; s.x+=s.vx*deltaTime; s.y+=s.vy*deltaTime; s.life-=deltaTime*1.5; if(s.life<=0) sparks.splice(i,1); } }
 
-    // Rendering (unchanged from previous working version, only removed emojis from text overlays)
+    // Rendering (full)
     let bloomCanvas = document.createElement('canvas');
     let blurCanvas = document.createElement('canvas');
     function applyBloom(ctxMain, w, h) { try { bloomCanvas.width=w; bloomCanvas.height=h; let tempCtx=bloomCanvas.getContext('2d'); tempCtx.drawImage(ctxMain.canvas,0,0); blurCanvas.width=w; blurCanvas.height=h; let blurCtx=blurCanvas.getContext('2d'); blurCtx.filter='blur(10px)'; blurCtx.drawImage(bloomCanvas,0,0); ctxMain.globalCompositeOperation='lighter'; ctxMain.drawImage(blurCanvas,0,0); ctxMain.globalCompositeOperation='source-over'; } catch(e){} }
@@ -634,7 +654,45 @@
     function listenToFirestore(){ notesCollection.onSnapshot((snap)=>{ snap.docChanges().forEach((ch)=>{ if(ch.type==="added"||ch.type==="modified"){ let data=ch.doc.data(); let idx=notes.findIndex(n=>n.id===data.id); if(idx!==-1) notes[idx]={...notes[idx],...data}; else notes.push({...data}); } else if(ch.type==="removed"){ let removed=notes.find(n=>n.id===ch.doc.id); if(removed) addDecayTrail(removed.x,removed.y); notes=notes.filter(n=>n.id!==ch.doc.id); } }); updateCounter(); computeClusters(); autoNameUnnamedClusters(); }); constellationsCollection.onSnapshot((snap)=>{ snap.docChanges().forEach((ch)=>{ let data=ch.doc.data(); let existing=namedConstellations.findIndex(c=>c.starIds.join(',')===data.starIds.join(',')); if(ch.type==="added"||ch.type==="modified"){ if(existing!==-1) namedConstellations[existing]=data; else namedConstellations.push(data); } else if(ch.type==="removed"){ namedConstellations=namedConstellations.filter(c=>c.starIds.join(',')!==data.starIds.join(',')); } }); }); }
 
     function stopFollowing(){ followingStarId=null; document.getElementById("releaseBtn").classList.remove("visible"); }
-    function initApp(){ initWorld(); const canvasElem=document.getElementById("cosmicCanvas"); function resize(){ w=window.innerWidth; h=window.innerHeight; canvasElem.width=w*devicePixelRatio; canvasElem.height=h*devicePixelRatio; canvasElem.style.width=w+"px"; canvasElem.style.height=h+"px"; ctx=canvasElem.getContext("2d"); ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); } resize(); window.addEventListener("resize",resize); listenToFirestore(); listenToTempStars(); updateCounter(); updateStreakCounter(); checkDailyNotification(); spawnDailyTempStars(); let uiHidden=false; const appDiv=document.getElementById("app"); function toggleUI(){ uiHidden=!uiHidden; if(uiHidden) appDiv.classList.add("ui-hidden"); else appDiv.classList.remove("ui-hidden"); } document.getElementById("hudToggle").addEventListener("click",toggleUI); document.getElementById("novaBtn").onclick=()=>{ let ns=createMemory(""); openEdit(ns.id); }; document.getElementById("releaseBtn").onclick=stopFollowing; function worldPos(px,py){ return {x:(px-w/2)/camera.zoom-camera.x, y:(py-h/2)/camera.zoom-camera.y}; } function hitTest(px,py){ let wp=worldPos(px,py); let best=null, bestD=85; for(let n of notes){ let d=Math.hypot(wp.x-n.x,wp.y-n.y); let thresh=Math.min(85,38+(n.radius||3)*2.8); if(d<thresh && d<bestD){ bestD=d; best=n; } } for(let t of tempStars){ let d=Math.hypot(wp.x-t.x,wp.y-t.y); if(d<25 && d<bestD){ bestD=d; best=t; } } return best; } function hitTestConstellation(px,py){ let wp=worldPos(px,py); for(let cl of currentClusters){ if(cl.starIds.length>=3 && Math.hypot(wp.x-cl.centroid.x,wp.y-cl.centroid.y)<60) return cl; } return null; } let previewTimer; async function showPreview(star,cx,cy){ if(previewTimer) clearTimeout(previewTimer); previewStarId=star.id; let creatorInfo="", text=""; if(star.isTemp){ if(star.isSpecial && !star.rewarded){ await tempStarsCollection.doc(star.id).update({rewarded:true}); star.rewarded=true; addStreakBonus(); addBirthSparks(star.x,star.y); } creatorInfo=star.isSpecial?`<div class="creator-tag">SPECIAL EPHEMERAL STAR</div>`:`<div class="creator-tag">ephemeral · fades soon</div>`; text=star.message; }else{ creatorInfo=(star.creatorName && star.creatorName!==localPeerName)?`<div class="creator-tag">from ${star.creatorName}</div>`:""; text=star.text.length>85?star.text.slice(0,82)+"…":star.text; } document.getElementById("etherPreview").innerHTML=creatorInfo+"\u201C"+text+"\u201D"; let left=Math.min(Math.max(cx-120,12),w-260); let top=Math.min(Math.max(cy-80,28),h-100); let previewDiv=document.getElementById("etherPreview"); previewDiv.style.left=left+"px"; previewDiv.style.top=top+"px"; previewDiv.classList.add("visible"); previewTimer=setTimeout(()=>{ document.getElementById("etherPreview").classList.remove("visible"); previewStarId=null; },1300); } function openEdit(id){ let star=notes.find(s=>s.id===id); if(!star) return; activeId=id; document.getElementById("editCreator").innerText=star.creatorName?`created by ${star.creatorName}`:""; document.getElementById("memoryEditor").value=star.text; let modal=document.getElementById("editModal"); modal.style.display="flex"; requestAnimationFrame(()=>modal.classList.add("visible")); } function saveEdit(){ if(activeId){ let star=notes.find(s=>s.id===activeId); if(star){ star.text=document.getElementById("memoryEditor").value; if(!star.text.trim()) star.text="a distant echo"; saveNoteToFirestore(star); } activeId=null; } closeModal(document.getElementById("editModal")); } function closeModal(m){ m.classList.remove("visible"); setTimeout(()=>m.style.display="none",250); } document.getElementById("saveMemoryBtn").onclick=saveEdit; document.getElementById("cancelEditBtn").onclick=()=>closeModal(document.getElementById("editModal")); document.getElementById("deleteMemoryBtn").onclick=()=>{ if(activeId){ deleteNote(activeId); activeId=null; closeModal(document.getElementById("editModal")); } }; document.getElementById("closeViewBtn").onclick=()=>closeModal(document.getElementById("viewModal")); document.getElementById("editFromViewBtn").onclick=()=>{ closeModal(document.getElementById("viewModal")); setTimeout(()=>{ if(activeId) openEdit(activeId); },100); }; let currentClusterForName=null; function promptConstellationName(cl){ currentClusterForName=cl; document.getElementById("constellationNameInput").value=cl.name||""; let m=document.getElementById("constellationNameModal"); m.style.display="flex"; requestAnimationFrame(()=>m.classList.add("visible")); } document.getElementById("saveConstellationName").onclick=()=>{ let name=document.getElementById("constellationNameInput").value.trim(); if(name && currentClusterForName){ let existing=namedConstellations.findIndex(c=>c.starIds.join(',')===currentClusterForName.starIds.join(',')); if(existing!==-1) namedConstellations[existing].name=name; else namedConstellations.push({starIds:currentClusterForName.starIds,name}); constellationsCollection.doc(currentClusterForName.starIds.join(',')).set({starIds:currentClusterForName.starIds,name}); showToast(`Constellation named: ${name}`); } closeModal(document.getElementById("constellationNameModal")); currentClusterForName=null; }; document.getElementById("cancelConstellationName").onclick=()=>{ closeModal(document.getElementById("constellationNameModal")); currentClusterForName=null; }; let isPan=false, panStart={x:0,y:0}, camStart={x:0,y:0}; let lastTapTime=0; let pendingSingleClick=null; canvasElem.addEventListener("touchstart",(e)=>{ e.preventDefault(); let t=e.touches[0]; let star=hitTest(t.clientX,t.clientY); let cl=hitTestConstellation(t.clientX,t.clientY); if(cl){ promptConstellationName(cl); return; } if(star){ let now=Date.now(); if(now-lastTapTime<300){ if(pendingSingleClick) clearTimeout(pendingSingleClick); if(!star.isTemp) openEdit(star.id); else showToast("ephemeral stars cannot be edited."); lastTapTime=0; }else{ lastTapTime=now; pendingSingleClick=setTimeout(()=>{ showPreview(star,t.clientX,t.clientY); pendingSingleClick=null; },150); } }else{ let now=Date.now(); if(uiHidden && now-lastTapTime<300){ toggleUI(); lastTapTime=0; if(pendingSingleClick) clearTimeout(pendingSingleClick); return; } lastTapTime=now; isPan=true; panStart={x:t.clientX,y:t.clientY}; camStart={x:camera.x,y:camera.y}; if(pendingSingleClick){ clearTimeout(pendingSingleClick); pendingSingleClick=null; } } }); canvasElem.addEventListener("touchmove",(e)=>{ if(isPan && e.touches.length===1){ let dx=e.touches[0].clientX-panStart.x; let dy=e.touches[0].clientY-panStart.y; camera.x=camStart.x+dx/camera.zoom; camera.y=camStart.y+dy/camera.zoom; } e.preventDefault(); if(pendingSingleClick){ clearTimeout(pendingSingleClick); pendingSingleClick=null; } }); canvasElem.addEventListener("touchend",()=>{ isPan=false; }); canvasElem.addEventListener("mousedown",(e)=>{ let star=hitTest(e.clientX,e.clientY); let cl=hitTestConstellation(e.clientX,e.clientY); if(cl){ promptConstellationName(cl); return; } if(star){ if(e.detail===2){ if(!star.isTemp) openEdit(star.id); else showToast("ephemeral stars cannot be edited."); }else{ showPreview(star,e.clientX,e.clientY); } }else{ isPan=true; panStart={x:e.clientX,y:e.clientY}; camStart={x:camera.x,y:camera.y}; } }); window.addEventListener("mousemove",(e)=>{ if(isPan){ let dx=e.clientX-panStart.x; let dy=e.clientY-panStart.y; camera.x=camStart.x+dx/camera.zoom; camera.y=camStart.y+dy/camera.zoom; } }); window.addEventListener("mouseup",()=>{ isPan=false; }); canvasElem.addEventListener("dblclick",(e)=>{ let star=hitTest(e.clientX,e.clientY); let cl=hitTestConstellation(e.clientX,e.clientY); if(!star && !cl && uiHidden) toggleUI(); }); canvasElem.addEventListener("wheel",(e)=>{ e.preventDefault(); let delta=e.deltaY>0?0.92:1.08; camera.targetZoom=Math.min(2.6,Math.max(0.42,camera.targetZoom*delta)); },{passive:false}); let lastTimestamp=0; function animateLoop(now){ let delta=Math.min(0.033,(now-lastTimestamp)/1000); lastTimestamp=now; time=now; updateFlowField(time); updateOrganic(time); updateFlowParticles(); updateComets(); updateNebulaColors(); simulateMotion(delta); render(); requestAnimationFrame(animateLoop); } requestAnimationFrame(animateLoop); }
+
+    // ----------------------------- CLEAR ALL FUNCTION -----------------------------
+    async function clearAllStars() {
+      // delete all permanent notes from Firestore
+      for (let note of notes) {
+        await deleteNoteFromFirestore(note.id);
+      }
+      notes = [];
+      // delete all temporary stars from Firestore
+      for (let ts of tempStars) {
+        await deleteTempStar(ts.id);
+      }
+      tempStars = [];
+      updateCounter();
+      computeClusters();
+      showToast("All stars cleared. The sky is empty.");
+    }
+
+    function initApp(){ initWorld(); const canvasElem=document.getElementById("cosmicCanvas"); function resize(){ w=window.innerWidth; h=window.innerHeight; canvasElem.width=w*devicePixelRatio; canvasElem.height=h*devicePixelRatio; canvasElem.style.width=w+"px"; canvasElem.style.height=h+"px"; ctx=canvasElem.getContext("2d"); ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); } resize(); window.addEventListener("resize",resize); listenToFirestore(); listenToTempStars(); updateCounter(); updateStreakCounter(); checkDailyNotification(); spawnDailyTempStars(); let uiHidden=false; const appDiv=document.getElementById("app"); function toggleUI(){ uiHidden=!uiHidden; if(uiHidden) appDiv.classList.add("ui-hidden"); else appDiv.classList.remove("ui-hidden"); } document.getElementById("hudToggle").addEventListener("click",toggleUI); document.getElementById("novaBtn").onclick=()=>{ let ns=createMemory(""); openEdit(ns.id); }; document.getElementById("releaseBtn").onclick=stopFollowing;
+      // Clear button event
+      const clearBtn = document.getElementById("clearAllBtn");
+      const clearModal = document.getElementById("clearConfirmModal");
+      const confirmClear = document.getElementById("confirmClearBtn");
+      const cancelClear = document.getElementById("cancelClearBtn");
+      clearBtn.onclick = () => { clearModal.style.display = "flex"; requestAnimationFrame(()=>clearModal.classList.add("visible")); };
+      confirmClear.onclick = async () => { await clearAllStars(); closeModal(clearModal); };
+      cancelClear.onclick = () => closeModal(clearModal);
+
+      function worldPos(px,py){ return {x:(px-w/2)/camera.zoom-camera.x, y:(py-h/2)/camera.zoom-camera.y}; }
+      function hitTest(px,py){ let wp=worldPos(px,py); let best=null, bestD=85; for(let n of notes){ let d=Math.hypot(wp.x-n.x,wp.y-n.y); let thresh=Math.min(85,38+(n.radius||3)*2.8); if(d<thresh && d<bestD){ bestD=d; best=n; } } for(let t of tempStars){ let d=Math.hypot(wp.x-t.x,wp.y-t.y); if(d<25 && d<bestD){ bestD=d; best=t; } } return best; }
+      function hitTestConstellation(px,py){ let wp=worldPos(px,py); for(let cl of currentClusters){ if(cl.starIds.length>=3 && Math.hypot(wp.x-cl.centroid.x,wp.y-cl.centroid.y)<60) return cl; } return null; }
+      let previewTimer; async function showPreview(star,cx,cy){ if(previewTimer) clearTimeout(previewTimer); previewStarId=star.id; let creatorInfo="", text=""; if(star.isTemp){ if(star.isSpecial && !star.rewarded){ await tempStarsCollection.doc(star.id).update({rewarded:true}); star.rewarded=true; addStreakBonus(); addBirthSparks(star.x,star.y); } creatorInfo=star.isSpecial?`<div class="creator-tag">SPECIAL EPHEMERAL STAR</div>`:`<div class="creator-tag">ephemeral · fades soon</div>`; text=star.message; }else{ creatorInfo=(star.creatorName && star.creatorName!==localPeerName)?`<div class="creator-tag">from ${star.creatorName}</div>`:""; text=star.text.length>85?star.text.slice(0,82)+"…":star.text; } document.getElementById("etherPreview").innerHTML=creatorInfo+"\u201C"+text+"\u201D"; let left=Math.min(Math.max(cx-120,12),w-260); let top=Math.min(Math.max(cy-80,28),h-100); let previewDiv=document.getElementById("etherPreview"); previewDiv.style.left=left+"px"; previewDiv.style.top=top+"px"; previewDiv.classList.add("visible"); previewTimer=setTimeout(()=>{ document.getElementById("etherPreview").classList.remove("visible"); previewStarId=null; },1300); }
+      function openEdit(id){ let star=notes.find(s=>s.id===id); if(!star) return; activeId=id; document.getElementById("editCreator").innerText=star.creatorName?`created by ${star.creatorName}`:""; document.getElementById("memoryEditor").value=star.text; let modal=document.getElementById("editModal"); modal.style.display="flex"; requestAnimationFrame(()=>modal.classList.add("visible")); }
+      function saveEdit(){ if(activeId){ let star=notes.find(s=>s.id===activeId); if(star){ star.text=document.getElementById("memoryEditor").value; if(!star.text.trim()) star.text="a distant echo"; saveNoteToFirestore(star); } activeId=null; } closeModal(document.getElementById("editModal")); }
+      function closeModal(m){ m.classList.remove("visible"); setTimeout(()=>m.style.display="none",250); }
+      document.getElementById("saveMemoryBtn").onclick=saveEdit; document.getElementById("cancelEditBtn").onclick=()=>closeModal(document.getElementById("editModal")); document.getElementById("deleteMemoryBtn").onclick=()=>{ if(activeId){ deleteNote(activeId); activeId=null; closeModal(document.getElementById("editModal")); } }; document.getElementById("closeViewBtn").onclick=()=>closeModal(document.getElementById("viewModal")); document.getElementById("editFromViewBtn").onclick=()=>{ closeModal(document.getElementById("viewModal")); setTimeout(()=>{ if(activeId) openEdit(activeId); },100); };
+      let currentClusterForName=null; function promptConstellationName(cl){ currentClusterForName=cl; document.getElementById("constellationNameInput").value=cl.name||""; let m=document.getElementById("constellationNameModal"); m.style.display="flex"; requestAnimationFrame(()=>m.classList.add("visible")); } document.getElementById("saveConstellationName").onclick=()=>{ let name=document.getElementById("constellationNameInput").value.trim(); if(name && currentClusterForName){ let existing=namedConstellations.findIndex(c=>c.starIds.join(',')===currentClusterForName.starIds.join(',')); if(existing!==-1) namedConstellations[existing].name=name; else namedConstellations.push({starIds:currentClusterForName.starIds,name}); constellationsCollection.doc(currentClusterForName.starIds.join(',')).set({starIds:currentClusterForName.starIds,name}); showToast(`Constellation named: ${name}`); } closeModal(document.getElementById("constellationNameModal")); currentClusterForName=null; }; document.getElementById("cancelConstellationName").onclick=()=>{ closeModal(document.getElementById("constellationNameModal")); currentClusterForName=null; };
+      let isPan=false, panStart={x:0,y:0}, camStart={x:0,y:0}; let lastTapTime=0; let pendingSingleClick=null;
+      canvasElem.addEventListener("touchstart",(e)=>{ e.preventDefault(); let t=e.touches[0]; let star=hitTest(t.clientX,t.clientY); let cl=hitTestConstellation(t.clientX,t.clientY); if(cl){ promptConstellationName(cl); return; } if(star){ let now=Date.now(); if(now-lastTapTime<300){ if(pendingSingleClick) clearTimeout(pendingSingleClick); if(!star.isTemp) openEdit(star.id); else showToast("ephemeral stars cannot be edited."); lastTapTime=0; }else{ lastTapTime=now; pendingSingleClick=setTimeout(()=>{ showPreview(star,t.clientX,t.clientY); pendingSingleClick=null; },150); } }else{ let now=Date.now(); if(uiHidden && now-lastTapTime<300){ toggleUI(); lastTapTime=0; if(pendingSingleClick) clearTimeout(pendingSingleClick); return; } lastTapTime=now; isPan=true; panStart={x:t.clientX,y:t.clientY}; camStart={x:camera.x,y:camera.y}; if(pendingSingleClick){ clearTimeout(pendingSingleClick); pendingSingleClick=null; } } }); canvasElem.addEventListener("touchmove",(e)=>{ if(isPan && e.touches.length===1){ let dx=e.touches[0].clientX-panStart.x; let dy=e.touches[0].clientY-panStart.y; camera.x=camStart.x+dx/camera.zoom; camera.y=camStart.y+dy/camera.zoom; } e.preventDefault(); if(pendingSingleClick){ clearTimeout(pendingSingleClick); pendingSingleClick=null; } }); canvasElem.addEventListener("touchend",()=>{ isPan=false; }); canvasElem.addEventListener("mousedown",(e)=>{ let star=hitTest(e.clientX,e.clientY); let cl=hitTestConstellation(e.clientX,e.clientY); if(cl){ promptConstellationName(cl); return; } if(star){ if(e.detail===2){ if(!star.isTemp) openEdit(star.id); else showToast("ephemeral stars cannot be edited."); }else{ showPreview(star,e.clientX,e.clientY); } }else{ isPan=true; panStart={x:e.clientX,y:e.clientY}; camStart={x:camera.x,y:camera.y}; } }); window.addEventListener("mousemove",(e)=>{ if(isPan){ let dx=e.clientX-panStart.x; let dy=e.clientY-panStart.y; camera.x=camStart.x+dx/camera.zoom; camera.y=camStart.y+dy/camera.zoom; } }); window.addEventListener("mouseup",()=>{ isPan=false; }); canvasElem.addEventListener("dblclick",(e)=>{ let star=hitTest(e.clientX,e.clientY); let cl=hitTestConstellation(e.clientX,e.clientY); if(!star && !cl && uiHidden) toggleUI(); }); canvasElem.addEventListener("wheel",(e)=>{ e.preventDefault(); let delta=e.deltaY>0?0.92:1.08; camera.targetZoom=Math.min(2.6,Math.max(0.42,camera.targetZoom*delta)); },{passive:false}); let lastTimestamp=0; function animateLoop(now){ let delta=Math.min(0.033,(now-lastTimestamp)/1000); lastTimestamp=now; time=now; updateFlowField(time); updateOrganic(time); updateFlowParticles(); updateComets(); updateNebulaColors(); simulateMotion(delta); render(); requestAnimationFrame(animateLoop); } requestAnimationFrame(animateLoop); }
     if(!localPeerName || localPeerName==='me'){ document.getElementById('nameModal').style.display='flex'; requestAnimationFrame(()=>document.getElementById('nameModal').classList.add('visible')); document.getElementById('saveNameBtn').onclick=()=>{ let name=document.getElementById('nameInput').value.trim(); if(!name) name='stargazer'; startApp(name); }; }else{ initApp(); }
     function startApp(name){ localPeerName=name; localStorage.setItem('constellation_peer_name',name); document.getElementById('nameModal').classList.remove('visible'); setTimeout(()=>document.getElementById('nameModal').style.display='none',350); initApp(); }
   })();
