@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>✦ NEBULAR CONSTELLATION · ORGANIC FLOW</title>
+  <title>✦ NEBULAR CONSTELLATION · FIXED</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
     html, body { width:100%; height:100%; overflow:hidden; background:#010108; }
@@ -80,8 +80,8 @@
   if (!localPeerName || localPeerName === 'me') { document.getElementById('nameModal').style.display = 'flex'; requestAnimationFrame(()=>document.getElementById('nameModal').classList.add('visible')); document.getElementById('saveNameBtn').onclick = () => { let name = document.getElementById('nameInput').value.trim(); if (!name) name = 'stargazer'; startApp(name); }; }
   else { initApp(); }
 
-  // ---------- PERLIN NOISE (improved) ----------
-  class Perlin { constructor() { this.grad3 = [[1,1,0],[-1,1,0],[1,-1,0],[-1,-1,0],[1,0,1],[-1,0,1],[1,0,-1],[-1,0,-1],[0,1,1],[0,-1,1],[0,1,-1],[0,-1,-1]]; this.p = [151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180]; for(let i=0;i<256;i++) this.p[256+i]=this.p[i]; } dot(g,x,y,z){ return g[0]*x+g[1]*y+g[2]*z; } noise3(x,y,z){ let X=Math.floor(x)&255, Y=Math.floor(y)&255, Z=Math.floor(z)&255; x-=Math.floor(x); y-=Math.floor(y); z-=Math.floor(z); let u=x*x*x*(x*(x*6-15)+10), v=y*y*y*(y*(y*6-15)+10), w=z*z*z*(z*(z*6-15)+10); let aaa=this.p[this.p[this.p[X]+Y]+Z], aba=this.p[this.p[this.p[X]+Y+1]+Z], aab=this.p[this.p[this.p[X]+Y]+Z+1], abb=this.p[this.p[this.p[X]+Y+1]+Z+1], baa=this.p[this.p[this.p[X+1]+Y]+Z], bba=this.p[this.p[this.p[X+1]+Y+1]+Z], bab=this.p[this.p[this.p[X+1]+Y]+Z+1], bbb=this.p[this.p[this.p[X+1]+Y+1]+Z+1]; let x1=this.lerp(this.dot(this.grad3[aaa%12],x,y,z), this.dot(this.grad3[baa%12],x-1,y,z), u); let x2=this.lerp(this.dot(this.grad3[aba%12],x,y-1,z), this.dot(this.grad3[bba%12],x-1,y-1,z), u); let y1=this.lerp(x1,x2,v); x1=this.lerp(this.dot(this.grad3[aab%12],x,y,z-1), this.dot(this.grad3[bab%12],x-1,y,z-1), u); x2=this.lerp(this.dot(this.grad3[abb%12],x,y-1,z-1), this.dot(this.grad3[bbb%12],x-1,y-1,z-1), u); let y2=this.lerp(x1,x2,v); return (this.lerp(y1,y2,w)+1)/2; } lerp(a,b,t){ return a+(b-a)*t; } }
+  // ---------- SIMPLE PERLIN NOISE (stable) ----------
+  class Perlin { constructor() { this.p = [151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180]; for(let i=0;i<256;i++) this.p[256+i]=this.p[i]; } fade(t){ return t*t*t*(t*(t*6-15)+10); } lerp(a,b,t){ return a+(b-a)*t; } grad(h,x,y,z){ let hh=h&15, u=hh<8?x:y, v=hh<4?y:(hh==12||hh==14?x:z); return ((hh&1)==0?u:-u)+((hh&2)==0?v:-v); } noise3(x,y,z){ let ix=Math.floor(x)&255, iy=Math.floor(y)&255, iz=Math.floor(z)&255; x-=Math.floor(x); y-=Math.floor(y); z-=Math.floor(z); let u=this.fade(x), v=this.fade(y), w=this.fade(z); let aaa=this.p[this.p[this.p[ix]+iy]+iz], aba=this.p[this.p[this.p[ix]+iy+1]+iz], aab=this.p[this.p[this.p[ix]+iy]+iz+1], abb=this.p[this.p[this.p[ix]+iy+1]+iz+1], baa=this.p[this.p[this.p[ix+1]+iy]+iz], bba=this.p[this.p[this.p[ix+1]+iy+1]+iz], bab=this.p[this.p[this.p[ix+1]+iy]+iz+1], bbb=this.p[this.p[this.p[ix+1]+iy+1]+iz+1]; let x1=this.lerp(this.grad(aaa,x,y,z), this.grad(baa,x-1,y,z), u); let x2=this.lerp(this.grad(aba,x,y-1,z), this.grad(bba,x-1,y-1,z), u); let y1=this.lerp(x1,x2,v); x1=this.lerp(this.grad(aab,x,y,z-1), this.grad(bab,x-1,y,z-1), u); x2=this.lerp(this.grad(abb,x,y-1,z-1), this.grad(bbb,x-1,y-1,z-1), u); let y2=this.lerp(x1,x2,v); return (this.lerp(y1,y2,w)+1)/2; } }
   const perlin = new Perlin();
   let timeFlow = 0;
 
@@ -93,47 +93,44 @@
   const MAX_AGE_MS = 24*60*60*1000, SUN_REPULSION = 0.0008;
   const SEED_CLUSTERS = [{ name: "Pleiades", x: -320, y: -240, color: [100,115,160] }, { name: "Hyades", x: 390, y: 110, color: [115,95,140] }, { name: "Beehive", x: 750, y: -490, color: [130,105,95] }, { name: "Double Cluster", x: -790, y: 510, color: [95,110,130] }, { name: "Taurus", x: 110, y: -580, color: [85,80,115] }, { name: "Orion's Sword", x: -170, y: 650, color: [105,95,125] }];
   
-  // flow field grid
-  let flowGrid = { cellSize: 120, cols: 40, rows: 40, angles: [] };
-  function updateFlowField(now) { for(let i=0;i<flowGrid.cols;i++) for(let j=0;j<flowGrid.rows;j++) { let x = (i - flowGrid.cols/2)*flowGrid.cellSize, y = (j - flowGrid.rows/2)*flowGrid.cellSize; let angle = perlin.noise3(x*0.003, y*0.003, now*0.0008) * Math.PI * 4; flowGrid.angles[i+ j*flowGrid.cols] = angle; } }
+  // flow field grid (pre-allocated)
+  let flowGrid = { cellSize: 120, cols: 40, rows: 40, angles: new Array(40*40).fill(0) };
+  function updateFlowField(now) { for(let i=0;i<flowGrid.cols;i++) for(let j=0;j<flowGrid.rows;j++) { let x = (i - flowGrid.cols/2)*flowGrid.cellSize, y = (j - flowGrid.rows/2)*flowGrid.cellSize; let angle = perlin.noise3(x*0.003, y*0.003, now*0.0008) * Math.PI * 4; flowGrid.angles[i + j*flowGrid.cols] = angle; } }
   function getFlowAngle(px,py) { let cx = Math.floor((px + 2000)/flowGrid.cellSize) % flowGrid.cols, cy = Math.floor((py + 2000)/flowGrid.cellSize) % flowGrid.rows; if(cx<0||cy<0||cx>=flowGrid.cols||cy>=flowGrid.rows) return 0; return flowGrid.angles[cx + cy*flowGrid.cols] || 0; }
 
-  // organic dust & star layers with noise
   function createStarLayer(count,spread,minSize,maxSize,minBright,maxBright,colorRange,parallax){ let l=[]; for(let i=0;i<count;i++) l.push({ x:(Math.random()-0.5)*spread, y:(Math.random()-0.5)*spread, size:minSize+Math.random()*(maxSize-minSize), brightness:minBright+Math.random()*(maxBright-minBright), colorTemp:[colorRange[0]+Math.random()*(colorRange[1]-colorRange[0]),colorRange[2]+Math.random()*(colorRange[3]-colorRange[2]),colorRange[4]+Math.random()*(colorRange[5]-colorRange[4])], parallax, driftPhase:Math.random()*Math.PI*2 }); return l; }
   function initWorld() { starLayers = [ createStarLayer(500,5000,0.2,0.8,0.3,0.6,[200,255,220,255,240,255],0.1), createStarLayer(700,4000,0.4,1.4,0.4,0.7,[180,255,200,255,220,255],0.3), createStarLayer(500,3000,0.6,2.0,0.5,0.8,[150,240,180,240,200,240],0.6), createStarLayer(300,2000,1.0,2.5,0.6,1.0,[120,220,150,220,180,240],0.9) ]; for(let i=0;i<80;i++) dustClouds.push({ x:(Math.random()-0.5)*3500, y:(Math.random()-0.5)*3500, radius:40+Math.random()*180, particles:Array.from({length:20+Math.floor(Math.random()*40)},()=>({ offsetX:(Math.random()-0.5)*180, offsetY:(Math.random()-0.5)*180, size:Math.random()*3+1, alpha:Math.random()*0.3+0.1 })), driftX:0, driftY:0, color:[160+Math.random()*95,180+Math.random()*75,220+Math.random()*35], noiseSeed:Math.random()*100 }); for(let i=0;i<200;i++) flowParticles.push({ x:(Math.random()-0.5)*4000, y:(Math.random()-0.5)*4000, vx:0, vy:0, life:Math.random()*100, size:1+Math.random()*2 }); galacticClusters = [...SEED_CLUSTERS]; }
   function updateOrganic() { let t = Date.now() * 0.0003; for(let cloud of dustClouds) { let angle = perlin.noise3(cloud.x*0.002, cloud.y*0.002, t) * Math.PI * 2; let speed = 0.15; cloud.driftX = Math.cos(angle)*speed; cloud.driftY = Math.sin(angle)*speed; cloud.x += cloud.driftX; cloud.y += cloud.driftY; if(cloud.x>2800) cloud.x=-2800; if(cloud.x<-2800) cloud.x=2800; if(cloud.y>2800) cloud.y=-2800; if(cloud.y<-2800) cloud.y=2800; } for(let layer of starLayers) for(let s of layer) { let drift = perlin.noise3(s.x*0.0005, s.y*0.0005, t*0.5)*0.8; s.x += drift*0.2; s.y += drift*0.15; if(s.x>3000) s.x=-3000; if(s.x<-3000) s.x=3000; if(s.y>2000) s.y=-2000; if(s.y<-2000) s.y=2000; } }
-
-  // flow particles simulation
   function updateFlowParticles() { for(let p of flowParticles) { let angle = getFlowAngle(p.x, p.y); p.vx += Math.cos(angle)*0.03; p.vy += Math.sin(angle)*0.03; let spd = Math.hypot(p.vx, p.vy); if(spd>2.5) { p.vx*=0.98; p.vy*=0.98; } p.x += p.vx; p.y += p.vy; if(Math.abs(p.x)>3000 || Math.abs(p.y)>3000) { p.x = (Math.random()-0.5)*4000; p.y = (Math.random()-0.5)*4000; p.vx = (Math.random()-0.5)*0.5; p.vy = (Math.random()-0.5)*0.5; } p.life = (p.life+0.5)%100; } }
 
-  // ---------- RENDERING & BLOOM ----------
+  // ---------- RENDERING & BLOOM (safe) ----------
   let bloomCanvas = document.createElement('canvas'), blurCanvas = document.createElement('canvas');
   function applyBloom(ctxMain, w, h) { try { let scene = bloomCanvas; scene.width = w; scene.height = h; let tempCtx = scene.getContext('2d'); tempCtx.drawImage(ctxMain.canvas, 0, 0); blurCanvas.width = w; blurCanvas.height = h; let blurCtx = blurCanvas.getContext('2d'); blurCtx.filter = 'blur(12px)'; blurCtx.drawImage(scene, 0, 0); ctxMain.globalCompositeOperation = 'lighter'; ctxMain.drawImage(blurCanvas, 0, 0); ctxMain.globalCompositeOperation = 'source-over'; } catch(e){} }
 
-  // procedural planet texture generator
-  function getPlanetGradient(ctx, x, y, radius, baseColor) { let grad = ctx.createRadialGradient(x-radius*0.3, y-radius*0.3, radius*0.2, x, y, radius*1.2); grad.addColorStop(0, `rgba(255,240,210,0.9)`); grad.addColorStop(0.4, baseColor); grad.addColorStop(0.7, `rgba(${parseInt(baseColor.slice(1,3),16)-40}, ${parseInt(baseColor.slice(3,5),16)-30}, ${parseInt(baseColor.slice(5,7),16)-20}, 1)`); grad.addColorStop(1, `rgba(30,20,40,0.9)`); return grad; }
+  function starColor(ageMs) { if(ageMs<86400*3) return { core:"#c0d4ff", glow:"rgba(180,200,255,0.7)" }; if(ageMs<86400*7) return { core:"#ffddaa", glow:"rgba(255,221,170,0.6)" }; return { core:"#ffaa77", glow:"rgba(255,170,119,0.5)" }; }
 
-  // draw with clipping mask for reveal
   function renderScene(ctx, w, h, withClip = true) {
     ctx.clearRect(0,0,w,h);
     const bgGrad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w, h)*0.8); bgGrad.addColorStop(0, "#05051a"); bgGrad.addColorStop(1, "#000008"); ctx.fillStyle = bgGrad; ctx.fillRect(0,0,w,h);
     if(activeReveal && withClip) { ctx.save(); ctx.beginPath(); ctx.arc(activeReveal.x, activeReveal.y, activeReveal.radius, 0, Math.PI*2); ctx.clip(); }
     ctx.save(); ctx.translate(w/2, h/2); ctx.scale(camera.zoom, camera.zoom); ctx.translate(camera.x, camera.y);
-    // draw star layers, dust, flow particles, stars, etc (condensed)
+    // star layers
     for(let l of starLayers) for(let s of l) { let px = s.x - camera.x * s.parallax * 0.1, py = s.y - camera.y * s.parallax * 0.1; let twinkle = 0.7+0.3*Math.sin(Date.now()*0.001+s.x*0.1); ctx.fillStyle = `rgba(${s.colorTemp[0]},${s.colorTemp[1]},${s.colorTemp[2]},${s.brightness*twinkle})`; ctx.beginPath(); ctx.arc(px, py, s.size, 0, Math.PI*2); ctx.fill(); }
+    // dust
     for(let cloud of dustClouds) for(let p of cloud.particles) { let px = cloud.x + p.offsetX, py = cloud.y + p.offsetY; let alpha = p.alpha * (0.6+0.4*Math.sin(Date.now()*0.0003+px*0.05)); ctx.fillStyle = `rgba(${cloud.color[0]},${cloud.color[1]},${cloud.color[2]},${alpha})`; ctx.beginPath(); ctx.arc(px, py, p.size, 0, Math.PI*2); ctx.fill(); }
-    for(let p of flowParticles) { let angle = getFlowAngle(p.x,p.y); let alpha = 0.4+0.3*Math.sin(p.life*0.2); ctx.fillStyle = `rgba(200,210,255,${alpha*0.5})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.size*0.8, 0, Math.PI*2); ctx.fill(); }
-    // draw constellation lines with animated dash
+    // flow particles
+    for(let p of flowParticles) { let alpha = 0.4+0.3*Math.sin(p.life*0.2); ctx.fillStyle = `rgba(200,210,255,${alpha*0.5})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.size*0.8, 0, Math.PI*2); ctx.fill(); }
+    // animated constellation lines
     ctx.save(); ctx.setLineDash([8, 12]); ctx.lineDashOffset = Date.now() * 0.005; ctx.strokeStyle = "rgba(110,140,210,0.35)"; ctx.lineWidth = 1.2; for(let i=0;i<notes.length;i++) for(let j=i+1;j<notes.length;j++) { let a=notes[i],b=notes[j]; if(Math.hypot(a.x-b.x,a.y-b.y)<210) { ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); } } ctx.setLineDash([]); ctx.restore();
-    // orbits animated dashes
+    // orbits animated
     for(let sun of notes.filter(n=>n.isSun)) { ctx.save(); ctx.setLineDash([4, 8]); ctx.lineDashOffset = Date.now() * 0.003; for(let planet of notes.filter(p=>p.orbitingSunId===sun.id)) { ctx.beginPath(); ctx.arc(sun.x, sun.y, planet.orbitRadius, 0, Math.PI*2); ctx.strokeStyle = `rgba(150,170,220,0.4)`; ctx.stroke(); } ctx.restore(); }
-    // stars & planets with shadow & procedural textures
-    for(let star of notes) { let age = Math.max(0, Date.now() - star.created + ageOffset); let colors = starColor(age); let pulse = Math.sin(star.pulsePhase)*0.5; let size = Math.max(2.5, star.radius + pulse); if(star.isSun) size = star.radius + pulse*3; ctx.shadowColor = "rgba(255,200,100,0.5)"; ctx.shadowBlur = 15; if(star.orbitingSunId) { let grad = getPlanetGradient(ctx, star.x, star.y, size, "#c9ae74"); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(star.x, star.y, size, 0, Math.PI*2); ctx.fill(); } else { let grad = ctx.createRadialGradient(star.x-2, star.y-2, 1, star.x, star.y, size*2); grad.addColorStop(0, colors.core); grad.addColorStop(0.8, colors.glow); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(star.x, star.y, size*1.5, 0, Math.PI*2); ctx.fill(); } ctx.shadowBlur = 0; }
+    // stars & planets
+    for(let star of notes) { let age = Math.max(0, Date.now() - star.created + ageOffset); let colors = starColor(age); let pulse = Math.sin(star.pulsePhase)*0.5; let size = Math.max(2.5, star.radius + pulse); if(star.isSun) size = star.radius + pulse*3; ctx.shadowColor = "rgba(255,200,100,0.5)"; ctx.shadowBlur = 15; if(star.orbitingSunId) { let grad = ctx.createRadialGradient(star.x-2, star.y-2, 1, star.x, star.y, size*2); grad.addColorStop(0, "#e6c99c"); grad.addColorStop(1, "#b87c4a"); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(star.x, star.y, size, 0, Math.PI*2); ctx.fill(); } else { let grad = ctx.createRadialGradient(star.x-2, star.y-2, 1, star.x, star.y, size*2); grad.addColorStop(0, colors.core); grad.addColorStop(0.8, colors.glow); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(star.x, star.y, size*1.5, 0, Math.PI*2); ctx.fill(); } ctx.shadowBlur = 0; }
     ctx.restore();
     if(activeReveal && withClip) { ctx.restore(); activeReveal.radius += 12; if(activeReveal.radius >= activeReveal.maxRadius) activeReveal = null; }
   }
 
-  function starColor(ageMs) { if(ageMs<86400*3) return { core:"#c0d4ff", glow:"rgba(180,200,255,0.7)" }; if(ageMs<86400*7) return { core:"#ffddaa", glow:"rgba(255,221,170,0.6)" }; return { core:"#ffaa77", glow:"rgba(255,170,119,0.5)" }; }
+  // ---------- DATABASE & HELPERS ----------
   function updateCounter() { document.getElementById("counterMeta").innerHTML = `<span class="star-count-icon"></span> ${notes.length === 0 ? "empty sky" : `${notes.length} stars`}`; }
   function showToast(msg){ let t=document.getElementById("toastMsg"); t.innerText=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2000); }
   async function saveNoteToFirestore(note){ await notesCollection.doc(note.id).set(note); }
@@ -145,24 +142,21 @@
     const note = { id: Date.now() + Math.random().toString(36), created: Date.now(), opened:0, text: text.trim()===""?"✦ a drifting thought":text, x, y, vx:(Math.random()-0.5)*0.05, vy:(Math.random()-0.5)*0.05, radius:3+Math.random()*3, mass:2.5, orbitPhase:0, pulsePhase:Math.random()*Math.PI*2, sentiment:0, creatorId:localPeerId, creatorName:localPeerName, trail:[], isSun:false, orbitingSunId:null, orbitRadius:0, orbitAngle:0, orbitSpeed:0, orbitDirection:1, eccentricity:0 };
     note.mass = Math.min(10, (note.text?.length||12)/40 + 2);
     notes.push(note); saveNoteToFirestore(note); updateCounter();
-    // trigger circular reveal
-    let canvasEl = document.getElementById("cosmicCanvas");
-    let rect = canvasEl.getBoundingClientRect();
-    let world = { x: note.x, y: note.y };
-    let screenX = (world.x + camera.x) * camera.zoom + w/2, screenY = (world.y + camera.y) * camera.zoom + h/2;
+    let rect = canvas.getBoundingClientRect();
+    let screenX = (note.x + camera.x) * camera.zoom + w/2, screenY = (note.y + camera.y) * camera.zoom + h/2;
     activeReveal = { x: screenX, y: screenY, radius: 0, maxRadius: Math.max(w,h)*1.2 };
     return note;
   }
   function listenToFirestore(){ notesCollection.onSnapshot((snap)=>{ snap.docChanges().forEach((ch)=>{ if(ch.type==="added"||ch.type==="modified"){ let data=ch.doc.data(); let idx=notes.findIndex(n=>n.id===data.id); if(idx!==-1) notes[idx]={...notes[idx],...data}; else notes.push({...data,trail:[]}); } else if(ch.type==="removed") notes=notes.filter(n=>n.id!==ch.doc.id); }); updateCounter(); }); }
 
-  // animation loop integration
+  // ---------- ANIMATION LOOP ----------
   let canvas = document.getElementById("cosmicCanvas"), animationId;
   function resize(){ w=innerWidth; h=innerHeight; canvas.width=w*devicePixelRatio; canvas.height=h*devicePixelRatio; canvas.style.width=w+"px"; canvas.style.height=h+"px"; ctx=canvas.getContext("2d"); ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); bloomCanvas.width=w; bloomCanvas.height=h; blurCanvas.width=w; blurCanvas.height=h; }
-  function animate(){ updateFlowField(Date.now()); updateOrganic(); updateFlowParticles(); simulateMotion(); renderScene(ctx, w, h, true); applyBloom(ctx, w, h); requestAnimationFrame(animate); }
   function simulateMotion(){ for(let note of notes){ if(!note.isSun){ note.vx *= 0.997; note.vy *= 0.997; note.x += note.vx; note.y += note.vy; note.pulsePhase += 0.003; } } camera.zoom += (camera.targetZoom - camera.zoom) * 0.08; if(followingStarId){ let star=notes.find(n=>n.id===followingStarId); if(star){ camera.x += (-star.x - camera.x)*0.08; camera.y += (-star.y - camera.y)*0.08; camera.targetZoom=Math.min(2.5, camera.targetZoom*0.99+1.8*0.01); } else stopFollowing(); } }
   function stopFollowing(){ followingStarId=null; document.getElementById("releaseBtn").classList.remove("visible"); }
+  function animate(){ updateFlowField(Date.now()); updateOrganic(); updateFlowParticles(); simulateMotion(); renderScene(ctx, w, h, true); applyBloom(ctx, w, h); requestAnimationFrame(animate); }
 
-  // UI & interactions (preserving original)
+  // ---------- UI & INTERACTIONS ----------
   function initApp(){
     initWorld(); resize(); listenToFirestore(); updateCounter(); window.addEventListener("resize",resize);
     let appDiv = document.getElementById("app"), uiHidden=false;
@@ -170,21 +164,22 @@
     document.getElementById("novaBtn").onclick = ()=>{ let ns = createMemory(""); openEdit(ns.id); };
     document.getElementById("releaseBtn").addEventListener("click",stopFollowing);
     document.getElementById("ageSlider").addEventListener("input",(e)=>{ let val=parseFloat(e.target.value); ageOffset=(1-val)*MAX_AGE_MS; document.getElementById("ageLabel").innerText=val>0.9?"newborn":val>0.5?"young":val>0.2?"aging":"ancient"; });
-    // hit test & preview
     function worldPos(px,py){ return { x:(px-w/2)/camera.zoom-camera.x, y:(py-h/2)/camera.zoom-camera.y }; }
     function hitTest(px,py){ let wp=worldPos(px,py); let best=null,bestD=70; for(let n of notes){ let d=Math.hypot(wp.x-n.x,wp.y-n.y); if(d<Math.min(80,35+n.radius*3.5) && d<bestD){ bestD=d; best=n; } } return best; }
-    function hitTestConstellation(px,py){ let wp=worldPos(px,py); for(let cl of currentClusters){ if(cl.starIds.length>=3 && Math.hypot(wp.x-cl.centroid.x, wp.y-cl.centroid.y)<50) return cl; } return null; }
+    function hitTestConstellation(px,py){ let wp=worldPos(px,py); for(let cl of currentClusters){ if(cl.starIds && cl.starIds.length>=3 && Math.hypot(wp.x-cl.centroid.x, wp.y-cl.centroid.y)<50) return cl; } return null; }
     let previewTimer; function showPreview(star,cx,cy){ previewStarId=star.id; let creatorInfo=(star.creatorName&&star.creatorName!==localPeerName)?`<div class="creator-tag">from ${star.creatorName}</div>`:""; let short=star.text.length>85?star.text.slice(0,82)+"…":star.text; document.getElementById("etherPreview").innerHTML=creatorInfo+short; let left=Math.min(Math.max(cx-95,12),w-210), top=Math.min(Math.max(cy-85,28),h-100); document.getElementById("etherPreview").style.left=left+"px"; document.getElementById("etherPreview").style.top=top+"px"; document.getElementById("etherPreview").classList.add("visible"); if(previewTimer) clearTimeout(previewTimer); previewTimer=setTimeout(()=>{ document.getElementById("etherPreview").classList.remove("visible"); previewStarId=null; },1200); }
     function openEdit(id){ activeId=id; let star=notes.find(s=>s.id===id); if(star){ document.getElementById("editCreator").textContent = star.creatorName ? `created by ${star.creatorName}` : ''; document.getElementById("memoryEditor").value=star.text; let modal=document.getElementById("editModal"); modal.style.display="flex"; requestAnimationFrame(()=>modal.classList.add("visible")); } }
     function saveEdit(){ if(activeId){ let star=notes.find(s=>s.id===activeId); if(star){ star.text=document.getElementById("memoryEditor").value; if(!star.text.trim()) star.text="✦ a distant echo"; saveNoteToFirestore(star); } activeId=null; } closeModal(document.getElementById("editModal")); }
     function closeModal(m){ m.classList.remove("visible"); setTimeout(()=>m.style.display="none",250); }
     document.getElementById("saveMemoryBtn").onclick=saveEdit; document.getElementById("cancelEditBtn").onclick=()=>closeModal(document.getElementById("editModal")); document.getElementById("deleteMemoryBtn").onclick=()=>{ if(activeId){ deleteNote(activeId); activeId=null; closeModal(document.getElementById("editModal")); } };
-    // constellation naming
     let currentClusterForName=null;
     function promptConstellationName(cl){ currentClusterForName=cl; document.getElementById("constellationNameInput").value=cl.name||""; let m=document.getElementById("constellationNameModal"); m.style.display="flex"; requestAnimationFrame(()=>m.classList.add("visible")); }
     document.getElementById("saveConstellationName").onclick=()=>{ let name=document.getElementById("constellationNameInput").value.trim(); if(name&&currentClusterForName){ let existing=namedConstellations.findIndex(c=>c.starIds.join(',')===currentClusterForName.starIds.join(',')); if(existing!==-1) namedConstellations[existing].name=name; else namedConstellations.push({starIds:currentClusterForName.starIds,name:name}); constellationsCollection.doc(currentClusterForName.starIds.join(',')).set({starIds:currentClusterForName.starIds,name:name}); } closeModal(document.getElementById("constellationNameModal")); currentClusterForName=null; };
     document.getElementById("cancelConstellationName").onclick=()=>{ closeModal(document.getElementById("constellationNameModal")); currentClusterForName=null; };
-    // touch/mouse handlers (simplified, keep original pan/zoom)
+    // compute clusters helper
+    function computeClusters() { const threshold = 220; let visited = new Set(); let clusters = []; for (let i=0; i<notes.length; i++) { if (visited.has(i)) continue; let comp = []; let queue = [i]; visited.add(i); while (queue.length) { let idx = queue.pop(); comp.push(idx); for (let j=0; j<notes.length; j++) { if (visited.has(j)) continue; let d = Math.hypot(notes[idx].x - notes[j].x, notes[idx].y - notes[j].y); if (d < threshold) { visited.add(j); queue.push(j); } } } if (comp.length >= 3) { let cx = 0, cy = 0; for (let idx of comp) { cx += notes[idx].x; cy += notes[idx].y; } cx /= comp.length; cy /= comp.length; let starIds = comp.map(i => notes[i].id); let name = null; for (let nc of namedConstellations) { if (nc.starIds.length === starIds.length && nc.starIds.every(id => starIds.includes(id))) { name = nc.name; break; } } clusters.push({ starIds, centroid: {x: cx, y: cy}, name }); } } currentClusters = clusters; }
+    setInterval(computeClusters, 1000);
+    // pan/zoom
     let isPan=false, panStart={x:0,y:0}, camStart={x:0,y:0};
     canvas.addEventListener("touchstart",(e)=>{ e.preventDefault(); let t=e.touches[0]; let star=hitTest(t.clientX,t.clientY), cl=hitTestConstellation(t.clientX,t.clientY); if(cl){ promptConstellationName(cl); return; } if(star){ showPreview(star,t.clientX,t.clientY); let now=Date.now(); if(now - (canvas._lastTap||0)<300) openEdit(star.id); else canvas._lastTap=now; } else { isPan=true; panStart={x:t.clientX,y:t.clientY}; camStart={x:camera.x,y:camera.y}; } });
     canvas.addEventListener("touchmove",(e)=>{ if(isPan && e.touches.length===1){ let dx=e.touches[0].clientX-panStart.x, dy=e.touches[0].clientY-panStart.y; camera.x=camStart.x+dx/camera.zoom; camera.y=camStart.y+dy/camera.zoom; } e.preventDefault(); });
