@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>✦ SYNC CONSTELLATION · FIXED & IMPROVED</title>
+  <title>✦ SYNC CONSTELLATION · FULLY FIXED</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
     html, body { width:100%; height:100%; overflow:hidden; background:#010108; }
@@ -199,7 +199,6 @@
   }
 
   function initApp() {
-    // UI toggle
     const app = document.getElementById('app');
     const uiToggleBtn = document.getElementById('uiToggleBtn');
     const hudToggle = document.getElementById('hudToggle');
@@ -222,7 +221,6 @@
       toggleUI();
     });
 
-    // CORE APP
     let notes = [];
     let activeId = null;
     let camera = { x: 0, y: 0, zoom: 1.0, targetZoom: 1.0 };
@@ -260,11 +258,7 @@
           y: (Math.random()-0.5)*spread,
           size: minSize + Math.random()*(maxSize-minSize),
           brightness: minBright + Math.random()*(maxBright-minBright),
-          colorTemp: [
-            colorRange[0] + Math.random()*(colorRange[1]-colorRange[0]),
-            colorRange[2] + Math.random()*(colorRange[3]-colorRange[2]),
-            colorRange[4] + Math.random()*(colorRange[5]-colorRange[4])
-          ],
+          colorTemp: [colorRange[0] + Math.random()*(colorRange[1]-colorRange[0]), colorRange[2] + Math.random()*(colorRange[3]-colorRange[2]), colorRange[4] + Math.random()*(colorRange[5]-colorRange[4])],
           parallax
         });
       }
@@ -284,12 +278,7 @@
         x: (Math.random()-0.5)*4000,
         y: (Math.random()-0.5)*4000,
         radius: 50 + Math.random()*200,
-        particles: Array.from({length: 30 + Math.floor(Math.random()*40)}, () => ({
-          offsetX: (Math.random()-0.5)*200,
-          offsetY: (Math.random()-0.5)*200,
-          size: Math.random()*4+1,
-          alpha: Math.random()*0.3+0.1
-        })),
+        particles: Array.from({length: 30 + Math.floor(Math.random()*40)}, () => ({ offsetX: (Math.random()-0.5)*200, offsetY: (Math.random()-0.5)*200, size: Math.random()*4+1, alpha: Math.random()*0.3+0.1 })),
         driftX: (Math.random()-0.5)*0.2,
         driftY: (Math.random()-0.5)*0.2,
         color: [180+Math.random()*75, 200+Math.random()*55, 240+Math.random()*15]
@@ -305,200 +294,115 @@
         let parallaxY = s.y - camera.y * s.parallax * 0.1;
         const twinkle = 0.7 + 0.3 * Math.sin(Date.now()*0.001 + s.x*0.1 + s.y*0.1);
         ctx.fillStyle = `rgba(${s.colorTemp[0]},${s.colorTemp[1]},${s.colorTemp[2]},${s.brightness*twinkle})`;
-        ctx.beginPath();
-        ctx.arc(parallaxX, parallaxY, s.size, 0, Math.PI*2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(parallaxX, parallaxY, s.size, 0, Math.PI*2); ctx.fill();
       }
     }
 
-    function drawDustClouds() { /* same as before, included in full code */ }
-    function drawCosmicWeb() { /* same as before */ }
+    function drawDustClouds() {
+      for (let cloud of dustClouds) {
+        for (let p of cloud.particles) {
+          let worldX = cloud.x + p.offsetX;
+          let worldY = cloud.y + p.offsetY;
+          let alpha = p.alpha * (0.6 + 0.4 * Math.sin(Date.now()*0.0003 + worldX*0.1));
+          ctx.fillStyle = `rgba(${cloud.color[0]},${cloud.color[1]},${cloud.color[2]},${alpha})`;
+          ctx.beginPath(); ctx.arc(worldX, worldY, p.size, 0, Math.PI*2); ctx.fill();
+        }
+        cloud.x += cloud.driftX; cloud.y += cloud.driftY;
+        if (cloud.x > 2500) cloud.x = -2500;
+        if (cloud.x < -2500) cloud.x = 2500;
+        if (cloud.y > 2500) cloud.y = -2500;
+        if (cloud.y < -2500) cloud.y = 2500;
+      }
+    }
 
-    function starColor(ageMs) { /* same */ }
-    function computeMass(note) { /* same */ }
-    function assignSolarSystems() { /* same, with asteroid belts and rings */ }
-    function computeClusters() { /* same */ }
+    function drawCosmicWeb() {
+      ctx.strokeStyle = "rgba(80,100,180,0.06)"; ctx.lineWidth = 1;
+      for (let i=0; i<galacticClusters.length; i++) {
+        for (let j=i+1; j<galacticClusters.length; j++) {
+          let a=galacticClusters[i], b=galacticClusters[j];
+          if (Math.hypot(a.x-b.x, a.y-b.y) < 800) {
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          }
+        }
+      }
+    }
 
-    // Firestore CRUD (unchanged)
+    function starColor(ageMs) {
+      const day=86400000, week=day*7, month=day*30;
+      if(ageMs<day*3) return { core:"#c0d4ff", glow:"rgba(180,200,255,0.45)" };
+      if(ageMs<week) return { core:"#ffddaa", glow:"rgba(255,221,170,0.4)" };
+      if(ageMs<month) return { core:"#ffaa77", glow:"rgba(255,170,119,0.35)" };
+      return { core:"#ff8866", glow:"rgba(255,136,102,0.3)" };
+    }
+
+    function computeMass(note) { if (note.isSun) return 15; return Math.min(10, (note.text?.length||12)/40 + Math.min(2.5, (note.opened||0)/10)); }
+
+    function assignSolarSystems() {
+      let suns = notes.filter(n => n.isSun);
+      let free = notes.filter(n => !n.isSun && !n.orbitingSunId);
+      for (let sun of suns) {
+        for (let i = free.length-1; i >= 0; i--) {
+          let s = free[i];
+          let dist = Math.hypot(s.x - sun.x, s.y - sun.y);
+          if (dist < 250) {
+            s.orbitingSunId = sun.id; s.orbitRadius = dist; s.orbitAngle = Math.atan2(s.y - sun.y, s.x - sun.x);
+            s.orbitSpeed = 0.002 + Math.random() * 0.006; s.orbitDirection = Math.random() > 0.5 ? 1 : -1;
+            s.eccentricity = Math.random() * 0.4; s.vx = 0; s.vy = 0; s.radius = 2 + Math.random() * 5;
+            s.hasRing = Math.random() < 0.15; s.ringTilt = Math.random() * Math.PI; s.ringWidth = s.radius * 1.8;
+            free.splice(i, 1);
+          }
+        }
+        if (!sun._asteroidBelt && Math.random() < 0.3) sun._asteroidBelt = { inner: sun.radius*3, outer: sun.radius*5, count: 40 + Math.floor(Math.random()*40) };
+      }
+      computeClusters();
+      for (let cluster of currentClusters) {
+        let clusterNotes = cluster.starIds.map(id => notes.find(n => n.id === id)).filter(n => n && !n.isSun && !n.orbitingSunId);
+        if (clusterNotes.length >= 3) {
+          clusterNotes.sort((a,b) => a.created - b.created);
+          let oldest = clusterNotes[0];
+          if (!oldest.isSun) {
+            oldest.isSun = true; oldest.mass = 15; oldest.radius = 10 + Math.random() * 4;
+            birthFlashes.push({ x: oldest.x, y: oldest.y, progress: 0 });
+            for (let i=1; i<clusterNotes.length; i++) {
+              let planet = clusterNotes[i];
+              planet.orbitingSunId = oldest.id; planet.isSun = false;
+              let dx = planet.x - oldest.x, dy = planet.y - oldest.y;
+              planet.orbitRadius = Math.hypot(dx, dy); planet.orbitAngle = Math.atan2(dy, dx);
+              planet.orbitSpeed = 0.002 + Math.random() * 0.006; planet.orbitDirection = Math.random() > 0.5 ? 1 : -1;
+              planet.eccentricity = Math.random() * 0.4; planet.vx = 0; planet.vy = 0; planet.radius = 2 + Math.random() * 5;
+              planet.hasRing = Math.random() < 0.15; planet.ringTilt = Math.random() * Math.PI; planet.ringWidth = planet.radius * 1.8;
+            }
+          }
+        }
+      }
+    }
+
+    function computeClusters() {
+      const threshold = 220;
+      let visited = new Set(), clusters = [];
+      for (let i=0; i<notes.length; i++) {
+        if (visited.has(i)) continue;
+        let comp = [], queue = [i]; visited.add(i);
+        while (queue.length) {
+          let idx = queue.pop(); comp.push(idx);
+          for (let j=0; j<notes.length; j++) {
+            if (visited.has(j)) continue;
+            if (Math.hypot(notes[idx].x - notes[j].x, notes[idx].y - notes[j].y) < threshold) { visited.add(j); queue.push(j); }
+          }
+        }
+        if (comp.length >= 3) {
+          let cx=0,cy=0; comp.forEach(i => { cx+=notes[i].x; cy+=notes[i].y; }); cx/=comp.length; cy/=comp.length;
+          let starIds = comp.map(i => notes[i].id), name = null;
+          for (let nc of namedConstellations) {
+            if (nc.starIds.length === starIds.length && nc.starIds.every(id => starIds.includes(id))) { name = nc.name; break; }
+          }
+          clusters.push({ starIds, centroid: {x: cx, y: cy}, name });
+        }
+      }
+      currentClusters = clusters;
+    }
+
     async function saveNoteToFirestore(note) {
       await notesCollection.doc(note.id).set({
         id: note.id, created: note.created, opened: note.opened || 0, text: note.text,
-        x: note.x, y: note.y, vx: note.vx, vy: note.vy,
-        radius: note.radius, mass: note.mass, orbitPhase: note.orbitPhase, pulsePhase: note.pulsePhase,
-        sentiment: note.sentiment, creatorId: note.creatorId, creatorName: note.creatorName,
-        isSun: note.isSun, orbitingSunId: note.orbitingSunId,
-        orbitRadius: note.orbitRadius, orbitAngle: note.orbitAngle,
-        orbitSpeed: note.orbitSpeed, orbitDirection: note.orbitDirection, eccentricity: note.eccentricity
-      });
-    }
-    async function deleteNoteFromFirestore(id) { await notesCollection.doc(id).delete(); }
-    async function saveConstellationNameToFirestore(constellation) { /* same */ }
-
-    function listenToFirestore() { /* same */ }
-
-    function createMemory(text = "") { /* same */ }
-    function deleteNote(id) { /* same */ }
-    function clearAllNotes() { /* same */ }
-    function updateCounter() { /* same */ }
-
-    // Simulation (unchanged, includes sparkles and comets)
-    function simulate() { /* same, but ensure comet/sparkle logic is there */ }
-
-    // ---- SHOOTING STAR FUNCTIONS (restored) ----
-    function spawnShootingStar(angle, speed, len, op, x, y) {
-      shootingStars.push({ x, y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, length: len, opacity: op });
-    }
-    function triggerMeteorShower() {
-      if (showerActive) return;
-      showerActive = true;
-      let edge = Math.floor(Math.random()*4), baseX, baseY;
-      if (edge===0) { baseX=-50; baseY=Math.random()*h; }
-      else if (edge===2) { baseX=w+50; baseY=Math.random()*h; }
-      else if (edge===1) { baseX=Math.random()*w; baseY=-50; }
-      else { baseX=Math.random()*w; baseY=h+50; }
-      let baseAngle = Math.random()*Math.PI*2, count = 5 + Math.floor(Math.random()*6);
-      for (let i=0;i<count;i++) {
-        let angle = baseAngle + (Math.random()-0.5)*0.6, speed = 7+Math.random()*10, len = 60+Math.random()*80, op = 0.5+Math.random()*0.5;
-        spawnShootingStar(angle, speed, len, op, baseX, baseY);
-      }
-      showerActive = false;
-    }
-    function updateShootingStars() {
-      for (let i=0;i<shootingStars.length;i++) {
-        let s=shootingStars[i]; s.x+=s.vx; s.y+=s.vy;
-        if(s.x+s.length<0||s.x-s.length>w||s.y+s.length<0||s.y-s.length>h) shootingStars.splice(i--,1);
-      }
-      if (--nextShootingStar<=0) {
-        let angle = Math.random()*Math.PI*2, speed = 5+Math.random()*8, len = 50+Math.random()*70, op = 0.4+Math.random()*0.5;
-        let edge = Math.floor(Math.random()*4), x,y;
-        if (edge===0) { x=-len*0.5; y=Math.random()*h; }
-        else if (edge===2) { x=w+len*0.5; y=Math.random()*h; }
-        else if (edge===1) { x=Math.random()*w; y=-len*0.5; }
-        else { x=Math.random()*w; y=h+len*0.5; }
-        spawnShootingStar(angle, speed, len, op, x, y);
-        nextShootingStar = Math.floor(150+Math.random()*400);
-      }
-      if (Math.random()<0.0003 && !showerActive) triggerMeteorShower();
-    }
-    function drawShootingStars() {
-      for (let s of shootingStars) {
-        let headX=s.x, headY=s.y, dir=Math.hypot(s.vx,s.vy); if(dir<0.01) continue;
-        let tailX=s.x-s.vx*(s.length/dir), tailY=s.y-s.vy*(s.length/dir);
-        let grad=ctx.createLinearGradient(headX,headY,tailX,tailY);
-        grad.addColorStop(0,`rgba(255,240,200,${s.opacity})`); grad.addColorStop(1,`rgba(160,100,70,0)`);
-        ctx.beginPath(); ctx.moveTo(headX,headY); ctx.lineTo(tailX,tailY); ctx.strokeStyle=grad; ctx.lineWidth=2.2; ctx.stroke();
-        ctx.beginPath(); ctx.arc(headX,headY,2.8,0,Math.PI*2); ctx.fillStyle=`rgba(255,220,160,${s.opacity*0.8})`; ctx.fill();
-      }
-    }
-
-    // Render function (unchanged max visuals, includes drawShootingStars call at end)
-    function render() {
-      // ... (all drawing code)
-      drawShootingStars();
-    }
-
-    // Interaction (unchanged, but modified to cancel follow on tap of followed star)
-    function startFollowing(starId) {
-      followingStarId = starId;
-      document.getElementById("releaseBtn").classList.add("visible");
-    }
-    function stopFollowing() {
-      followingStarId = null;
-      document.getElementById("releaseBtn").classList.remove("visible");
-    }
-    document.getElementById("releaseBtn").addEventListener("click", stopFollowing);
-
-    function worldPos(px,py) { return { x:(px-w/2)/camera.zoom-camera.x, y:(py-h/2)/camera.zoom-camera.y }; }
-    function hitTest(px,py) { /* same */ }
-    // ... (other interaction functions identical)
-
-    // Modify touch/mouse to stop follow when tapping followed star
-    canvas.addEventListener("touchstart",(e)=>{
-      e.preventDefault();
-      if(e.touches.length!==1){ endPan(); return; }
-      let touch = e.touches[0];
-      let star = hitTest(touch.clientX, touch.clientY);
-      let constellation = hitTestConstellationCentroid(touch.clientX, touch.clientY);
-      if (constellation && constellation.starIds.length>=3) {
-        promptConstellationName(constellation); endPan(); return;
-      }
-      if(star){
-        if (followingStarId === star.id) {
-          stopFollowing();
-          endPan();
-          return;
-        }
-        showPreview(star, touch.clientX, touch.clientY);
-        let now = Date.now();
-        if(now-lastTap<300){
-          clearTimeout(longPressTimer);
-          openEdit(star.id);
-          lastTap=0;
-        }else{
-          lastTap=now;
-          longPressTimer=setTimeout(()=>{
-            startFollowing(star.id);
-            longPressTimer=null;
-          },500);
-        }
-        endPan();
-      }else{
-        startPan(touch.clientX, touch.clientY);
-        lastTap=0;
-      }
-    });
-
-    // Mouse: single click on followed star stops following
-    canvas.addEventListener("mousedown",(e)=>{
-      let star = hitTest(e.clientX, e.clientY);
-      if(star){
-        if (followingStarId === star.id) {
-          stopFollowing();
-          endMousePan();
-          return;
-        }
-        showPreview(star, e.clientX, e.clientY);
-        if (lastMouseDownStar && lastMouseDownStar.id === star.id && Date.now() - lastMouseDownTime < 300) {
-          clearTimeout(mouseLongPressTimer);
-          mouseLongPressTimer = null;
-          openEdit(star.id);
-          lastMouseDownStar = null;
-          endMousePan();
-          return;
-        }
-        if (mouseLongPressTimer) clearTimeout(mouseLongPressTimer);
-        mouseLongPressTimer = setTimeout(() => {
-          startFollowing(star.id);
-          mouseLongPressTimer = null;
-        }, 500);
-        lastMouseDownStar = star;
-        lastMouseDownTime = Date.now();
-        endMousePan();
-      } else {
-        startMousePan(e.clientX, e.clientY);
-        lastMouseDownStar = null;
-        if (mouseLongPressTimer) { clearTimeout(mouseLongPressTimer); mouseLongPressTimer = null; }
-      }
-    });
-
-    // ... rest of pan/zoom/keyboard identical
-
-    function animate(){
-      simulate();
-      updateShootingStars();
-      render();
-      requestAnimationFrame(animate);
-    }
-
-    function init() {
-      resize();
-      listenToFirestore();
-      updateCounter();
-      nextShootingStar = 60;
-    }
-    init();
-    animate();
-  }
-</script>
-</body>
-</html>
+        x: note.x, y: note.y, vx: note.vx, vy: note
