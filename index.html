@@ -218,7 +218,7 @@
       }
     }
 
-    // Double-tap on HUD toggles UI (as before), but also double-tap on empty space restores it
+    // HUD toggle still works as before
     document.getElementById('hudToggle').addEventListener('click', (e) => {
       if (e.target.closest('.meta')) return;
       toggleUI();
@@ -1049,7 +1049,7 @@
     function moveMousePan(cx,cy) { if(!isMousePanning)return; let dx=cx-mousePanStart.x, dy=cy-mousePanStart.y; camera.x=mouseCameraStart.x+dx/camera.zoom; camera.y=mouseCameraStart.y+dy/camera.zoom; }
     function endMousePan() { isMousePanning=false; }
 
-    // Touch handlers (with double-tap restore UI)
+    // Touch handlers (with panning allowed when UI hidden, double-tap to restore)
     canvas.addEventListener("touchstart",(e)=>{
       e.preventDefault();
       if(e.touches.length!==1){ endPan(); return; }
@@ -1075,21 +1075,22 @@
         }
         endPan();
       }else{
-        // Empty space touched
+        // Empty space
+        let now = Date.now();
         if (uiHidden) {
-          // Double-tap restores UI
-          let now = Date.now();
           if (now - lastTap < 300) {
+            // Double-tap restores UI
             toggleUI();
             lastTap = 0;
             endPan();
             return;
           }
           lastTap = now;
-        } else {
-          // Normal panning
+          // Start panning even when UI hidden
           startPan(touch.clientX, touch.clientY);
-          lastTap = 0;
+        } else {
+          startPan(touch.clientX, touch.clientY);
+          lastTap = 0; // reset for star double-tap detection
         }
       }
     });
@@ -1117,7 +1118,7 @@
 
     canvas.addEventListener("touchcancel",()=>{ if(longPressTimer)clearTimeout(longPressTimer); endPan(); pinchDist=null; });
 
-    // Mouse handlers (with double-click restore UI)
+    // Mouse handlers (with panning allowed when UI hidden, double-click to restore)
     let lastMouseDownStar = null;
     let lastMouseDownTime = 0;
     let mouseLongPressTimer = null;
@@ -1144,16 +1145,18 @@
         lastMouseDownTime = Date.now();
         endMousePan();
       } else {
-        // Empty space clicked
+        // Empty space
+        let now = Date.now();
         if (uiHidden) {
-          let now = Date.now();
           if (now - mouseLastTap < 300) {
+            // Double-click restores UI
             toggleUI();
             mouseLastTap = 0;
             endMousePan();
             return;
           }
           mouseLastTap = now;
+          startMousePan(e.clientX, e.clientY);
         } else {
           startMousePan(e.clientX, e.clientY);
           mouseLastTap = 0;
