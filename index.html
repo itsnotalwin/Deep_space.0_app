@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>✦ SYNC CONSTELLATION · COMPLETE</title>
+  <title>✦ SYNC CONSTELLATION · PHASE 1 POLISH</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
     html, body { width:100%; height:100%; overflow:hidden; background:#010108; }
@@ -24,10 +24,10 @@
     #app.ui-hidden .preview {
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
-    .release-btn { display:none; }   /* hidden by default */
+    .release-btn { display:none; }
     .release-btn.visible { display:flex; }
 
     /* HUD */
@@ -36,7 +36,8 @@
       display:flex; justify-content:space-between; align-items:center; z-index:100;
       background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
       padding:10px 24px; border-radius:60px; border:0.5px solid rgba(100,120,180,0.25);
-      box-shadow:0 8px 20px rgba(0,0,0,0.4); transition: opacity 0.3s ease;
+      box-shadow:0 8px 20px rgba(0,0,0,0.4);
+      transition: opacity 0.3s ease, transform 0.3s ease;
       cursor: pointer;
     }
     .title { font-size:11px; font-weight:400; letter-spacing:0.5em; color:rgba(200,210,240,0.85); text-shadow:0 0 12px rgba(100,140,220,0.4); text-transform:uppercase; }
@@ -50,7 +51,7 @@
       z-index:98; background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
       border-radius:60px; padding:6px 16px; display:flex; align-items:center; gap:10px;
       border:0.5px solid rgba(100,120,180,0.2); box-shadow:0 8px 20px rgba(0,0,0,0.3);
-      transition: opacity 0.3s ease;
+      transition: opacity 0.3s ease, transform 0.3s ease;
     }
     .age-label { font-size:9px; color:rgba(180,190,230,0.9); white-space:nowrap; min-width:70px; text-align:center; letter-spacing:0.3px; }
     input[type="range"].age-slider { width:120px; height:4px; -webkit-appearance:none; background:rgba(255,255,255,0.08); border-radius:4px; outline:none; }
@@ -65,7 +66,7 @@
       backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); color:#e6f0ff; font-size:32px;
       border:0.5px solid rgba(140,160,220,0.3); box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 0 1px rgba(120,140,200,0.2);
       z-index:120; cursor:pointer; display:flex; align-items:center; justify-content:center;
-      transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1), opacity 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1), opacity 0.3s ease, transform 0.3s ease;
       animation: btnGlow 3s ease-in-out infinite;
     }
     @keyframes btnGlow { 0%,100% { box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 0 1px rgba(120,140,200,0.2); } 50% { box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 25px rgba(150,180,255,0.6); } }
@@ -79,9 +80,15 @@
       border:0.5px solid rgba(100,120,180,0.3); color:#c8d6ff; font-size:20px;
       z-index:150; cursor:pointer; align-items:center; justify-content:center;
       box-shadow:0 6px 15px rgba(0,0,0,0.5);
-      transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1), opacity 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1), opacity 0.3s ease, transform 0.3s ease;
     }
     .release-btn:active { transform:translate(-50%,-50%) scale(0.9); background:rgba(30,30,55,0.8); }
+
+    /* Hidden state transforms */
+    #app.ui-hidden .hud { transform: translateY(-30px); }
+    #app.ui-hidden .age-bar { transform: translateY(30px) translateX(-50%); }
+    #app.ui-hidden .add { transform: translateY(30px); }
+    #app.ui-hidden .release-btn { transform: translate(-50%,-50%) scale(0.5); }
 
     /* Vignette */
     .vignette {
@@ -218,7 +225,6 @@
       }
     }
 
-    // HUD toggle still works as before
     document.getElementById('hudToggle').addEventListener('click', (e) => {
       if (e.target.closest('.meta')) return;
       toggleUI();
@@ -253,7 +259,7 @@
     let ageOffset = 0;
     let birthFlashes = [];
 
-    // --- MAX BACKGROUND LAYERS ---
+    // --- MAX BACKGROUND LAYERS (unchanged) ---
     const createStarLayer = (count, spread, minSize, maxSize, minBright, maxBright, colorRange, parallax) => {
       let layer = [];
       for (let i=0; i<count; i++) {
@@ -525,17 +531,32 @@
         creatorId: localPeerId, creatorName: localPeerName,
         trail: [],
         isSun: false, orbitingSunId: null,
-        orbitRadius: 0, orbitAngle: 0, orbitSpeed: 0, orbitDirection: 1, eccentricity: 0
+        orbitRadius: 0, orbitAngle: 0, orbitSpeed: 0, orbitDirection: 1, eccentricity: 0,
+        fadeIn: 0   // NEW: for fade-in effect
       };
       note.mass = computeMass(note);
       notes.push(note);
       saveNoteToFirestore(note);
       updateCounter();
+      showToast(`✦ ${localPeerName} created a star`);
+      if (navigator.vibrate) navigator.vibrate(15);
       return note;
     }
 
-    function deleteNote(id) { notes = notes.filter(n => n.id !== id); deleteNoteFromFirestore(id); updateCounter(); }
-    function clearAllNotes() { notes.forEach(n => deleteNoteFromFirestore(n.id)); notes = []; updateCounter(); showToast("constellation cleared"); }
+    function deleteNote(id) {
+      notes = notes.filter(n => n.id !== id);
+      deleteNoteFromFirestore(id);
+      updateCounter();
+      showToast("🗑 star obliterated");
+      if (navigator.vibrate) navigator.vibrate([50,50,50]);
+    }
+    function clearAllNotes() {
+      notes.forEach(n => deleteNoteFromFirestore(n.id));
+      notes = [];
+      updateCounter();
+      showToast("constellation cleared");
+      if (navigator.vibrate) navigator.vibrate([50,50,50]);
+    }
     function updateCounter() { document.getElementById("counterMeta").innerHTML = `<span class="star-count-icon"></span> ${notes.length === 0 ? "empty sky" : `${notes.length} stars`}`; }
 
     function simulate() {
@@ -543,6 +564,11 @@
         if (!note.trail) note.trail = [];
         note.trail.push({x: note.x, y: note.y});
         if (note.trail.length > 25) note.trail.shift();
+        // Fade-in
+        if (note.fadeIn !== undefined && note.fadeIn < 1) {
+          note.fadeIn += 0.02;
+          if (note.fadeIn > 1) note.fadeIn = 1;
+        }
       }
       for (let i=birthFlashes.length-1; i>=0; i--) {
         birthFlashes[i].progress += 0.02;
@@ -769,6 +795,7 @@
         ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(flash.x, flash.y, radius, 0, Math.PI*2); ctx.fill();
       }
 
+      // Star trails (drawn without fade-in effect)
       for (let star of notes) {
         if (star.trail && star.trail.length > 1) {
           let age = Math.max(0, Date.now() - star.created + ageOffset);
@@ -787,6 +814,7 @@
         }
       }
 
+      // Stars with fade-in
       for (let star of notes) {
         let age = Math.max(0, Date.now() - star.created + ageOffset);
         let colors = starColor(age);
@@ -795,8 +823,20 @@
         if (star.isSun) {
           size = star.radius + pulse * 3;
           colors = { core:"#fff8e0", glow:"rgba(255,240,180,0.8)" };
+        } else if (star.orbitingSunId) {
+          size = star.radius + pulse * 0.3;
+        }
+
+        // Fade-in alpha
+        let fadeAlpha = (star.fadeIn !== undefined) ? star.fadeIn : 1;
+        if (fadeAlpha <= 0) continue;
+
+        ctx.save();
+        ctx.globalAlpha = fadeAlpha;
+
+        if (star.isSun) {
           ctx.save();
-          ctx.globalAlpha = 0.15;
+          ctx.globalAlpha *= 0.15; // rays are already semi-transparent
           for (let ray=0; ray<8; ray++) {
             let angle = (Date.now()*0.0005 + ray * Math.PI/4) % (Math.PI*2);
             let rayLength = size * (4 + Math.sin(Date.now()*0.002 + ray)*2);
@@ -825,19 +865,16 @@
               ctx.beginPath(); ctx.arc(mx, my, 1.5, 0, Math.PI*2); ctx.fill();
             }
           }
-        } else if (star.orbitingSunId) {
-          size = star.radius + pulse * 0.3;
-          if (star.hasRing) {
-            ctx.save();
-            ctx.translate(star.x, star.y);
-            ctx.rotate(star.ringTilt);
-            ctx.beginPath();
-            ctx.ellipse(0, 0, star.ringWidth, star.ringWidth*0.3, 0, 0, Math.PI*2);
-            ctx.strokeStyle = "rgba(200,220,255,0.4)";
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-            ctx.restore();
-          }
+        } else if (star.orbitingSunId && star.hasRing) {
+          ctx.save();
+          ctx.translate(star.x, star.y);
+          ctx.rotate(star.ringTilt);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, star.ringWidth, star.ringWidth*0.3, 0, 0, Math.PI*2);
+          ctx.strokeStyle = "rgba(200,220,255,0.4)";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.restore();
         }
 
         let outerGlow = ctx.createRadialGradient(star.x, star.y, size*0.8, star.x, star.y, size*7);
@@ -856,8 +893,11 @@
           ctx.strokeStyle = "rgba(220, 230, 255, 0.8)"; ctx.lineWidth = 2;
           ctx.shadowColor = "rgba(180, 200, 255, 0.6)"; ctx.shadowBlur = 10; ctx.stroke(); ctx.shadowBlur = 0;
         }
+
+        ctx.restore(); // restore globalAlpha
       }
 
+      // Sparkles, comets (unchanged, drawn after stars)
       for (let spark of sparkles) {
         let alpha = spark.timeLeft * 0.9;
         let radius = 2 + spark.timeLeft * 2;
@@ -912,6 +952,8 @@
         if (existing !== -1) namedConstellations[existing].name = name;
         else namedConstellations.push({ starIds: cluster.starIds, name: name });
         saveConstellationNameToFirestore({ starIds: cluster.starIds, name: name });
+        showToast(`◈ constellation "${name}" named`);
+        if (navigator.vibrate) navigator.vibrate(10);
       }
       closeModal(document.getElementById("constellationNameModal"));
       window._currentCluster = null;
@@ -921,6 +963,7 @@
     function startFollowing(starId) {
       followingStarId = starId;
       document.getElementById("releaseBtn").classList.add("visible");
+      if (navigator.vibrate) navigator.vibrate(10);
     }
     function stopFollowing() {
       followingStarId = null;
@@ -982,6 +1025,7 @@
         let modal=document.getElementById("editModal");
         modal.style.display="flex"; requestAnimationFrame(()=>modal.classList.add("visible"));
         document.getElementById("memoryEditor").focus();
+        if (navigator.vibrate) navigator.vibrate(10);
       }
     }
     function closeModal(modal){ modal.classList.remove("visible"); setTimeout(()=>modal.style.display="none",250); }
@@ -993,6 +1037,7 @@
           if(!star.text.trim()) star.text="✦ a distant echo";
           star.mass=computeMass(star);
           saveNoteToFirestore(star);
+          showToast("✦ memory updated");
         }
         activeId=null;
       }
@@ -1006,7 +1051,6 @@
     document.getElementById("closeViewBtn").onclick = () => closeModal(document.getElementById("viewModal"));
     document.getElementById("editFromViewBtn").onclick = () => { closeModal(document.getElementById("viewModal")); setTimeout(()=>{ if(activeId) openEdit(activeId); },100); };
 
-    // Clear modal is present but not accessible since clear button is removed (can be used for future)
     document.getElementById("confirmClearBtn").onclick = () => { clearAllNotes(); closeModal(document.getElementById("clearConfirmModal")); };
     document.getElementById("cancelClearBtn").onclick = () => closeModal(document.getElementById("clearConfirmModal"));
 
@@ -1049,7 +1093,7 @@
     function moveMousePan(cx,cy) { if(!isMousePanning)return; let dx=cx-mousePanStart.x, dy=cy-mousePanStart.y; camera.x=mouseCameraStart.x+dx/camera.zoom; camera.y=mouseCameraStart.y+dy/camera.zoom; }
     function endMousePan() { isMousePanning=false; }
 
-    // Touch handlers (with panning allowed when UI hidden, double-tap to restore)
+    // Touch handlers (with double-tap tuned to 250ms and haptics)
     canvas.addEventListener("touchstart",(e)=>{
       e.preventDefault();
       if(e.touches.length!==1){ endPan(); return; }
@@ -1062,7 +1106,7 @@
       if(star){
         showPreview(star, touch.clientX, touch.clientY);
         let now = Date.now();
-        if(now-lastTap<300){
+        if(now-lastTap<250){
           clearTimeout(longPressTimer);
           openEdit(star.id);
           lastTap=0;
@@ -1075,22 +1119,19 @@
         }
         endPan();
       }else{
-        // Empty space
         let now = Date.now();
         if (uiHidden) {
-          if (now - lastTap < 300) {
-            // Double-tap restores UI
+          if (now - lastTap < 250) {
             toggleUI();
             lastTap = 0;
             endPan();
             return;
           }
           lastTap = now;
-          // Start panning even when UI hidden
           startPan(touch.clientX, touch.clientY);
         } else {
           startPan(touch.clientX, touch.clientY);
-          lastTap = 0; // reset for star double-tap detection
+          lastTap = 0;
         }
       }
     });
@@ -1118,7 +1159,7 @@
 
     canvas.addEventListener("touchcancel",()=>{ if(longPressTimer)clearTimeout(longPressTimer); endPan(); pinchDist=null; });
 
-    // Mouse handlers (with panning allowed when UI hidden, double-click to restore)
+    // Mouse handlers (double-click tuned to 250ms)
     let lastMouseDownStar = null;
     let lastMouseDownTime = 0;
     let mouseLongPressTimer = null;
@@ -1128,7 +1169,7 @@
       let star = hitTest(e.clientX, e.clientY);
       if(star){
         showPreview(star, e.clientX, e.clientY);
-        if (lastMouseDownStar && lastMouseDownStar.id === star.id && Date.now() - lastMouseDownTime < 300) {
+        if (lastMouseDownStar && lastMouseDownStar.id === star.id && Date.now() - lastMouseDownTime < 250) {
           clearTimeout(mouseLongPressTimer);
           mouseLongPressTimer = null;
           openEdit(star.id);
@@ -1145,11 +1186,9 @@
         lastMouseDownTime = Date.now();
         endMousePan();
       } else {
-        // Empty space
         let now = Date.now();
         if (uiHidden) {
-          if (now - mouseLastTap < 300) {
-            // Double-click restores UI
+          if (now - mouseLastTap < 250) {
             toggleUI();
             mouseLastTap = 0;
             endMousePan();
