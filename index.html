@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>✦ SYNC CONSTELLATION · CLEAN UI</title>
+  <title>✦ SYNC CONSTELLATION · COMPLETE</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
     html, body { width:100%; height:100%; overflow:hidden; background:#010108; }
@@ -26,8 +26,8 @@
       pointer-events: none;
       transition: opacity 0.3s ease;
     }
-    /* Keep the release button hidden unless following, even when UI is shown */
-    .release-btn { display:none; }
+
+    .release-btn { display:none; }   /* hidden by default */
     .release-btn.visible { display:flex; }
 
     /* HUD */
@@ -36,9 +36,8 @@
       display:flex; justify-content:space-between; align-items:center; z-index:100;
       background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
       padding:10px 24px; border-radius:60px; border:0.5px solid rgba(100,120,180,0.25);
-      box-shadow:0 8px 20px rgba(0,0,0,0.4);
-      transition: opacity 0.3s ease;
-      cursor: pointer; /* make whole HUD clickable for toggle */
+      box-shadow:0 8px 20px rgba(0,0,0,0.4); transition: opacity 0.3s ease;
+      cursor: pointer;
     }
     .title { font-size:11px; font-weight:400; letter-spacing:0.5em; color:rgba(200,210,240,0.85); text-shadow:0 0 12px rgba(100,140,220,0.4); text-transform:uppercase; }
     .meta { font-size:11px; font-weight:450; color:rgba(180,195,230,0.8); background:rgba(0,0,0,0.35); padding:6px 16px; border-radius:40px; backdrop-filter:blur(8px); letter-spacing:0.3px; display:flex; align-items:center; gap:6px; }
@@ -74,18 +73,14 @@
 
     /* Release button */
     .release-btn {
-  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  width:48px; height:48px; border-radius:48px;
-  background:rgba(15,15,30,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
-  border:0.5px solid rgba(100,120,180,0.3); color:#c8d6ff; font-size:20px;
-  z-index:150; cursor:pointer; display:none;          /* hidden by default */
-  align-items:center; justify-content:center;
-  box-shadow:0 6px 15px rgba(0,0,0,0.5);
-  transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1), opacity 0.3s ease;
-}
-.release-btn.visible {
-  display:flex;       /* only shown when following */
-}
+      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      width:48px; height:48px; border-radius:48px;
+      background:rgba(15,15,30,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+      border:0.5px solid rgba(100,120,180,0.3); color:#c8d6ff; font-size:20px;
+      z-index:150; cursor:pointer; align-items:center; justify-content:center;
+      box-shadow:0 6px 15px rgba(0,0,0,0.5);
+      transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1), opacity 0.3s ease;
+    }
     .release-btn:active { transform:translate(-50%,-50%) scale(0.9); background:rgba(30,30,55,0.8); }
 
     /* Vignette */
@@ -132,7 +127,6 @@
 <div id="app">
   <canvas id="cosmicCanvas"></canvas>
   <div class="vignette"></div>
-  <!-- HUD is now the only top bar, and it toggles UI visibility when clicked -->
   <div class="hud" id="hudToggle">
     <div class="title">✦ SYNC CONSTELLATION</div>
     <div class="meta" id="counterMeta"><span class="star-count-icon"></span> 0 stars</div>
@@ -146,7 +140,7 @@
   <div class="preview" id="etherPreview"></div>
   <div class="notification" id="toastMsg"></div>
 
-  <!-- Modals (unchanged) -->
+  <!-- Modals -->
   <div class="modal" id="viewModal"><div class="panel"><div id="viewCreator" class="creator-info"></div><div class="viewer" id="memoryViewer"></div><div class="actions"><button id="closeViewBtn">close</button><button id="editFromViewBtn">edit</button></div></div></div>
   <div class="modal" id="editModal"><div class="panel"><div id="editCreator" class="creator-info"></div><textarea id="memoryEditor" placeholder="...a thought drifts..."></textarea><div class="actions"><button id="saveMemoryBtn">engrave</button><button id="cancelEditBtn">drift</button><button id="deleteMemoryBtn" class="delete">obliterate</button></div></div></div>
   <div class="modal" id="constellationNameModal"><div class="panel"><div style="text-align:center; color:#d0d8ff; margin-bottom:10px;">name this constellation</div><input type="text" class="name-input" id="constellationNameInput" placeholder="constellation name"><div class="actions"><button id="saveConstellationName">save</button><button id="cancelConstellationName">cancel</button></div></div></div>
@@ -212,23 +206,23 @@
   }
 
   function initApp() {
-    // UI toggle
     const app = document.getElementById('app');
-    const hudToggle = document.getElementById('hudToggle');
     let uiHidden = false;
-    hudToggle.addEventListener('click', (e) => {
-      // Don't toggle if clicking on the counter meta itself (to allow future interactions)
-      if (e.target.closest('.meta')) return;
+
+    function toggleUI() {
       uiHidden = !uiHidden;
       if (uiHidden) {
         app.classList.add('ui-hidden');
       } else {
         app.classList.remove('ui-hidden');
       }
-    });
+    }
 
-    // Clear button removed; if needed, we can keep the modal for clearing via another method, but the button is gone.
-    // Share button removed.
+    // Double-tap on HUD toggles UI (as before), but also double-tap on empty space restores it
+    document.getElementById('hudToggle').addEventListener('click', (e) => {
+      if (e.target.closest('.meta')) return;
+      toggleUI();
+    });
 
     let notes = [];
     let activeId = null;
@@ -259,7 +253,7 @@
     let ageOffset = 0;
     let birthFlashes = [];
 
-    // --- MAX BACKGROUND LAYERS (unchanged) ---
+    // --- MAX BACKGROUND LAYERS ---
     const createStarLayer = (count, spread, minSize, maxSize, minBright, maxBright, colorRange, parallax) => {
       let layer = [];
       for (let i=0; i<count; i++) {
@@ -1012,9 +1006,9 @@
     document.getElementById("closeViewBtn").onclick = () => closeModal(document.getElementById("viewModal"));
     document.getElementById("editFromViewBtn").onclick = () => { closeModal(document.getElementById("viewModal")); setTimeout(()=>{ if(activeId) openEdit(activeId); },100); };
 
-    // Clear confirmation modal is still accessible from a hidden button? We removed the clear button,
-    // but we can keep the modal and maybe later add a way to clear. For now, we just keep the modal but no trigger.
-    // We'll leave the confirmClearBtn etc. in the DOM but not accessible. That's fine.
+    // Clear modal is present but not accessible since clear button is removed (can be used for future)
+    document.getElementById("confirmClearBtn").onclick = () => { clearAllNotes(); closeModal(document.getElementById("clearConfirmModal")); };
+    document.getElementById("cancelClearBtn").onclick = () => closeModal(document.getElementById("clearConfirmModal"));
 
     const ageSlider = document.getElementById("ageSlider");
     const ageLabel = document.getElementById("ageLabel");
@@ -1055,6 +1049,7 @@
     function moveMousePan(cx,cy) { if(!isMousePanning)return; let dx=cx-mousePanStart.x, dy=cy-mousePanStart.y; camera.x=mouseCameraStart.x+dx/camera.zoom; camera.y=mouseCameraStart.y+dy/camera.zoom; }
     function endMousePan() { isMousePanning=false; }
 
+    // Touch handlers (with double-tap restore UI)
     canvas.addEventListener("touchstart",(e)=>{
       e.preventDefault();
       if(e.touches.length!==1){ endPan(); return; }
@@ -1080,8 +1075,22 @@
         }
         endPan();
       }else{
-        startPan(touch.clientX, touch.clientY);
-        lastTap=0;
+        // Empty space touched
+        if (uiHidden) {
+          // Double-tap restores UI
+          let now = Date.now();
+          if (now - lastTap < 300) {
+            toggleUI();
+            lastTap = 0;
+            endPan();
+            return;
+          }
+          lastTap = now;
+        } else {
+          // Normal panning
+          startPan(touch.clientX, touch.clientY);
+          lastTap = 0;
+        }
       }
     });
 
@@ -1108,9 +1117,11 @@
 
     canvas.addEventListener("touchcancel",()=>{ if(longPressTimer)clearTimeout(longPressTimer); endPan(); pinchDist=null; });
 
+    // Mouse handlers (with double-click restore UI)
     let lastMouseDownStar = null;
     let lastMouseDownTime = 0;
     let mouseLongPressTimer = null;
+    let mouseLastTap = 0;
 
     canvas.addEventListener("mousedown",(e)=>{
       let star = hitTest(e.clientX, e.clientY);
@@ -1133,7 +1144,20 @@
         lastMouseDownTime = Date.now();
         endMousePan();
       } else {
-        startMousePan(e.clientX, e.clientY);
+        // Empty space clicked
+        if (uiHidden) {
+          let now = Date.now();
+          if (now - mouseLastTap < 300) {
+            toggleUI();
+            mouseLastTap = 0;
+            endMousePan();
+            return;
+          }
+          mouseLastTap = now;
+        } else {
+          startMousePan(e.clientX, e.clientY);
+          mouseLastTap = 0;
+        }
         lastMouseDownStar = null;
         if (mouseLongPressTimer) { clearTimeout(mouseLongPressTimer); mouseLongPressTimer = null; }
       }
