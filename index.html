@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>✦ ETERNAL CONSTELLATION · CAMERA FIXED</title>
+  <title>✦ PARALLAX CONSTELLATION · FIXED</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
     html, body { width:100%; height:100%; overflow:hidden; background:#010108; }
@@ -540,7 +540,7 @@
     }
 
     // ----------------------------- INIT BACKGROUND -----------------------------
-    function createStarLayer(count, spread, minSize, maxSize, minBright, maxBright, colorRange) {
+    function createStarLayer(count, spread, minSize, maxSize, minBright, maxBright, colorRange, parallax) {
       let layer = [];
       for (let i=0; i<count; i++) {
         layer.push({
@@ -553,6 +553,7 @@
             colorRange[2]+Math.random()*(colorRange[3]-colorRange[2]),
             colorRange[4]+Math.random()*(colorRange[5]-colorRange[4])
           ],
+          parallax: parallax,
           phase: Math.random()*Math.PI*2
         });
       }
@@ -561,12 +562,12 @@
 
     function initWorld() {
       starLayers = [
-        createStarLayer(800, 6500, 0.2,0.7,0.3,0.6, [200,255,220,255,240,255]),
-        createStarLayer(1000, 5500, 0.3,1.0,0.4,0.7, [180,255,200,255,220,255]),
-        createStarLayer(700, 4500, 0.5,1.5,0.5,0.8, [150,240,180,240,200,240]),
-        createStarLayer(500, 3500, 0.8,2.2,0.6,0.9, [120,220,150,220,180,240]),
-        createStarLayer(400, 2800, 1.2,2.8,0.7,1.0, [100,200,130,200,160,220]),
-        createStarLayer(250, 2000, 1.8,3.5,0.8,1.0, [80,180,110,180,140,200])
+        createStarLayer(800, 6500, 0.2,0.7,0.3,0.6, [200,255,220,255,240,255], 0.05),
+        createStarLayer(1000, 5500, 0.3,1.0,0.4,0.7, [180,255,200,255,220,255], 0.12),
+        createStarLayer(700, 4500, 0.5,1.5,0.5,0.8, [150,240,180,240,200,240], 0.25),
+        createStarLayer(500, 3500, 0.8,2.2,0.6,0.9, [120,220,150,220,180,240], 0.45),
+        createStarLayer(400, 2800, 1.2,2.8,0.7,1.0, [100,200,130,200,160,220], 0.7),
+        createStarLayer(250, 2000, 1.8,3.5,0.8,1.0, [80,180,110,180,140,200], 1.0)
       ];
       nebulaLayers = [];
       const baseColors = [
@@ -784,7 +785,7 @@
       }
     }
 
-    // ----------------------------- RENDERING (NO PARALLAX OFFSETS) -----------------------------
+    // ----------------------------- RENDERING (WITH PARALLAX) -----------------------------
     let bloomCanvas = document.createElement('canvas');
     let blurCanvas = document.createElement('canvas');
     function applyBloom(ctxMain, w, h) {
@@ -817,7 +818,7 @@
       ctx.scale(camera.zoom, camera.zoom);
       ctx.translate(camera.x, camera.y);
       
-      // Nebulas
+      // Nebulas (no parallax, fixed to world)
       for (let neb of nebulaLayers) {
         let pulse = 0.7 + 0.3 * Math.sin(time*0.002 * neb.pulseSpeed + neb.phase);
         let rad = neb.radius * (0.9 + 0.1 * Math.sin(time*0.001 + neb.phase));
@@ -831,18 +832,23 @@
         ctx.fill();
       }
       
-      // Star layers (no parallax, just world coordinates)
+      // Star layers with parallax: screen position = world position - (camera * parallaxFactor)
       for (let layer of starLayers) {
+        let parallax = layer[0].parallax; // all stars in same layer share factor
+        let offsetX = camera.x * parallax;
+        let offsetY = camera.y * parallax;
         for (let s of layer) {
+          let px = s.x - offsetX;
+          let py = s.y - offsetY;
           let twinkle = 0.65 + 0.35 * Math.sin(time*0.004 + s.phase);
           ctx.fillStyle = `rgba(${s.colorTemp[0]}, ${s.colorTemp[1]}, ${s.colorTemp[2]}, ${s.brightness * twinkle * 0.8})`;
           ctx.beginPath();
-          ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
+          ctx.arc(px, py, s.size, 0, Math.PI*2);
           ctx.fill();
         }
       }
       
-      // Dust
+      // Dust (no parallax, fixed to world)
       for (let cloud of dustClouds) {
         for (let p of cloud.particles) {
           let px = cloud.x + p.offsetX;
@@ -855,7 +861,7 @@
         }
       }
       
-      // Flow particles
+      // Flow particles (no parallax, fixed to world)
       for (let p of flowParticles) {
         let alpha = 0.25 + 0.2 * Math.sin(p.life*0.2);
         ctx.fillStyle = `rgba(210, 230, 255, ${alpha*0.6})`;
@@ -864,7 +870,7 @@
         ctx.fill();
       }
       
-      // Galactic clusters
+      // Galactic clusters (fixed)
       for (let gc of galacticClusters) {
         let gradGlow = ctx.createRadialGradient(gc.x, gc.y, 20, gc.x, gc.y, 400);
         gradGlow.addColorStop(0, `rgba(${gc.color[0]}, ${gc.color[1]}, ${gc.color[2]}, 0.1)`);
@@ -883,7 +889,7 @@
         }
       }
       
-      // Permanent stars
+      // Permanent stars (no parallax – they are world objects)
       for (let star of notes) {
         let visuals = getStarVisuals(star);
         let pulseFactor = getPulseFactor(star, visuals.pulseSpeed);
@@ -925,7 +931,7 @@
         }
       }
       
-      // Temporary stars
+      // Temporary stars (fixed)
       for (let star of tempStars) {
         let pulse = 0.8 + 0.2 * Math.sin(time * (star.isSpecial ? 0.0025 : 0.003));
         let size = (star.isSpecial ? 5.5 : 4) + pulse * 1.2;
@@ -953,7 +959,7 @@
         ctx.shadowBlur = 0;
       }
       
-      // Comets
+      // Comets (fixed)
       for (let c of comets) {
         let tailX = c.x - c.vx * 70;
         let tailY = c.y - c.vy * 70;
