@@ -3,65 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>✦ SYNC CONSTELLATION · MAX VISUALS + UI TOGGLE</title>
+  <title>✦ SYNC CONSTELLATION · MAX + TOGGLE</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
     html, body { width:100%; height:100%; overflow:hidden; background:#010108; }
     body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; }
-
     #app { position:relative; width:100%; height:100%; overflow:hidden; }
-
     canvas { position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; background:#010108; }
     canvas:active { cursor:grabbing; }
 
-    /* UI visibility toggled via .ui-hidden on #app */
+    /* UI hide class */
     #app.ui-hidden .hud,
     #app.ui-hidden .age-bar,
     #app.ui-hidden .add,
     #app.ui-hidden .release-btn,
     #app.ui-hidden .vignette,
     #app.ui-hidden .notification,
-    #app.ui-hidden .preview {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    /* The small toggle button never hides */
+    #app.ui-hidden .preview { opacity:0; pointer-events:none; transition: opacity 0.3s ease; }
+
+    /* Always‑visible toggle button */
     .ui-toggle-btn {
-      position: absolute;
-      top: max(20px, env(safe-area-inset-top));
-      right: 24px;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(15,15,30,0.6);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 0.5px solid rgba(100,120,180,0.3);
-      color: #c8d6ff;
-      font-size: 18px;
-      z-index: 200;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-      transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1);
-      line-height: 1;
+      position:absolute; top:max(20px, env(safe-area-inset-top)); right:24px;
+      width:36px; height:36px; border-radius:50%;
+      background:rgba(15,15,30,0.6); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+      border:0.5px solid rgba(100,120,180,0.3); color:#c8d6ff; font-size:18px;
+      z-index:200; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 10px rgba(0,0,0,0.4); transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1);
     }
-    .ui-toggle-btn:active {
-      transform: scale(0.9);
-      background: rgba(30,30,55,0.8);
-    }
+    .ui-toggle-btn:active { transform:scale(0.9); background:rgba(30,30,55,0.8); }
+
     /* HUD */
     .hud {
       position:absolute; top:max(20px, env(safe-area-inset-top)); left:24px; right:24px;
       display:flex; justify-content:space-between; align-items:center; z-index:100;
       background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
       padding:10px 24px; border-radius:60px; border:0.5px solid rgba(100,120,180,0.25);
-      box-shadow:0 8px 20px rgba(0,0,0,0.4);
-      transition: opacity 0.3s ease;
-      cursor: pointer;
+      box-shadow:0 8px 20px rgba(0,0,0,0.4); transition: opacity 0.3s ease; cursor:pointer;
     }
     .title { font-size:11px; font-weight:400; letter-spacing:0.5em; color:rgba(200,210,240,0.85); text-shadow:0 0 12px rgba(100,140,220,0.4); text-transform:uppercase; }
     .meta { font-size:11px; font-weight:450; color:rgba(180,195,230,0.8); background:rgba(0,0,0,0.35); padding:6px 16px; border-radius:40px; backdrop-filter:blur(8px); letter-spacing:0.3px; display:flex; align-items:center; gap:6px; }
@@ -73,8 +50,7 @@
       position:absolute; bottom:max(30px, env(safe-area-inset-bottom, 30px)); left:50%; transform:translateX(-50%);
       z-index:98; background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px);
       border-radius:60px; padding:6px 16px; display:flex; align-items:center; gap:10px;
-      border:0.5px solid rgba(100,120,180,0.2); box-shadow:0 8px 20px rgba(0,0,0,0.3);
-      transition: opacity 0.3s ease;
+      border:0.5px solid rgba(100,120,180,0.2); box-shadow:0 8px 20px rgba(0,0,0,0.3); transition: opacity 0.3s ease;
     }
     .age-label { font-size:9px; color:rgba(180,190,230,0.9); white-space:nowrap; min-width:70px; text-align:center; letter-spacing:0.3px; }
     input[type="range"].age-slider { width:120px; height:4px; -webkit-appearance:none; background:rgba(255,255,255,0.08); border-radius:4px; outline:none; }
@@ -95,7 +71,7 @@
     @keyframes btnGlow { 0%,100% { box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 0 1px rgba(120,140,200,0.2); } 50% { box-shadow:0 6px 25px rgba(0,0,0,0.6),0 0 25px rgba(150,180,255,0.6); } }
     .add:active { transform:scale(0.9); background:radial-gradient(circle at 35% 35%,rgba(120,140,210,0.8),rgba(30,30,55,0.95)); }
 
-    /* Release button (follow) */
+    /* Release button */
     .release-btn {
       position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
       width:48px; height:48px; border-radius:48px;
@@ -106,19 +82,15 @@
       transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1), opacity 0.3s ease;
       visibility: hidden;
     }
-    .release-btn.visible {
-      display: flex;
-      visibility: visible;
-    }
+    .release-btn.visible { display:flex; visibility:visible; }
     .release-btn:active { transform:translate(-50%,-50%) scale(0.9); background:rgba(30,30,55,0.8); }
 
     /* Vignette */
     .vignette {
       position:absolute; inset:0; pointer-events:none; z-index:10;
-      background:
-        radial-gradient(ellipse at 50% 50%, transparent 25%, rgba(0,0,0,0.8) 90%),
-        radial-gradient(ellipse at 30% 30%, rgba(200,120,255,0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 70% 70%, rgba(255,160,80,0.1) 0%, transparent 50%);
+      background: radial-gradient(ellipse at 50% 50%, transparent 25%, rgba(0,0,0,0.8) 90%),
+                   radial-gradient(ellipse at 30% 30%, rgba(200,120,255,0.15) 0%, transparent 50%),
+                   radial-gradient(ellipse at 70% 70%, rgba(255,160,80,0.1) 0%, transparent 50%);
       transition: opacity 0.3s ease;
     }
     .vignette::after {
@@ -130,7 +102,7 @@
     }
     @keyframes grain { 0%,100% { transform: translate(0,0); } 10% { transform: translate(-5%,-2%); } 20% { transform: translate(3%,1%); } 30% { transform: translate(-1%,4%); } 40% { transform: translate(2%,-3%); } 50% { transform: translate(-4%,-1%); } 60% { transform: translate(1%,2%); } 70% { transform: translate(-2%,-4%); } 80% { transform: translate(3%,2%); } 90% { transform: translate(-1%,1%); } }
 
-    /* Modals (unchanged) */
+    /* Modals */
     .modal { position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,2,12,0.75); backdrop-filter:blur(32px); -webkit-backdrop-filter:blur(32px); z-index:300; opacity:0; transition:opacity 0.35s cubic-bezier(0.2,0.95,0.4,1); }
     .modal.visible { opacity:1; }
     .panel { width:86%; max-width:440px; background:rgba(8,8,22,0.8); backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); border:1px solid rgba(100,120,180,0.3); border-radius:52px; padding:30px 26px; transform:scale(0.96); transition:transform 0.35s cubic-bezier(0.16,1,0.3,1); box-shadow:0 25px 50px rgba(0,0,0,0.7); }
@@ -170,7 +142,6 @@
   <div class="preview" id="etherPreview"></div>
   <div class="notification" id="toastMsg"></div>
 
-  <!-- Modals (unchanged) -->
   <div class="modal" id="viewModal"><div class="panel"><div id="viewCreator" class="creator-info"></div><div class="viewer" id="memoryViewer"></div><div class="actions"><button id="closeViewBtn">close</button><button id="editFromViewBtn">edit</button></div></div></div>
   <div class="modal" id="editModal"><div class="panel"><div id="editCreator" class="creator-info"></div><textarea id="memoryEditor" placeholder="...a thought drifts..."></textarea><div class="actions"><button id="saveMemoryBtn">engrave</button><button id="cancelEditBtn">drift</button><button id="deleteMemoryBtn" class="delete">obliterate</button></div></div></div>
   <div class="modal" id="constellationNameModal"><div class="panel"><div style="text-align:center; color:#d0d8ff; margin-bottom:10px;">name this constellation</div><input type="text" class="name-input" id="constellationNameInput" placeholder="constellation name"><div class="actions"><button id="saveConstellationName">save</button><button id="cancelConstellationName">cancel</button></div></div></div>
@@ -259,6 +230,7 @@
       toggleUI();
     });
 
+    // CORE APP
     let notes = [];
     let activeId = null;
     let camera = { x: 0, y: 0, zoom: 1.0, targetZoom: 1.0 };
@@ -288,7 +260,6 @@
     let ageOffset = 0;
     let birthFlashes = [];
 
-    // ---- BACKGROUND LAYERS ----
     const createStarLayer = (count, spread, minSize, maxSize, minBright, maxBright, colorRange, parallax) => {
       let layer = [];
       for (let i=0; i<count; i++) {
@@ -393,10 +364,7 @@
       return { core:"#ff8866", glow:"rgba(255,136,102,0.3)" };
     }
 
-    function computeMass(note) {
-      if (note.isSun) return 15;
-      return Math.min(10, (note.text?.length||12)/40 + Math.min(2.5, (note.opened||0)/10));
-    }
+    function computeMass(note) { if (note.isSun) return 15; return Math.min(10, (note.text?.length||12)/40 + Math.min(2.5, (note.opened||0)/10)); }
 
     function assignSolarSystems() {
       let suns = notes.filter(n => n.isSun);
@@ -420,10 +388,8 @@
             free.splice(i, 1);
           }
         }
-        if (!sun._asteroidBelt) {
-          if (Math.random() < 0.3) {
-            sun._asteroidBelt = { inner: sun.radius*3, outer: sun.radius*5, count: 40 + Math.floor(Math.random()*40) };
-          }
+        if (!sun._asteroidBelt && Math.random() < 0.3) {
+          sun._asteroidBelt = { inner: sun.radius*3, outer: sun.radius*5, count: 40 + Math.floor(Math.random()*40) };
         }
       }
       computeClusters();
@@ -497,14 +463,11 @@
       await notesCollection.doc(note.id).set({
         id: note.id, created: note.created, opened: note.opened || 0, text: note.text,
         x: note.x, y: note.y, vx: note.vx, vy: note.vy,
-        radius: note.radius, mass: note.mass,
-        orbitPhase: note.orbitPhase, pulsePhase: note.pulsePhase,
-        sentiment: note.sentiment,
-        creatorId: note.creatorId, creatorName: note.creatorName,
+        radius: note.radius, mass: note.mass, orbitPhase: note.orbitPhase, pulsePhase: note.pulsePhase,
+        sentiment: note.sentiment, creatorId: note.creatorId, creatorName: note.creatorName,
         isSun: note.isSun, orbitingSunId: note.orbitingSunId,
         orbitRadius: note.orbitRadius, orbitAngle: note.orbitAngle,
-        orbitSpeed: note.orbitSpeed, orbitDirection: note.orbitDirection,
-        eccentricity: note.eccentricity
+        orbitSpeed: note.orbitSpeed, orbitDirection: note.orbitDirection, eccentricity: note.eccentricity
       });
     }
     async function deleteNoteFromFirestore(id) { await notesCollection.doc(id).delete(); }
@@ -548,18 +511,13 @@
       let y = cluster.y + (Math.random()-0.5)*800;
       const note = {
         id: Date.now() + Math.random().toString(36),
-        created: Date.now(),
-        opened: 0,
+        created: Date.now(), opened: 0,
         text: text.trim() === "" ? "✦ a drifting thought" : text,
-        x, y,
-        vx: (Math.random()-0.5)*0.05, vy: (Math.random()-0.5)*0.05,
-        radius: 3 + Math.random() * 3,
-        mass: 2.5,
-        orbitPhase: 0, pulsePhase: Math.random()*Math.PI*2,
-        sentiment: 0,
+        x, y, vx: (Math.random()-0.5)*0.05, vy: (Math.random()-0.5)*0.05,
+        radius: 3 + Math.random() * 3, mass: 2.5,
+        orbitPhase: 0, pulsePhase: Math.random()*Math.PI*2, sentiment: 0,
         creatorId: localPeerId, creatorName: localPeerName,
-        trail: [],
-        isSun: false, orbitingSunId: null,
+        trail: [], isSun: false, orbitingSunId: null,
         orbitRadius: 0, orbitAngle: 0, orbitSpeed: 0, orbitDirection: 1, eccentricity: 0
       };
       note.mass = computeMass(note);
@@ -665,15 +623,12 @@
         comets.push({
           x: Math.cos(angle) * 2000, y: Math.sin(angle) * 2000,
           vx: Math.cos(angle + Math.PI) * speed, vy: Math.sin(angle + Math.PI) * speed,
-          life: 800 + Math.random() * 400,
-          tailLength: 60 + Math.random() * 80
+          life: 800 + Math.random() * 400, tailLength: 60 + Math.random() * 80
         });
       }
       for (let i=comets.length-1; i>=0; i--) {
         let c = comets[i];
-        c.x += c.vx;
-        c.y += c.vy;
-        c.life--;
+        c.x += c.vx; c.y += c.vy; c.life--;
         if (c.life <= 0) comets.splice(i,1);
       }
     }
@@ -681,11 +636,9 @@
     function render() {
       ctx.clearRect(0,0,w,h);
       const bgGrad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w, h)*0.8);
-      bgGrad.addColorStop(0, "#05051a");
-      bgGrad.addColorStop(1, "#000008");
+      bgGrad.addColorStop(0, "#05051a"); bgGrad.addColorStop(1, "#000008");
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, w, h);
-
       ctx.save();
       ctx.translate(w/2, h/2);
       ctx.scale(camera.zoom, camera.zoom);
@@ -705,16 +658,13 @@
         grad.addColorStop(0, `rgba(${gc.color[0]}, ${gc.color[1]}, ${gc.color[2]}, 0.08)`);
         grad.addColorStop(0.6, `rgba(${gc.color[0]}, ${gc.color[1]}, ${gc.color[2]}, 0.02)`);
         grad.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = grad;
-        ctx.beginPath(); ctx.arc(gc.x, gc.y, 380, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(gc.x, gc.y, 380, 0, Math.PI*2); ctx.fill();
         let fadeAlpha = Math.min(1, Math.max(0, (camera.zoom - 0.5) / 0.5));
         if (fadeAlpha > 0.01) {
           ctx.font = `${Math.max(9, 12*camera.zoom)}px "Segoe UI", system-ui, sans-serif`;
           ctx.fillStyle = `rgba(190, 200, 240, ${0.55 * fadeAlpha})`;
-          ctx.shadowColor = `rgba(100, 130, 200, ${0.3 * fadeAlpha})`;
-          ctx.shadowBlur = 6;
-          ctx.fillText(gc.name, gc.x-35, gc.y-50);
-          ctx.shadowBlur = 0;
+          ctx.shadowColor = `rgba(100, 130, 200, ${0.3 * fadeAlpha})`; ctx.shadowBlur = 6;
+          ctx.fillText(gc.name, gc.x-35, gc.y-50); ctx.shadowBlur = 0;
         }
       }
 
@@ -727,9 +677,7 @@
             let x = sun.x + Math.cos(angle) * radius;
             let y = sun.y + Math.sin(angle) * radius;
             ctx.fillStyle = "rgba(200,180,150,0.5)";
-            ctx.beginPath();
-            ctx.arc(x, y, 0.8, 0, Math.PI*2);
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y, 0.8, 0, Math.PI*2); ctx.fill();
           }
         }
         let planets = notes.filter(n => n.orbitingSunId === sun.id);
@@ -739,8 +687,7 @@
           ctx.arc(sun.x, sun.y, planet.orbitRadius, 0, Math.PI*2);
           let pulse = 0.12 + 0.06 * Math.sin(Date.now()*0.001 * planet.orbitSpeed*100);
           ctx.strokeStyle = `rgba(100, 120, 180, ${pulse})`;
-          ctx.lineWidth = 1.0;
-          ctx.stroke();
+          ctx.lineWidth = 1.0; ctx.stroke();
           ctx.setLineDash([]);
         }
       }
@@ -757,8 +704,7 @@
               let isNamed = currentClusters.some(cl => cl.name && cl.starIds.includes(a.id) && cl.starIds.includes(b.id));
               if (isNamed) alpha += 0.15;
               ctx.strokeStyle = `rgba(140, 170, 220, ${alpha})`;
-              ctx.lineWidth = isNamed ? 1.2 : 0.7;
-              ctx.stroke();
+              ctx.lineWidth = isNamed ? 1.2 : 0.7; ctx.stroke();
               if (isNamed) {
                 let t = (Date.now() * 0.0005) % 1;
                 let mx = a.x + (b.x - a.x) * t;
@@ -777,10 +723,8 @@
           let pulse = 0.7 + 0.3 * Math.sin(Date.now()*0.003);
           ctx.font = `${Math.max(10, 14*camera.zoom)}px "Segoe UI", system-ui, sans-serif`;
           ctx.fillStyle = `rgba(255, 230, 180, ${0.85 * pulse})`;
-          ctx.shadowColor = "rgba(255, 200, 100, 0.7)";
-          ctx.shadowBlur = 10;
-          ctx.fillText(cluster.name, cluster.centroid.x - 30, cluster.centroid.y - 15);
-          ctx.shadowBlur = 0;
+          ctx.shadowColor = "rgba(255, 200, 100, 0.7)"; ctx.shadowBlur = 10;
+          ctx.fillText(cluster.name, cluster.centroid.x - 30, cluster.centroid.y - 15); ctx.shadowBlur = 0;
         }
       }
 
@@ -797,10 +741,7 @@
           let age = Math.max(0, Date.now() - star.created + ageOffset);
           let colors = starColor(age);
           let trailRGB = star._trailRGB;
-          if (!trailRGB) {
-            trailRGB = colors.glow.match(/\d+/g).slice(0,3).map(Number);
-            star._trailRGB = trailRGB;
-          }
+          if (!trailRGB) { trailRGB = colors.glow.match(/\d+/g).slice(0,3).map(Number); star._trailRGB = trailRGB; }
           for (let k=1; k<star.trail.length; k++) {
             let alpha = k / star.trail.length * 0.15;
             ctx.strokeStyle = `rgba(${trailRGB[0]},${trailRGB[1]},${trailRGB[2]},${alpha})`;
@@ -823,10 +764,7 @@
           for (let ray=0; ray<8; ray++) {
             let angle = (Date.now()*0.0005 + ray * Math.PI/4) % (Math.PI*2);
             let rayLength = size * (4 + Math.sin(Date.now()*0.002 + ray)*2);
-            let grad = ctx.createLinearGradient(
-              star.x, star.y,
-              star.x + Math.cos(angle)*rayLength, star.y + Math.sin(angle)*rayLength
-            );
+            let grad = ctx.createLinearGradient(star.x, star.y, star.x + Math.cos(angle)*rayLength, star.y + Math.sin(angle)*rayLength);
             grad.addColorStop(0, "rgba(255,200,100,0.8)");
             grad.addColorStop(1, "rgba(255,200,100,0)");
             ctx.fillStyle = grad;
@@ -857,8 +795,7 @@
             ctx.beginPath();
             ctx.ellipse(0, 0, star.ringWidth, star.ringWidth*0.3, 0, 0, Math.PI*2);
             ctx.strokeStyle = "rgba(200,220,255,0.4)";
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
+            ctx.lineWidth = 1.5; ctx.stroke();
             ctx.restore();
           }
         }
@@ -889,9 +826,7 @@
         glow.addColorStop(0.5, `rgba(255, 255, 220, ${alpha*0.6})`);
         glow.addColorStop(1, `rgba(255, 255, 220, 0)`);
         ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(spark.x, spark.y, radius*2, 0, Math.PI*2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(spark.x, spark.y, radius*2, 0, Math.PI*2); ctx.fill();
       }
 
       for (let c of comets) {
@@ -901,12 +836,8 @@
         grad.addColorStop(0, "rgba(255,255,255,0.9)");
         grad.addColorStop(0.3, "rgba(200,220,255,0.6)");
         grad.addColorStop(1, "rgba(100,150,255,0)");
-        ctx.beginPath();
-        ctx.moveTo(c.x, c.y);
-        ctx.lineTo(tailX, tailY);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 3;
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(tailX, tailY);
+        ctx.strokeStyle = grad; ctx.lineWidth = 3; ctx.stroke();
         let coma = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, 8);
         coma.addColorStop(0, "rgba(255,255,255,0.9)");
         coma.addColorStop(1, "rgba(200,200,255,0)");
@@ -1040,7 +971,7 @@
       else ageLabel.textContent = "ancient";
     });
 
-    // Pan / zoom
+    // ---- INTERACTION (pan, zoom, touch, mouse) ----
     let isPanning = false, panStart = {x:0,y:0}, panCameraStart = {x:0,y:0};
     let isMousePanning = false, mousePanStart = {x:0,y:0}, mouseCameraStart = {x:0,y:0};
     let longPressTimer=null, lastTap=0;
