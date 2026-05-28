@@ -1,1608 +1,2174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <title>✦ CONSTELLATION · NO EMOJIS · 300+ QUOTES</title>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
-    html, body { width:100%; height:100%; overflow:hidden; background:#010108; }
-    body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; }
-    #app { position:relative; width:100%; height:100%; overflow:hidden; }
-    canvas { position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; background:#010108; }
-    canvas:active { cursor:grabbing; }
-    #app.ui-hidden .hud, #app.ui-hidden .add, #app.ui-hidden .release-btn,
-    #app.ui-hidden .vignette, #app.ui-hidden .notification, #app.ui-hidden .preview {
-      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-    }
-    .release-btn { display:none; }
-    .release-btn.visible { display:flex; }
-    .hud { position:absolute; top:max(20px, env(safe-area-inset-top)); left:24px; right:24px; display:flex; justify-content:space-between; align-items:center; z-index:100; background:rgba(10,10,24,0.55); backdrop-filter:blur(24px); padding:10px 24px; border-radius:60px; border:0.5px solid rgba(100,120,180,0.25); box-shadow:0 8px 20px rgba(0,0,0,0.4); transition: opacity 0.3s ease; cursor: pointer; }
-    .title { font-size:11px; font-weight:400; letter-spacing:0.5em; color:rgba(200,210,240,0.85); text-shadow:0 0 12px rgba(100,140,220,0.4); text-transform:uppercase; }
-    .meta { font-size:11px; font-weight:450; color:rgba(180,195,230,0.8); background:rgba(0,0,0,0.35); padding:6px 16px; border-radius:40px; backdrop-filter:blur(8px); letter-spacing:0.3px; display:flex; align-items:center; gap:6px; }
-    .star-count-icon { display:inline-block; width:8px; height:8px; background:#aaccff; border-radius:50%; box-shadow:0 0 8px #aaccff; margin-right:2px; animation: pulseIcon 2s ease-in-out infinite; }
-    @keyframes pulseIcon { 0%,100% { box-shadow:0 0 8px #aaccff; } 50% { box-shadow:0 0 20px #cce0ff; } }
-    #streakDisplay { margin-left:12px; font-size:11px; background:rgba(0,0,0,0.4); padding:4px 8px; border-radius:40px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>✦ CONSTELLATION · NO EMOJIS · 300+ QUOTES</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #010108;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        #app {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: grab;
+            background: #010108;
+        }
+        canvas:active {
+            cursor: grabbing;
+        }
+        #app.ui-hidden .hud,
+        #app.ui-hidden .add,
+        #app.ui-hidden .release-btn,
+        #app.ui-hidden .notification,
+        #app.ui-hidden .preview {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .release-btn {
+            display: none;
+        }
+        .release-btn.visible {
+            display: flex;
+        }
+        .hud {
+            position: absolute;
+            top: max(20px, env(safe-area-inset-top));
+            left: 24px;
+            right: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(10, 10, 24, 0.55);
+            backdrop-filter: blur(24px);
+            padding: 10px 24px;
+            border-radius: 60px;
+            border: 0.5px solid rgba(100, 120, 180, 0.25);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+        .title {
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 0.5em;
+            color: rgba(200, 210, 240, 0.85);
+            text-shadow: 0 0 12px rgba(100, 140, 220, 0.4);
+            text-transform: uppercase;
+        }
+        .meta {
+            font-size: 11px;
+            font-weight: 450;
+            color: rgba(180, 195, 230, 0.8);
+            background: rgba(0, 0, 0, 0.35);
+            padding: 6px 16px;
+            border-radius: 40px;
+            backdrop-filter: blur(8px);
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .star-count-icon {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #aaccff;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #aaccff;
+            margin-right: 2px;
+            animation: pulseIcon 2s ease-in-out infinite;
+        }
+        @keyframes pulseIcon {
+            0%,
+            100% {
+                box-shadow: 0 0 8px #aaccff;
+            }
+            50% {
+                box-shadow: 0 0 20px #cce0ff;
+            }
+        }
+        #streakDisplay {
+            margin-left: 12px;
+            font-size: 11px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 4px 8px;
+            border-radius: 40px;
+        }
 
-    /* ===== REDESIGNED ADD BUTTON (no emoji) ===== */
-    .add {
-      position: absolute;
-      right: 28px;
-      bottom: max(100px, calc(env(safe-area-inset-bottom) + 100px));
-      width: 68px;
-      height: 68px;
-      border-radius: 68px;
-      background: radial-gradient(circle at 35% 35%, rgba(70, 90, 140, 0.5), rgba(20, 25, 45, 0.7));
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      color: #eef3ff;
-      font-size: 36px;
-      font-weight: 300;
-      border: 0.5px solid rgba(140, 180, 255, 0.4);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(120, 150, 220, 0.2) inset, 0 0 15px rgba(100, 150, 255, 0.3);
-      z-index: 120;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.3s ease;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      line-height: 1;
-      text-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
-    }
-    .add:hover {
-      transform: scale(1.05);
-      background: radial-gradient(circle at 35% 35%, rgba(100, 130, 200, 0.6), rgba(30, 40, 70, 0.8));
-      border-color: rgba(200, 220, 255, 0.7);
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 200, 255, 0.4) inset, 0 0 25px rgba(100, 150, 255, 0.5);
-      color: #ffffff;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-    }
-    .add:active {
-      transform: scale(0.94);
-      background: radial-gradient(circle at 35% 35%, rgba(50, 70, 120, 0.7), rgba(15, 20, 35, 0.9));
-      transition: 0.05s;
-    }
+        .add {
+            position: absolute;
+            right: 28px;
+            bottom: max(100px, calc(env(safe-area-inset-bottom) + 100px));
+            width: 68px;
+            height: 68px;
+            border-radius: 68px;
+            background: radial-gradient(circle at 35% 35%, rgba(70, 90, 140, 0.5), rgba(20, 25, 45, 0.7));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #eef3ff;
+            font-size: 36px;
+            font-weight: 300;
+            border: 0.5px solid rgba(140, 180, 255, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(120, 150, 220, 0.2) inset,
+                0 0 15px rgba(100, 150, 255, 0.3);
+            z-index: 120;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.3s ease;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            line-height: 1;
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+        }
+        .add:hover {
+            transform: scale(1.05);
+            background: radial-gradient(circle at 35% 35%, rgba(100, 130, 200, 0.6), rgba(30, 40, 70, 0.8));
+            border-color: rgba(200, 220, 255, 0.7);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(180, 200, 255, 0.4) inset,
+                0 0 25px rgba(100, 150, 255, 0.5);
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+        .add:active {
+            transform: scale(0.94);
+            background: radial-gradient(circle at 35% 35%, rgba(50, 70, 120, 0.7), rgba(15, 20, 35, 0.9));
+            transition: 0.05s;
+        }
 
-    .release-btn { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:48px; height:48px; border-radius:48px; background:rgba(15,15,30,0.6); backdrop-filter:blur(16px); border:0.5px solid rgba(100,120,180,0.3); color:#c8d6ff; font-size:20px; z-index:150; cursor:pointer; align-items:center; justify-content:center; box-shadow:0 6px 15px rgba(0,0,0,0.5); transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1); }
-    .release-btn:active { transform:translate(-50%,-50%) scale(0.9); background:rgba(30,30,55,0.8); }
-    .vignette { position:absolute; inset:0; pointer-events:none; z-index:10; background: radial-gradient(ellipse at 50% 50%, transparent 25%, rgba(0,0,0,0.8) 90%), radial-gradient(ellipse at 30% 30%, rgba(200,120,255,0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(255,160,80,0.1) 0%, transparent 50%); transition: opacity 0.3s ease; }
-    .vignette::after { content:''; position:absolute; inset:0; background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); background-size: 256px 256px; mix-blend-mode: overlay; animation: grain 8s steps(10) infinite; }
-    @keyframes grain { 0%,100% { transform: translate(0,0); } 10% { transform: translate(-5%,-2%); } 20% { transform: translate(3%,1%); } 30% { transform: translate(-1%,4%); } 40% { transform: translate(2%,-3%); } 50% { transform: translate(-4%,-1%); } 60% { transform: translate(1%,2%); } 70% { transform: translate(-2%,-4%); } 80% { transform: translate(3%,2%); } 90% { transform: translate(-1%,1%); } }
-    .modal { position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,2,12,0.75); backdrop-filter:blur(32px); z-index:300; opacity:0; transition:opacity 0.35s cubic-bezier(0.2,0.95,0.4,1); }
-    .modal.visible { opacity:1; }
-    .panel { width:86%; max-width:440px; background:rgba(8,8,22,0.8); backdrop-filter:blur(28px); border:1px solid rgba(100,120,180,0.3); border-radius:52px; padding:30px 26px; transform:scale(0.96); transition:transform 0.35s cubic-bezier(0.16,1,0.3,1); box-shadow:0 25px 50px rgba(0,0,0,0.7); }
-    .modal.visible .panel { transform:scale(1); }
-    textarea,.viewer { width:100%; background:rgba(2,2,10,0.55); border:0.5px solid rgba(90,110,160,0.35); border-radius:38px; padding:22px 20px; font-family:'SF Mono','Menlo','Consolas',monospace; font-size:15px; line-height:1.6; color:#e4ebff; outline:none; resize:none; backdrop-filter:blur(12px); }
-    .viewer { min-height:240px; white-space:pre-wrap; word-break:break-word; }
-    .creator-info { font-size:11px; color:rgba(180,190,230,0.8); margin-bottom:10px; text-align:center; font-style:italic; }
-    .actions { display:flex; gap:12px; margin-top:24px; }
-    .actions button { flex:1; height:50px; border-radius:60px; background:rgba(18,18,30,0.7); backdrop-filter:blur(8px); border:0.5px solid rgba(100,120,180,0.25); color:#eef2ff; font-size:13px; font-weight:500; cursor:pointer; letter-spacing:0.4px; transition:all 0.2s ease; box-shadow:0 4px 12px rgba(0,0,0,0.3); }
-    .delete { color:#ff9b7c !important; background:rgba(40,20,22,0.7) !important; border-color:rgba(255,150,120,0.3) !important; }
-    .preview { position:absolute; max-width:320px; background:rgba(6,6,16,0.92); backdrop-filter:blur(32px); border-radius:32px; padding:14px 20px; border:0.5px solid rgba(140,160,220,0.4); font-size:12px; line-height:1.5; color:#dbe4ff; pointer-events:none; z-index:400; opacity:0; transform:translateY(12px) scale(0.96); transition:opacity 0.25s ease,transform 0.25s cubic-bezier(0.2,0.9,0.4,1.1); box-shadow:0 15px 35px rgba(0,0,0,0.6); }
-    .preview.visible { opacity:1; transform:translateY(0) scale(1); }
-    .notification { position:absolute; bottom:120px; left:50%; transform:translateX(-50%); background:rgba(10,10,24,0.7); backdrop-filter:blur(24px); padding:10px 22px; border-radius:40px; font-size:12px; color:#ccd6ff; pointer-events:none; z-index:200; opacity:0; transition:opacity 0.3s,transform 0.3s; white-space:nowrap; border:0.5px solid rgba(100,120,180,0.3); }
-    .name-input { width:100%; background:rgba(2,2,10,0.6); border:0.5px solid rgba(100,120,180,0.4); border-radius:40px; padding:12px 20px; color:#fff; font-size:18px; text-align:center; outline:none; }
-  </style>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+        .release-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 48px;
+            background: rgba(15, 15, 30, 0.6);
+            backdrop-filter: blur(16px);
+            border: 0.5px solid rgba(100, 120, 180, 0.3);
+            color: #c8d6ff;
+            font-size: 20px;
+            z-index: 150;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .release-btn:active {
+            transform: translate(-50%, -50%) scale(0.9);
+            background: rgba(30, 30, 55, 0.8);
+        }
+        .modal {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(2, 2, 12, 0.75);
+            backdrop-filter: blur(32px);
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.35s cubic-bezier(0.2, 0.95, 0.4, 1);
+        }
+        .modal.visible {
+            opacity: 1;
+        }
+        .panel {
+            width: 86%;
+            max-width: 440px;
+            background: rgba(8, 8, 22, 0.8);
+            backdrop-filter: blur(28px);
+            border: 1px solid rgba(100, 120, 180, 0.3);
+            border-radius: 52px;
+            padding: 30px 26px;
+            transform: scale(0.96);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+        }
+        .modal.visible .panel {
+            transform: scale(1);
+        }
+        textarea,
+        .viewer {
+            width: 100%;
+            background: rgba(2, 2, 10, 0.55);
+            border: 0.5px solid rgba(90, 110, 160, 0.35);
+            border-radius: 38px;
+            padding: 22px 20px;
+            font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #e4ebff;
+            outline: none;
+            resize: none;
+            backdrop-filter: blur(12px);
+        }
+        .viewer {
+            min-height: 240px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .creator-info {
+            font-size: 11px;
+            color: rgba(180, 190, 230, 0.8);
+            margin-bottom: 10px;
+            text-align: center;
+            font-style: italic;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .actions button {
+            flex: 1;
+            height: 50px;
+            border-radius: 60px;
+            background: rgba(18, 18, 30, 0.7);
+            backdrop-filter: blur(8px);
+            border: 0.5px solid rgba(100, 120, 180, 0.25);
+            color: #eef2ff;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            letter-spacing: 0.4px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .delete {
+            color: #ff9b7c !important;
+            background: rgba(40, 20, 22, 0.7) !important;
+            border-color: rgba(255, 150, 120, 0.3) !important;
+        }
+        .preview {
+            position: absolute;
+            max-width: 320px;
+            background: rgba(6, 6, 16, 0.92);
+            backdrop-filter: blur(32px);
+            border-radius: 32px;
+            padding: 14px 20px;
+            border: 0.5px solid rgba(140, 160, 220, 0.4);
+            font-size: 12px;
+            line-height: 1.5;
+            color: #dbe4ff;
+            pointer-events: none;
+            z-index: 400;
+            opacity: 0;
+            transform: translateY(12px) scale(0.96);
+            transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+        }
+        .preview.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        .notification {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 10, 24, 0.7);
+            backdrop-filter: blur(24px);
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-size: 12px;
+            color: #ccd6ff;
+            pointer-events: none;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            white-space: nowrap;
+            border: 0.5px solid rgba(100, 120, 180, 0.3);
+        }
+        .name-input {
+            width: 100%;
+            background: rgba(2, 2, 10, 0.6);
+            border: 0.5px solid rgba(100, 120, 180, 0.4);
+            border-radius: 40px;
+            padding: 12px 20px;
+            color: #fff;
+            font-size: 18px;
+            text-align: center;
+            outline: none;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js">
+    </script>
 </head>
 <body>
-<div id="app">
-  <canvas id="cosmicCanvas"></canvas>
-  <div class="vignette"></div>
-  <div class="hud" id="hudToggle">
-    <div class="title">✦ CONSTELLATION</div>
-    <div class="meta" id="counterMeta"><span class="star-count-icon"></span> 0 stars</div>
-  </div>
-  <button class="add" id="novaBtn">+</button>
-  <button class="release-btn" id="releaseBtn">⟳</button>
-  <div class="preview" id="etherPreview"></div><div class="notification" id="toastMsg"></div>
-  <div class="modal" id="viewModal"><div class="panel"><div id="viewCreator" class="creator-info"></div><div class="viewer" id="memoryViewer"></div><div class="actions"><button id="closeViewBtn">close</button><button id="editFromViewBtn">edit</button></div></div></div>
-  <div class="modal" id="editModal"><div class="panel"><div id="editCreator" class="creator-info"></div><textarea id="memoryEditor" placeholder="...a thought drifts..."></textarea><div class="actions"><button id="saveMemoryBtn">engrave</button><button id="cancelEditBtn">drift</button><button id="deleteMemoryBtn" class="delete">obliterate</button></div></div></div>
-  <div class="modal" id="constellationNameModal"><div class="panel"><div style="text-align:center; color:#d0d8ff;">✧ name the constellation ✧</div><input type="text" class="name-input" id="constellationNameInput" placeholder="constellation name"><div class="actions"><button id="saveConstellationName">engrave</button><button id="cancelConstellationName">drift</button></div></div></div>
-  <div class="modal" id="clearConfirmModal"><div class="panel"><div style="color:#ffcccc;">clear all stars?</div><div class="actions"><button id="confirmClearBtn" class="delete">yes</button><button id="cancelClearBtn">cancel</button></div></div></div>
-  <div class="modal" id="nameModal"><div class="panel"><div style="color:#d0d8ff;">who are you, stargazer?</div><input type="text" id="nameInput" placeholder="cosmic name" maxlength="20" style="width:100%; background:rgba(2,2,10,0.6); border-radius:40px; padding:12px 20px; color:#fff; text-align:center;"><div class="actions"><button id="saveNameBtn">enter nebula</button></div></div></div>
-</div>
+    <div id="app">
+        <canvas id="cosmicCanvas"></canvas>
+        <!-- The vignette div has been removed as requested -->
+        <div class="hud" id="hudToggle">
+            <div class="title">✦ CONSTELLATION</div>
+            <div class="meta" id="counterMeta"><span class="star-count-icon"></span> 0 stars</div>
+        </div>
+        <button class="add" id="novaBtn">+</button>
+        <button class="release-btn" id="releaseBtn">⟳</button>
+        <div class="preview" id="etherPreview"></div>
+        <div class="notification" id="toastMsg"></div>
+        <div class="modal" id="viewModal">
+            <div class="panel">
+                <div id="viewCreator" class="creator-info"></div>
+                <div class="viewer" id="memoryViewer"></div>
+                <div class="actions"><button id="closeViewBtn">close</button><button id="editFromViewBtn">edit</button></div>
+            </div>
+        </div>
+        <div class="modal" id="editModal">
+            <div class="panel">
+                <div id="editCreator" class="creator-info"></div><textarea id="memoryEditor" placeholder="...a thought drifts..."></textarea>
+                <div class="actions"><button id="saveMemoryBtn">engrave</button><button id="cancelEditBtn">drift</button><button id="deleteMemoryBtn"
+                        class="delete">obliterate</button></div>
+            </div>
+        </div>
+        <div class="modal" id="constellationNameModal">
+            <div class="panel">
+                <div style="text-align:center; color:#d0d8ff;">✧ name the constellation ✧</div>
+                <input type="text" class="name-input" id="constellationNameInput" placeholder="constellation name">
+                <div class="actions"><button id="saveConstellationName">engrave</button><button id="cancelConstellationName">drift</button></div>
+            </div>
+        </div>
+        <div class="modal" id="clearConfirmModal">
+            <div class="panel">
+                <div style="color:#ffcccc;">clear all stars?</div>
+                <div class="actions"><button id="confirmClearBtn" class="delete">yes</button><button id="cancelClearBtn">cancel</button></div>
+            </div>
+        </div>
+        <div class="modal" id="nameModal">
+            <div class="panel">
+                <div style="color:#d0d8ff;">who are you, stargazer?</div>
+                <input type="text" id="nameInput" class="name-input" placeholder="cosmic name" maxlength="20">
+                <div class="actions"><button id="saveNameBtn">enter nebula</button></div>
+            </div>
+        </div>
+    </div>
 
-<script>
-  (function(){
-    // ----------------------------- FIREBASE -----------------------------
-    const firebaseConfig = {
-      apiKey: "AIzaSyA07--fyHuHINmX8wd182RHqpPNyDmumDE",
-      authDomain: "farts-c8c49.firebaseapp.com",
-      projectId: "farts-c8c49",
-      storageBucket: "farts-c8c49.firebasestorage.app",
-      messagingSenderId: "143589845026",
-      appId: "1:143589845026:web:b8c8cddeefc266bf52c27b"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const notesCollection = db.collection("notes");
-    const constellationsCollection = db.collection("constellations");
-    const tempStarsCollection = db.collection("tempStars");
+    <script>
+        (function() {
+            // ----------------------------- FIREBASE -----------------------------
+            const firebaseConfig = {
+                apiKey: "AIzaSyA07--fyHuHINmX8wd182RHqpPNyDmumDE",
+                authDomain: "farts-c8c49.firebaseapp.com",
+                projectId: "farts-c8c49",
+                storageBucket: "farts-c8c49.firebasestorage.app",
+                messagingSenderId: "143589845026",
+                appId: "1:143589845026:web:b8c8cddeefc266bf52c27b"
+            };
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            const notesCollection = db.collection("notes");
+            const constellationsCollection = db.collection("constellations");
+            const tempStarsCollection = db.collection("tempStars");
 
-    let localPeerId = localStorage.getItem('constellation_peer_id');
-    if (!localPeerId) {
-      localPeerId = 'peer_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem('constellation_peer_id', localPeerId);
-    }
-    let localPeerName = localStorage.getItem('constellation_peer_name');
-
-    // ----------------------------- 300+ QUOTE LIBRARY (including Chinese proverbs in English) -----------------------------
-    const quoteLibrary = [
-      // Original poetic fragments
-      "the silence between stars", "a breath held too long", "echo of a forgotten galaxy",
-      "where light goes to dream", "dust that remembers", "the shape of an unfinished thought",
-      "a whisper painted in ultraviolet", "gravity of almost", "the color of things not said",
-      "fractal of a lost moment", "stillness shaped like a question", "an orbit around nothing",
-      "the weight of a sigh", "embers of a dying sun", "a language made of shadows",
-      "thread of a nonexistent story", "a pause in the hum of the universe", "the scent of burnt‑out stars",
-      "a mirror for ghosts", "the geometry of longing", "a crack in the cosmic egg",
-      "where time goes to untangle", "a map of half‑remembered dreams", "the sound of a single photon",
-      "a rift of tender static", "the dust of old prayers", "an unbroken thread of maybe",
-      "a coin lost between dimensions", "the shape of an absence", "a lantern for wandering voids",
-      "a sigh of the cosmic wind", "a tear in the fabric of routine", "the echo of a star's first cry",
-      "a fragment of a forgotten hymn", "the color of three am", "an unfinished constellation",
-      "the ghost of a supernova", "a stray frequency from a dead world", "the memory of a raindrop on a far moon",
-      "a knot of spacetime", "the perfume of ancient nebulae", "a half‑open door to elsewhere",
-      // Chinese proverbs (English translations)
-      "A journey of a thousand miles begins with a single step.",
-      "It is better to light a candle than to curse the darkness.",
-      "The flame that burns twice as bright burns half as long.",
-      "A man who chases two rabbits catches neither.",
-      "Tension is who you think you should be. Relaxation is who you are.",
-      "The best time to plant a tree was twenty years ago. The second best time is now.",
-      "A bird does not sing because it has an answer. It sings because it has a song.",
-      "To know the road ahead, ask those coming back.",
-      "If you want happiness for an hour, take a nap. If you want happiness for a day, go fishing.",
-      "The gem cannot be polished without friction, nor man perfected without trials.",
-      "A book is like a garden carried in the pocket.",
-      "A little impatience will spoil great plans.",
-      "A single conversation with a wise man is better than ten years of study.",
-      "Better a diamond with a flaw than a pebble without one.",
-      "Do not use a cannon to kill a mosquito.",
-      "Fear not the slow pace; fear only the standstill.",
-      "Give a man a fish and you feed him for a day; teach him to fish and you feed him for a lifetime.",
-      "He who asks is a fool for five minutes, but he who does not ask remains a fool forever.",
-      "I hear and I forget. I see and I remember. I do and I understand.",
-      "If you are patient in one moment of anger, you will escape a hundred days of sorrow.",
-      "If you want your children to be clever, tell them fairy tales. If you want them to be more clever, tell them more fairy tales.",
-      "In the middle of difficulty lies opportunity.",
-      "It is easy to get a thousand soldiers but hard to find a good general.",
-      "Learn as if you were going to live forever. Live as if you were going to die tomorrow.",
-      "No matter how high the mountain, the path must be climbed.",
-      "One kind word can warm three winter months.",
-      "Patience is power; with time and patience the mulberry leaf becomes a silk gown.",
-      "The journey is the reward.",
-      "The man who moves a mountain begins by carrying away small stones.",
-      "The person who says it cannot be done should not interrupt the person doing it.",
-      "To forget one's ancestors is to be a stream without a source.",
-      "We open the door to opportunity by walking through it.",
-      "When you drink the water, remember the spring.",
-      "A smile will gain you ten more years of life.",
-      "A single penny can hide a thousand worries.",
-      "Big troubles come from small beginnings.",
-      "Don't curse the darkness; light a candle.",
-      "Even a hare will bite when it is cornered.",
-      "Failure is not falling down but refusing to get up.",
-      "Good medicine tastes bitter.",
-      "He who rides a tiger is afraid to dismount.",
-      "If you are wrong, you need not worry; if you are right, you need not be angry.",
-      "It is better to be a dog in a peaceful time than a man in a chaotic period.",
-      "Keep a green tree in your heart and perhaps a singing bird will come.",
-      "Laughter is the best medicine.",
-      "Make happy those who are near, and those who are far will come.",
-      "Opportunities are for the prepared mind.",
-      "People who live in glass houses should not throw stones.",
-      "Silence is a source of great strength.",
-      "The fish sees the bait, not the hook.",
-      "The frog in the well knows nothing of the great ocean.",
-      "The grass is always greener on the other side of the fence.",
-      "The older the ginger, the hotter the spice.",
-      "Time and tide wait for no man.",
-      "Treat your inferiors as you would your superiors.",
-      "Virtue is not knowing but doing.",
-      "Wealth is not what you have, but what you are.",
-      "What is the use of running when you are on the wrong road?",
-      "When prosperity comes, do not use all of it.",
-      "Wise men are not always silent, but they know when to be.",
-      "You cannot put an old head on young shoulders.",
-      "A frog in a well cannot conceive of the ocean.",
-      "A man without a smiling face must not open a shop.",
-      "A spark can start a fire that burns down an entire forest.",
-      "Better to light a single candle than to curse the darkness.",
-      "Distance tests a horse's strength; time reveals a person's character.",
-      "Everything is difficult before it becomes easy.",
-      "Great souls have wills; feeble ones have only wishes.",
-      "He who knows others is wise; he who knows himself is enlightened.",
-      "If you are honest and truthful, you need not fear the world.",
-      "If you don't want anyone to know, don't do it.",
-      "It is better to be the enemy of a good man than the friend of a bad one.",
-      "It is not the knowing that is difficult, but the doing.",
-      "Let a fox be the judge at a goose trial.",
-      "Misfortune might be a blessing in disguise.",
-      "Never write a letter while you are angry.",
-      "One joy scatters a hundred griefs.",
-      "Patience is a bitter plant but it has sweet fruit.",
-      "Pearls do not float on the sea; they must be sought.",
-      "Rain does not fall on one roof alone.",
-      "Send a man to a tiger and you will not get his bones back.",
-      "The apple never falls far from the tree.",
-      "The bird wishes it were a cloud; the cloud wishes it were a bird.",
-      "The ear that hears the warnings of the wise will rest in safety.",
-      "The falling of one leaf heralds the coming of autumn.",
-      "The greatest conqueror is he who overcomes the enemy without a blow.",
-      "The more you sweat in peace, the less you bleed in war.",
-      "The only way to have a friend is to be one.",
-      "The wise man does not say all that he thinks, but he thinks all that he says.",
-      "There is no general without a soldier.",
-      "Trees that grow slowly bear the best fruit.",
-      "Water can both carry a boat and overturn it.",
-      "What is done by night appears by day.",
-      "When the wind rises, waves follow.",
-      "Worry is the interest paid on trouble before it falls due.",
-      "A bad workman blames his tools.",
-      "A closed mind is like a closed book: just a block of wood.",
-      "A good neighbour is better than a brother far away.",
-      "A small leak will sink a great ship.",
-      "A smile is the shortest distance between two people.",
-      "A good conscience is a constant feast.",
-      "A thorn defends the rose, harming only those who would steal the blossom.",
-      "An ant may well destroy a whole dam.",
-      "As the wind blows, you must set your sail.",
-      "Avoid the crowd of evil; do not even start a conversation with it.",
-      "Be not afraid of growing slowly; be afraid only of standing still.",
-      "Better to be a beast than a man who gossips.",
-      "Better to live in peace than in a palace of strife.",
-      "Calamity is the touchstone of a brave mind.",
-      "Do not fear going forward slowly; fear only to stand still.",
-      "Do not remove a fly from your friend's forehead with a hatchet.",
-      "Even the wise are ignorant in the future.",
-      "Foolish men learn from no one; wise men learn from everyone.",
-      "Give me a fish and I eat for a day; teach me to fish and I eat for a lifetime.",
-      "Go to bed with the lamb and rise with the lark.",
-      "Happiness is not a station you arrive at, but a manner of traveling.",
-      "He who blames others has a long way to go on his journey. He who blames himself is halfway there.",
-      "He who knows that enough is enough will always have enough.",
-      "If you have knowledge, let others light their candles at it.",
-      "In a dark place, we find the light.",
-      "It is better to light a candle than to curse the darkness.",
-      "Keep your face to the sun and you will never see the shadows.",
-      "Let the wise man guard his thoughts for they become words. Guard his words for they become actions.",
-      "No evil is without compensation.",
-      "One cannot manage too many affairs; like pumpkins in the water, one pops up while you try to hold down the other.",
-      "Only when you have tasted the bitter can you appreciate the sweet.",
-      "Patience can overcome any misfortune.",
-      "Success depends on previous preparation, and without such preparation there is sure to be failure.",
-      "The best doctor is the one you do not need.",
-      "The door that you do not open is the one that leads to your destiny.",
-      "The fragrance always stays in the hand that gives the rose.",
-      "The greatest victory is that which requires no battle.",
-      "The less you talk, the more you are listened to.",
-      "The longer the night, the closer the dawn.",
-      "The man who removes a mountain begins by carrying away small stones.",
-      "The softest things in the world overcome the hardest.",
-      "The teacher opens the door, but you must walk through it yourself.",
-      "The water that carries the boat is the same that swallows it.",
-      "There are no shortcuts to any place worth going.",
-      "To be angry is to let others' mistakes punish you.",
-      "To know what you know and what you do not know is the beginning of wisdom.",
-      "To live a long life, eat like a cat, drink like a dog.",
-      "We count our miseries carefully, and accept our blessings grudgingly.",
-      "What you do not want done to yourself, do not do to others.",
-      "When you have only two pennies left, buy a loaf of bread with one and a lily with the other.",
-      "Wise men learn by other men's mistakes; fools by their own.",
-      "You cannot prevent the birds of sorrow from flying over your head, but you can prevent them from building nests in your hair.",
-      "Your mind is like a parachute – it only works when it is open.",
-      "A child's life is like a piece of paper on which everyone who passes leaves a mark.",
-      "A graceful taunt is worth more than a brutal insult.",
-      "A mouse that only has one hole is quickly caught.",
-      "A person who cannot tolerate small misfortunes will never accomplish great things.",
-      "A single sunbeam is enough to drive away many shadows.",
-      "A teacher for a day is a father for a lifetime.",
-      "All the flowers of tomorrow are in the seeds of today.",
-      "Before you embark on a journey of revenge, dig two graves.",
-      "Better to be without a book than to believe it entirely.",
-      "Choose a job you love, and you will never have to work a day in your life.",
-      "Do not confine your children to your own learning, for they were born in another time.",
-      "Don't be afraid of going slowly, be afraid of standing still.",
-      "Even a stone can be worn down by constant dripping.",
-      "Even the weariest river winds somewhere safe to sea.",
-      "Every bird loves to hear himself sing.",
-      "Every person has two educations: one which he receives from others, and one which he gives himself.",
-      "Falling into the mud is not the failure; staying in the mud is.",
-      "Fine words and an insinuating appearance are seldom associated with true virtue.",
-      "Forget injuries, never forget kindnesses.",
-      "Give a man a mask and he will tell you the truth.",
-      "Great doubts are the messengers of deep wisdom.",
-      "He who knows he has enough is rich.",
-      "He who speaks without modesty will find it difficult to make his words good.",
-      "I felt sorry for myself because I had no shoes – until I met a man who had no feet.",
-      "If you are the smartest person in the room, you are in the wrong room.",
-      "If you bow at all, bow low.",
-      "If you do not change direction, you may end up where you are heading.",
-      "If you want to know what a man is like, look at his friends.",
-      "In a quiet harbour you do not learn to sail.",
-      "It does not matter how slowly you go as long as you do not stop.",
-      "It is easier to govern a kingdom than to govern a family.",
-      "It is not the beauty of the building you should look at, but the construction of the foundation.",
-      "Keeping a little ahead of conditions is the secret of success.",
-      "Let the dead past bury its dead.",
-      "Little by little, even a thousand‑mile journey is completed.",
-      "Look at a stonecutter hammering away at his rock perhaps a hundred times without as much as a crack showing in it.",
-      "More haste, less speed.",
-      "Never cut what you can untie.",
-      "No one is so old that he cannot live one more year, nor so young that he cannot die today.",
-      "Once bitten by a snake, he is scared all his life at the sight of a rope.",
-      "One generation plants the trees, the next enjoys the shade.",
-      "One never notices what has been done; one can only see what remains to be done.",
-      "Only when you cannot see the shore do you discover the real sailor.",
-      "Poverty is not a disgrace, but being ashamed of it is.",
-      "Real knowledge is to know the extent of one's ignorance.",
-      "Silence is the true friend that never betrays.",
-      "Small holes sink great ships.",
-      "Speak the truth, even if your voice shakes.",
-      "The beginning of wisdom is to call things by their proper name.",
-      "The bird that flies too high is easily shot.",
-      "The cure for anything is salt water: sweat, tears, or the sea.",
-      "The deep well of silence is where wisdom hides.",
-      "The diamond cannot be polished without friction, nor the man perfected without trials.",
-      "The greatest glory in living lies not in never falling, but in rising every time we fall.",
-      "The heart that loves is always young.",
-      "The hero is brave in deeds as well as words.",
-      "The key to happiness is having dreams; the key to success is making them come true.",
-      "The man who asks a question is a fool for a minute; the man who never asks is a fool for life.",
-      "The morning wind spreads its fresh smell. We must get up and take that in, that wind that lets us live.",
-      "The only real failure is the failure to try.",
-      "The person who removes a mountain begins by carrying away small stones.",
-      "The pleasure of doing good is the only one that never wears out.",
-      "The power of the sword is not in the steel but in the hand that wields it.",
-      "The purest treasure mortal times afford is spotless reputation.",
-      "The rose that grows in the mud still smells sweet.",
-      "The secret of getting ahead is getting started.",
-      "The strength of a nation derives from the integrity of the home.",
-      "The superior man thinks always of virtue; the common man thinks of comfort.",
-      "The tongue can paint what the eye cannot see.",
-      "The wise man learns more from a fool than the fool learns from the wise man.",
-      "There are no shortcuts to the top of a mountain – you must climb the whole way.",
-      "There is no medicine for fear.",
-      "Those who cannot remember the past are condemned to repeat it.",
-      "Time is a great teacher, but unfortunately it kills all its pupils.",
-      "To be idle is to be at once useless and uneasy.",
-      "To know the road ahead, ask those coming back.",
-      "To the mind that is still, the whole universe surrenders.",
-      "Trees that are slow to grow bear the best fruit.",
-      "Trust your own instinct. Your mistakes might as well be your own, instead of someone else's.",
-      "Walls have ears, and bottles have mouths.",
-      "We are what we repeatedly do. Excellence, then, is not an act, but a habit.",
-      "We can learn from history, but we cannot live in it.",
-      "When a finger points to the moon, the fool looks at the finger.",
-      "When you realise how perfect everything is, you will tilt your head back and laugh at the sky.",
-      "Where there is love, there is no darkness.",
-      "Wise men talk because they have something to say; fools, because they have to say something.",
-      "Without hard work, nothing grows but weeds.",
-      "You are the sky. Everything else is just the weather.",
-      "You cannot stop the birds of sorrow from flying over your head, but you can stop them from nesting in your hair.",
-      "Your mind is a garden. Your thoughts are the seeds. You can grow flowers, or you can grow weeds.",
-      "A gem is not polished without rubbing, nor a man perfected without trials.",
-      "A hero is born in the midst of danger.",
-      "A light heart lives long.",
-      "A little fire burns up a great deal of grain.",
-      "A man's character is his fate.",
-      "A single rotten apple spoils the whole barrel.",
-      "A smooth sea never made a skilled sailor.",
-      "A thousand cups of wine do not suffice when true friends meet, but half a sentence is too much between strangers.",
-      "All birds find shelter during a rain. But the eagle avoids the rain by flying above the clouds.",
-      "All that you need is in your mind. The rest is just noise."
-    ];
-    // Ensure we have at least 300 quotes – the library above is ~320 unique lines.
-    
-    function getRandomQuote(isSpecial) {
-      if (isSpecial) {
-        // special quotes – a subset of deeper ones
-        const specials = [
-          "A star that remembers every sky it ever burned in.",
-          "The universe blinked, and in that blink, you existed.",
-          "Somewhere, a clock ticks in a dimension without time.",
-          "You are the dream of a forgotten god.",
-          "Every ending is just a prelude to a different silence.",
-          "This light left its galaxy before you were born.",
-          "The void doesn't whisper; it sings in frequencies you almost hear.",
-          "You are not late for the end of the world – you are early for the next one.",
-          "A single atom of stardust carries the blueprint of eternity.",
-          "The darkness is not empty; it is full of unspoken things."
-        ];
-        return specials[Math.floor(Math.random() * specials.length)];
-      }
-      return quoteLibrary[Math.floor(Math.random() * quoteLibrary.length)];
-    }
-
-    // ----------------------------- STREAK COUNTER (no emoji) -----------------------------
-    let currentStreak = 0;
-    function updateStreakCounter() {
-      const lastVisit = localStorage.getItem('last_visit_date');
-      const today = new Date().toDateString();
-      if (!lastVisit) {
-        currentStreak = 1;
-      } else if (lastVisit === today) {
-        currentStreak = parseInt(localStorage.getItem('streak')) || 1;
-      } else {
-        const lastDate = new Date(lastVisit);
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        if (lastDate.toDateString() === yesterday.toDateString()) {
-          currentStreak = (parseInt(localStorage.getItem('streak')) || 0) + 1;
-        } else {
-          currentStreak = 1;
-        }
-      }
-      localStorage.setItem('streak', currentStreak);
-      localStorage.setItem('last_visit_date', today);
-      let streakElem = document.getElementById('streakDisplay');
-      if (!streakElem) {
-        const meta = document.querySelector('.meta');
-        streakElem = document.createElement('span');
-        streakElem.id = 'streakDisplay';
-        meta.appendChild(streakElem);
-      }
-      streakElem.innerText = `[${currentStreak}]`;
-    }
-
-    function addStreakBonus() {
-      currentStreak += 1;
-      localStorage.setItem('streak', currentStreak);
-      updateStreakCounter();
-      showToast("+1 streak from the special star!");
-    }
-
-    // ----------------------------- DAILY RESET NOTIFICATION (no emoji) -----------------------------
-    function checkDailyNotification() {
-      const lastNotif = localStorage.getItem('last_notification_date');
-      const today = new Date().toDateString();
-      if (lastNotif !== today) {
-        showToast("A new day begins – ephemeral stars have appeared in the sky.");
-        localStorage.setItem('last_notification_date', today);
-      }
-    }
-
-    // ----------------------------- TEMPORARY STARS (incl. daily special) -----------------------------
-    async function spawnDailyTempStars() {
-      const todayStr = new Date().toDateString();
-      const lastSpawn = localStorage.getItem('last_temp_spawn');
-      if (lastSpawn === todayStr) return;
-      const count = 2 + Math.floor(Math.random() * 4);
-      let specialIndex = Math.floor(Math.random() * count);
-      for (let i=0; i<count; i++) {
-        const isSpecial = (i === specialIndex);
-        const expiryDays = 1 + Math.random() * 30;
-        const expiresAt = Date.now() + expiryDays * 86400000;
-        const x = (Math.random() - 0.5) * 2500;
-        const y = (Math.random() - 0.5) * 2500;
-        const tempStar = {
-          id: 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-          x, y,
-          createdAt: Date.now(),
-          expiresAt: expiresAt,
-          message: getRandomQuote(isSpecial),
-          isSpecial: isSpecial,
-          rewarded: false,
-          creatorId: null,
-          isTemp: true
-        };
-        await tempStarsCollection.doc(tempStar.id).set(tempStar);
-      }
-      localStorage.setItem('last_temp_spawn', todayStr);
-      showToast(`${count} ephemeral stars appeared – one is special!`);
-    }
-
-    // ----------------------------- STAR DECAY TRAIL -----------------------------
-    let decayParticles = [];
-    function addDecayTrail(x, y) {
-      for (let i=0; i<45; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 0.3 + Math.random() * 1.2;
-        decayParticles.push({
-          x: x, y: y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          life: 2 + Math.random() * 3,
-          size: 1 + Math.random() * 2.5,
-          color: `hsl(${30 + Math.random() * 40}, 80%, 60%)`
-        });
-      }
-    }
-    function updateDecayTrails(deltaTime) {
-      for (let i=decayParticles.length-1; i>=0; i--) {
-        let p = decayParticles[i];
-        p.x += p.vx * deltaTime;
-        p.y += p.vy * deltaTime;
-        p.life -= deltaTime;
-        if (p.life <= 0) decayParticles.splice(i,1);
-      }
-    }
-
-    function deleteNote(id) {
-      const star = notes.find(n=>n.id===id);
-      if (star) addDecayTrail(star.x, star.y);
-      notes = notes.filter(n=>n.id!==id);
-      deleteNoteFromFirestore(id);
-      updateCounter();
-      computeClusters();
-    }
-    async function deleteTempStar(id) {
-      const star = tempStars.find(s=>s.id===id);
-      if (star) addDecayTrail(star.x, star.y);
-      await tempStarsCollection.doc(id).delete();
-      tempStars = tempStars.filter(s=>s.id!==id);
-    }
-
-    // ----------------------------- SIMPLEX NOISE (full) -----------------------------
-    class SimplexNoise {
-      constructor() {
-        this.grad3 = [
-          [1,1,0], [-1,1,0], [1,-1,0], [-1,-1,0],
-          [1,0,1], [-1,0,1], [1,0,-1], [-1,0,-1],
-          [0,1,1], [0,-1,1], [0,1,-1], [0,-1,-1]
-        ];
-        this.p = [151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180];
-        for (let i=0; i<256; i++) this.p[256+i] = this.p[i];
-        this.perm = this.p;
-      }
-      dot(g, x, y, z) { return g[0]*x + g[1]*y + g[2]*z; }
-      noise3(x, y, z) {
-        let n0=0, n1=0, n2=0, n3=0;
-        let s = (x+y+z)/3.0;
-        let i = Math.floor(x+s);
-        let j = Math.floor(y+s);
-        let k = Math.floor(z+s);
-        let t = (i+j+k)/6.0;
-        let X0 = i-t;
-        let Y0 = j-t;
-        let Z0 = k-t;
-        let x0 = x-X0;
-        let y0 = y-Y0;
-        let z0 = z-Z0;
-        let i1, j1, k1;
-        let i2, j2, k2;
-        if (x0>=y0) {
-          if (y0>=z0) { i1=1; j1=0; k1=0; i2=1; j2=1; k2=0; }
-          else if (x0>=z0) { i1=1; j1=0; k1=0; i2=1; j2=0; k2=1; }
-          else { i1=0; j1=0; k1=1; i2=1; j2=0; k2=1; }
-        } else {
-          if (y0<z0) { i1=0; j1=0; k1=1; i2=0; j2=1; k2=1; }
-          else if (x0<z0) { i1=0; j1=1; k1=0; i2=0; j2=1; k2=1; }
-          else { i1=0; j1=1; k1=0; i2=1; j2=1; k2=0; }
-        }
-        let x1 = x0 - i1 + 1.0/6.0;
-        let y1 = y0 - j1 + 1.0/6.0;
-        let z1 = z0 - k1 + 1.0/6.0;
-        let x2 = x0 - i2 + 2.0/6.0;
-        let y2 = y0 - j2 + 2.0/6.0;
-        let z2 = z0 - k2 + 2.0/6.0;
-        let x3 = x0 - 1.0;
-        let y3 = y0 - 1.0;
-        let z3 = z0 - 1.0;
-        let ii = i & 255;
-        let jj = j & 255;
-        let kk = k & 255;
-        let gi0 = this.perm[ii+this.perm[jj+this.perm[kk]]] % 12;
-        let gi1 = this.perm[ii+i1+this.perm[jj+j1+this.perm[kk+k1]]] % 12;
-        let gi2 = this.perm[ii+i2+this.perm[jj+j2+this.perm[kk+k2]]] % 12;
-        let gi3 = this.perm[ii+1+this.perm[jj+1+this.perm[kk+1]]] % 12;
-        let t0 = 0.6 - x0*x0 - y0*y0 - z0*z0;
-        if (t0<0) n0=0; else { t0 *= t0; n0 = t0 * t0 * this.dot(this.grad3[gi0], x0, y0, z0); }
-        let t1 = 0.6 - x1*x1 - y1*y1 - z1*z1;
-        if (t1<0) n1=0; else { t1 *= t1; n1 = t1 * t1 * this.dot(this.grad3[gi1], x1, y1, z1); }
-        let t2 = 0.6 - x2*x2 - y2*y2 - z2*z2;
-        if (t2<0) n2=0; else { t2 *= t2; n2 = t2 * t2 * this.dot(this.grad3[gi2], x2, y2, z2); }
-        let t3 = 0.6 - x3*x3 - y3*y3 - z3*z3;
-        if (t3<0) n3=0; else { t3 *= t3; n3 = t3 * t3 * this.dot(this.grad3[gi3], x3, y3, z3); }
-        return 32.0 * (n0 + n1 + n2 + n3);
-      }
-    }
-    const noise = new SimplexNoise();
-
-    // ----------------------------- GLOBALS -----------------------------
-    let notes = [];
-    let tempStars = [];
-    let activeId = null;
-    let camera = { x: 0, y: 0, zoom: 1.0, targetZoom: 1.0 };
-    let w, h, ctx;
-    let followingStarId = null;
-    let currentClusters = [];
-    let namedConstellations = [];
-    let galacticClusters = [];
-    let dustClouds = [];
-    let starLayers = [];
-    let flowParticles = [];
-    let nebulaLayers = [];
-    let previewStarId = null;
-    let comets = [];
-    let sparks = [];
-    let time = 0;
-    const SEED_CLUSTERS = [
-      { name: "Pleiades", x: -320, y: -240, color: [100,115,160] },
-      { name: "Hyades", x: 390, y: 110, color: [115,95,140] },
-      { name: "Beehive", x: 750, y: -490, color: [130,105,95] },
-      { name: "Double Cluster", x: -790, y: 510, color: [95,110,130] },
-      { name: "Taurus", x: 110, y: -580, color: [85,80,115] },
-      { name: "Orion's Sword", x: -170, y: 650, color: [105,95,125] }
-    ];
-    const autoNames = [
-      "Veil of Eternity", "Cinder Hearth", "Solace Drift", "Aether's Kiss", "Woven Sorrow",
-      "The Silent Bell", "Forgotten Halo", "Ember Wake", "Strayed Loom", "Votive Remains",
-      "Gilded Ruin", "Pale Urn", "The Unspoken Lyre", "Raven's Compass", "Thistle Crown",
-      "Omen of Dust", "The Still Pyre", "Hollow Sigil", "Weeping Prism", "Last Accord"
-    ];
-
-    // Flow field
-    const flowGrid = { cellSize: 90, cols: 60, rows: 60, angles: [] };
-    function updateFlowField(t) {
-      for (let i=0; i<flowGrid.cols; i++) {
-        for (let j=0; j<flowGrid.rows; j++) {
-          let x = (i - flowGrid.cols/2) * flowGrid.cellSize;
-          let y = (j - flowGrid.rows/2) * flowGrid.cellSize;
-          let angle = noise.noise3(x*0.0018, y*0.0018, t*0.0004) * Math.PI * 5;
-          flowGrid.angles[i + j*flowGrid.cols] = angle;
-        }
-      }
-    }
-    function getFlowAngle(px, py) {
-      let cx = Math.floor((px + 3000) / flowGrid.cellSize) % flowGrid.cols;
-      let cy = Math.floor((py + 3000) / flowGrid.cellSize) % flowGrid.rows;
-      if (cx<0 || cy<0 || cx>=flowGrid.cols || cy>=flowGrid.rows) return 0;
-      return flowGrid.angles[cx + cy*flowGrid.cols] || 0;
-    }
-
-    // ----------------------------- INIT BACKGROUND -----------------------------
-    function createStarLayer(count, spread, minSize, maxSize, minBright, maxBright, colorRange, parallax) {
-      let layer = [];
-      for (let i=0; i<count; i++) {
-        layer.push({
-          x: (Math.random()-0.5)*spread,
-          y: (Math.random()-0.5)*spread,
-          size: minSize + Math.random()*(maxSize-minSize),
-          brightness: minBright + Math.random()*(maxBright-minBright),
-          colorTemp: [
-            colorRange[0]+Math.random()*(colorRange[1]-colorRange[0]),
-            colorRange[2]+Math.random()*(colorRange[3]-colorRange[2]),
-            colorRange[4]+Math.random()*(colorRange[5]-colorRange[4])
-          ],
-          parallax,
-          phase: Math.random()*Math.PI*2
-        });
-      }
-      return layer;
-    }
-
-    function initWorld() {
-      starLayers = [
-        createStarLayer(800, 6500, 0.2,0.7,0.3,0.6, [200,255,220,255,240,255], 0.05),
-        createStarLayer(1000, 5500, 0.3,1.0,0.4,0.7, [180,255,200,255,220,255], 0.12),
-        createStarLayer(700, 4500, 0.5,1.5,0.5,0.8, [150,240,180,240,200,240], 0.25),
-        createStarLayer(500, 3500, 0.8,2.2,0.6,0.9, [120,220,150,220,180,240], 0.45),
-        createStarLayer(400, 2800, 1.2,2.8,0.7,1.0, [100,200,130,200,160,220], 0.7),
-        createStarLayer(250, 2000, 1.8,3.5,0.8,1.0, [80,180,110,180,140,200], 1.0)
-      ];
-      nebulaLayers = [];
-      const baseColors = [
-        [[80,60,150], [120,80,180], [160,100,210]],
-        [[60,90,140], [90,120,170], [130,150,200]],
-        [[140,70,100], [180,100,130], [220,130,160]],
-        [[40,100,80], [70,130,110], [110,160,140]],
-        [[160,80,60], [200,110,90], [240,140,120]]
-      ];
-      for (let i=0; i<40; i++) {
-        let colorset = baseColors[Math.floor(Math.random()*baseColors.length)];
-        nebulaLayers.push({
-          x: (Math.random()-0.5)*3800,
-          y: (Math.random()-0.5)*3800,
-          radius: 180 + Math.random()*420,
-          baseColor1: colorset[0],
-          baseColor2: colorset[1],
-          baseColor3: colorset[2],
-          color1: [...colorset[0]],
-          color2: [...colorset[1]],
-          color3: [...colorset[2]],
-          pulseSpeed: 0.001 + Math.random()*0.002,
-          phase: Math.random()*Math.PI*2
-        });
-      }
-      dustClouds = [];
-      for (let i=0; i<180; i++) {
-        dustClouds.push({
-          x: (Math.random()-0.5)*4500,
-          y: (Math.random()-0.5)*4500,
-          particles: Array.from({length: 35+Math.floor(Math.random()*70)}, () => ({
-            offsetX: (Math.random()-0.5)*240,
-            offsetY: (Math.random()-0.5)*240,
-            size: Math.random()*4+1,
-            alpha: Math.random()*0.45+0.1
-          })),
-          color: [120+Math.random()*135, 140+Math.random()*115, 180+Math.random()*75]
-        });
-      }
-      flowParticles = [];
-      for (let i=0; i<600; i++) {
-        flowParticles.push({
-          x: (Math.random()-0.5)*5000,
-          y: (Math.random()-0.5)*5000,
-          vx: (Math.random()-0.5)*0.4,
-          vy: (Math.random()-0.5)*0.4,
-          life: Math.random()*100,
-          size: 1+Math.random()*3
-        });
-      }
-      galacticClusters = JSON.parse(JSON.stringify(SEED_CLUSTERS));
-      for (let i=0; i<flowGrid.cols*flowGrid.rows; i++) flowGrid.angles[i] = 0;
-    }
-
-    function updateNebulaColors() {
-      for (let neb of nebulaLayers) {
-        let influenceR=0, influenceG=0, influenceB=0, totalWeight=0;
-        for (let star of notes) {
-          let dx = star.x - neb.x, dy = star.y - neb.y;
-          let dist = Math.hypot(dx, dy);
-          if (dist < 300) {
-            let weight = (1 - dist/300) * (star.mass||2);
-            let age = Math.max(0, Date.now() - star.created);
-            let day = 86400000, week = day*7;
-            let r,g,b;
-            if (age < week) { r=120; g=180; b=255; }
-            else if (age < week*4) { r=255; g=200; b=120; }
-            else { r=255; g=120; b=100; }
-            influenceR += r * weight;
-            influenceG += g * weight;
-            influenceB += b * weight;
-            totalWeight += weight;
-          }
-        }
-        if (totalWeight > 0.1) {
-          let tR = influenceR / totalWeight;
-          let tG = influenceG / totalWeight;
-          let tB = influenceB / totalWeight;
-          neb.color1 = [
-            Math.floor(neb.baseColor1[0] * 0.3 + tR * 0.7),
-            Math.floor(neb.baseColor1[1] * 0.3 + tG * 0.7),
-            Math.floor(neb.baseColor1[2] * 0.3 + tB * 0.7)
-          ];
-          neb.color2 = [
-            Math.floor(neb.baseColor2[0] * 0.3 + tR * 0.7),
-            Math.floor(neb.baseColor2[1] * 0.3 + tG * 0.7),
-            Math.floor(neb.baseColor2[2] * 0.3 + tB * 0.7)
-          ];
-          neb.color3 = [
-            Math.floor(neb.baseColor3[0] * 0.3 + tR * 0.7),
-            Math.floor(neb.baseColor3[1] * 0.3 + tG * 0.7),
-            Math.floor(neb.baseColor3[2] * 0.3 + tB * 0.7)
-          ];
-        } else {
-          neb.color1 = [...neb.baseColor1];
-          neb.color2 = [...neb.baseColor2];
-          neb.color3 = [...neb.baseColor3];
-        }
-      }
-    }
-
-    function updateOrganic(t) {
-      for (let layer of starLayers) {
-        for (let s of layer) {
-          let angle = noise.noise3(s.x*0.0003, s.y*0.0003, t*0.00025) * Math.PI * 2;
-          let speed = 0.12;
-          s.x += Math.cos(angle)*speed;
-          s.y += Math.sin(angle)*speed;
-          if (s.x > 3600) s.x = -3600;
-          if (s.x < -3600) s.x = 3600;
-          if (s.y > 2800) s.y = -2800;
-          if (s.y < -2800) s.y = 2800;
-        }
-      }
-      for (let cloud of dustClouds) {
-        let angle = noise.noise3(cloud.x*0.0012, cloud.y*0.0012, t*0.00018) * Math.PI * 2;
-        let speed = 0.18;
-        cloud.x += Math.cos(angle)*speed;
-        cloud.y += Math.sin(angle)*speed;
-        if (cloud.x > 3600) cloud.x = -3600;
-        if (cloud.x < -3600) cloud.x = 3600;
-        if (cloud.y > 3600) cloud.y = -3600;
-        if (cloud.y < -3600) cloud.y = 3600;
-      }
-      for (let neb of nebulaLayers) {
-        let angle = noise.noise3(neb.x*0.0005, neb.y*0.0005, t*0.0001) * Math.PI * 2;
-        neb.x += Math.cos(angle)*0.08;
-        neb.y += Math.sin(angle)*0.08;
-        if (neb.x > 3200) neb.x = -3200;
-        if (neb.x < -3200) neb.x = 3200;
-        if (neb.y > 3200) neb.y = -3200;
-        if (neb.y < -3200) neb.y = 3200;
-        neb.phase = (neb.phase || 0) + 0.005;
-      }
-    }
-
-    function updateFlowParticles() {
-      for (let p of flowParticles) {
-        let angle = getFlowAngle(p.x, p.y);
-        p.vx += Math.cos(angle)*0.035;
-        p.vy += Math.sin(angle)*0.035;
-        let spd = Math.hypot(p.vx, p.vy);
-        if (spd > 2.8) { p.vx *= 0.97; p.vy *= 0.97; }
-        p.x += p.vx;
-        p.y += p.vy;
-        if (Math.abs(p.x) > 4200 || Math.abs(p.y) > 4200) {
-          p.x = (Math.random()-0.5)*4800;
-          p.y = (Math.random()-0.5)*4800;
-          p.vx = (Math.random()-0.5)*0.5;
-          p.vy = (Math.random()-0.5)*0.5;
-        }
-        p.life = (p.life+0.4) % 100;
-      }
-    }
-
-    // ----------------------------- STAR TYPE DIFFERENTIATION -----------------------------
-    function getStarVisuals(star) {
-      const age = Math.max(0, Date.now() - star.created);
-      const day = 86400000;
-      const week = day * 7;
-      const month = day * 30;
-      const mass = star.mass || 2.5;
-      let sizeFactor = 1.0;
-      let coreColor = "#ffddaa";
-      let glowColor = "rgba(255,221,170,0.5)";
-      let pulseSpeed = 0.008;
-      let isWhiteDwarf = false;
-      if (mass < 1.5 && age > month) {
-        isWhiteDwarf = true;
-        sizeFactor = 0.55;
-        coreColor = "#ffffff";
-        glowColor = "rgba(255,255,255,0.8)";
-        pulseSpeed = 0.02;
-      } else if (age < day * 3) {
-        sizeFactor = 0.8;
-        coreColor = "#c0e0ff";
-        glowColor = "rgba(180,220,255,0.7)";
-        pulseSpeed = 0.015;
-      } else if (age > month) {
-        sizeFactor = 1.4;
-        coreColor = "#ffaa77";
-        glowColor = "rgba(255,170,119,0.6)";
-        pulseSpeed = 0.005;
-      }
-      return { sizeFactor, coreColor, glowColor, pulseSpeed, isWhiteDwarf };
-    }
-
-    function getPulseFactor(star, customSpeed = null) {
-      let speed = customSpeed !== null ? customSpeed : 0.008;
-      let phase = (star.pulsePhase || 0) + time * speed;
-      let raw = Math.sin(phase);
-      return 0.6 + 0.5 * raw * raw;
-    }
-
-    function addBirthSparks(x, y) {
-      for (let i=0; i<60; i++) {
-        let angle = Math.random() * Math.PI * 2;
-        let speed = 0.5 + Math.random() * 2.5;
-        sparks.push({
-          x: x, y: y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          life: 0.8 + Math.random() * 1.2,
-          color: `hsl(${30 + Math.random() * 60}, 100%, 60%)`
-        });
-      }
-    }
-    function updateSparks(deltaTime) {
-      for (let i=sparks.length-1; i>=0; i--) {
-        let s = sparks[i];
-        s.x += s.vx * deltaTime;
-        s.y += s.vy * deltaTime;
-        s.life -= deltaTime * 1.5;
-        if (s.life <= 0) sparks.splice(i,1);
-      }
-    }
-
-    // ----------------------------- RENDERING -----------------------------
-    let bloomCanvas = document.createElement('canvas');
-    let blurCanvas = document.createElement('canvas');
-    function applyBloom(ctxMain, w, h) {
-      try {
-        bloomCanvas.width = w; bloomCanvas.height = h;
-        let tempCtx = bloomCanvas.getContext('2d');
-        tempCtx.drawImage(ctxMain.canvas, 0, 0);
-        blurCanvas.width = w; blurCanvas.height = h;
-        let blurCtx = blurCanvas.getContext('2d');
-        blurCtx.filter = 'blur(10px)';
-        blurCtx.drawImage(bloomCanvas, 0, 0);
-        ctxMain.globalCompositeOperation = 'lighter';
-        ctxMain.drawImage(blurCanvas, 0, 0);
-        ctxMain.globalCompositeOperation = 'source-over';
-      } catch(e) {}
-    }
-
-    function render() {
-      if (!ctx) return;
-      ctx.clearRect(0, 0, w, h);
-      const grad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w,h)*0.9);
-      grad.addColorStop(0, "#02021a");
-      grad.addColorStop(0.5, "#010110");
-      grad.addColorStop(1, "#000005");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
-      
-      ctx.save();
-      ctx.translate(w/2, h/2);
-      ctx.scale(camera.zoom, camera.zoom);
-      ctx.translate(camera.x, camera.y);
-      
-      // Nebulas
-      for (let neb of nebulaLayers) {
-        let pulse = 0.7 + 0.3 * Math.sin(time*0.002 * neb.pulseSpeed + neb.phase);
-        let rad = neb.radius * (0.9 + 0.1 * Math.sin(time*0.001 + neb.phase));
-        let gradN = ctx.createRadialGradient(neb.x, neb.y, rad*0.2, neb.x, neb.y, rad);
-        gradN.addColorStop(0, `rgba(${neb.color1[0]}, ${neb.color1[1]}, ${neb.color1[2]}, ${0.1 * pulse})`);
-        gradN.addColorStop(0.5, `rgba(${neb.color2[0]}, ${neb.color2[1]}, ${neb.color2[2]}, ${0.06 * pulse})`);
-        gradN.addColorStop(1, `rgba(${neb.color3[0]}, ${neb.color3[1]}, ${neb.color3[2]}, 0)`);
-        ctx.fillStyle = gradN;
-        ctx.beginPath();
-        ctx.arc(neb.x, neb.y, rad, 0, Math.PI*2);
-        ctx.fill();
-      }
-      
-      // Star layers
-      for (let layer of starLayers) {
-        for (let s of layer) {
-          let px = s.x - camera.x * s.parallax * 0.1;
-          let py = s.y - camera.y * s.parallax * 0.1;
-          let twinkle = 0.65 + 0.35 * Math.sin(time*0.004 + s.phase);
-          ctx.fillStyle = `rgba(${s.colorTemp[0]}, ${s.colorTemp[1]}, ${s.colorTemp[2]}, ${s.brightness * twinkle * 0.8})`;
-          ctx.beginPath();
-          ctx.arc(px, py, s.size, 0, Math.PI*2);
-          ctx.fill();
-        }
-      }
-      
-      // Dust
-      for (let cloud of dustClouds) {
-        for (let p of cloud.particles) {
-          let px = cloud.x + p.offsetX;
-          let py = cloud.y + p.offsetY;
-          let alpha = p.alpha * (0.5 + 0.5 * Math.sin(time*0.001 + px*0.02));
-          ctx.fillStyle = `rgba(${cloud.color[0]}, ${cloud.color[1]}, ${cloud.color[2]}, ${alpha*0.6})`;
-          ctx.beginPath();
-          ctx.arc(px, py, p.size, 0, Math.PI*2);
-          ctx.fill();
-        }
-      }
-      
-      // Flow particles
-      for (let p of flowParticles) {
-        let alpha = 0.25 + 0.2 * Math.sin(p.life*0.2);
-        ctx.fillStyle = `rgba(210, 230, 255, ${alpha*0.6})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size*0.7, 0, Math.PI*2);
-        ctx.fill();
-      }
-      
-      // Only orbit lines (dashed) – no star-to-star lines
-      ctx.save();
-      for (let sun of notes.filter(n=>n.isSun)) {
-        ctx.setLineDash([6, 10]);
-        ctx.lineDashOffset = time * 0.007;
-        for (let planet of notes.filter(p=>p.orbitingSunId === sun.id)) {
-          ctx.beginPath();
-          ctx.arc(sun.x, sun.y, planet.orbitRadius, 0, Math.PI*2);
-          ctx.strokeStyle = "rgba(170, 200, 250, 0.45)";
-          ctx.stroke();
-        }
-      }
-      ctx.restore();
-      
-      // Galactic clusters
-      for (let gc of galacticClusters) {
-        let gradGlow = ctx.createRadialGradient(gc.x, gc.y, 20, gc.x, gc.y, 400);
-        gradGlow.addColorStop(0, `rgba(${gc.color[0]}, ${gc.color[1]}, ${gc.color[2]}, 0.1)`);
-        gradGlow.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = gradGlow;
-        ctx.beginPath();
-        ctx.arc(gc.x, gc.y, 400, 0, Math.PI*2);
-        ctx.fill();
-        if (camera.zoom > 0.55) {
-          ctx.font = `${Math.max(11, 16*camera.zoom)}px "Segoe UI", system-ui, sans-serif`;
-          ctx.fillStyle = `rgba(230, 240, 255, ${0.6 * Math.min(1, (camera.zoom-0.45)/0.4)})`;
-          ctx.shadowBlur = 6;
-          ctx.shadowColor = "rgba(100,150,255,0.4)";
-          ctx.fillText(gc.name, gc.x-40, gc.y-60);
-          ctx.shadowBlur = 0;
-        }
-      }
-      
-      // Permanent stars with differentiation
-      for (let star of notes) {
-        let visuals = getStarVisuals(star);
-        let pulseFactor = getPulseFactor(star, visuals.pulseSpeed);
-        let baseSize = (star.radius || 3.2) * visuals.sizeFactor;
-        let size = Math.max(2.0, baseSize + 0.6 * pulseFactor);
-        if (star.isSun) size = (star.radius||6) + 1.0 * pulseFactor;
-        
-        let glow = ctx.createRadialGradient(star.x, star.y, size*0.6, star.x, star.y, size*7);
-        glow.addColorStop(0, visuals.glowColor);
-        glow.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, size*7, 0, Math.PI*2);
-        ctx.fill();
-        
-        let inner = ctx.createRadialGradient(star.x-2, star.y-2, 1, star.x, star.y, size*1.8);
-        inner.addColorStop(0, visuals.coreColor);
-        inner.addColorStop(0.5, visuals.isWhiteDwarf ? "#ffe8cc" : "#ffdd99");
-        inner.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = inner;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, size*1.4, 0, Math.PI*2);
-        ctx.fill();
-        
-        ctx.fillStyle = visuals.isWhiteDwarf ? "#ffffff" : "#fffde0";
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = visuals.isWhiteDwarf ? "rgba(255,255,255,0.8)" : "rgba(255,220,100,0.6)";
-        ctx.beginPath();
-        ctx.arc(star.x-0.8, star.y-0.8, size*0.35, 0, Math.PI*2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        
-        if (previewStarId === star.id) {
-          ctx.beginPath();
-          ctx.arc(star.x, star.y, size*3.8, 0, Math.PI*2);
-          ctx.strokeStyle = "rgba(255, 245, 200, 0.8)";
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        }
-      }
-      
-      // Temporary stars (special vs regular)
-      for (let star of tempStars) {
-        let pulse = 0.8 + 0.2 * Math.sin(time * (star.isSpecial ? 0.0025 : 0.003));
-        let size = (star.isSpecial ? 5.5 : 4) + pulse * 1.2;
-        let glowColor = star.isSpecial ? "rgba(255, 200, 80, 0.9)" : "rgba(255, 220, 140, 0.7)";
-        let coreColor = star.isSpecial ? "#ffcc66" : "#ffdd99";
-        let glow = ctx.createRadialGradient(star.x, star.y, size*0.5, star.x, star.y, size*6);
-        glow.addColorStop(0, glowColor);
-        glow.addColorStop(1, "rgba(255, 180, 80, 0)");
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, size*6, 0, Math.PI*2);
-        ctx.fill();
-        
-        ctx.fillStyle = coreColor;
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = star.isSpecial ? "rgba(255, 200, 80, 0.9)" : "rgba(255, 200, 100, 0.8)";
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, size*0.8, 0, Math.PI*2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, size*1.3 + pulse*0.5, 0, Math.PI*2);
-        ctx.strokeStyle = star.isSpecial ? "rgba(255, 200, 80, 0.9)" : "rgba(255, 220, 120, 0.8)";
-        ctx.lineWidth = 1.8;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      }
-      
-      // Comets
-      for (let c of comets) {
-        let tailX = c.x - c.vx * 70;
-        let tailY = c.y - c.vy * 70;
-        let grad = ctx.createLinearGradient(c.x, c.y, tailX, tailY);
-        grad.addColorStop(0, "rgba(255,255,210,0.8)");
-        grad.addColorStop(1, "rgba(180,140,80,0)");
-        ctx.beginPath();
-        ctx.moveTo(c.x, c.y);
-        ctx.lineTo(tailX, tailY);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
-        ctx.fillStyle = "#ffffcc";
-        ctx.beginPath();
-        ctx.arc(c.x, c.y, 2.5, 0, Math.PI*2);
-        ctx.fill();
-      }
-      
-      ctx.restore();
-      
-      // Sparks & decay trails
-      for (let s of sparks) {
-        let sparkScreenX = (s.x + camera.x) * camera.zoom + w/2;
-        let sparkScreenY = (s.y + camera.y) * camera.zoom + h/2;
-        ctx.fillStyle = s.color;
-        ctx.beginPath();
-        ctx.arc(sparkScreenX, sparkScreenY, 2 * s.life, 0, Math.PI*2);
-        ctx.fill();
-      }
-      for (let p of decayParticles) {
-        let px = (p.x + camera.x) * camera.zoom + w/2;
-        let py = (p.y + camera.y) * camera.zoom + h/2;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(px, py, p.size * (p.life * 0.6 + 0.3), 0, Math.PI*2);
-        ctx.fill();
-      }
-      
-      applyBloom(ctx, w, h);
-    }
-
-    // ----------------------------- SIMULATION -----------------------------
-    function simulateMotion(deltaTime) {
-      for (let note of notes) {
-        if (!note.isSun) {
-          note.vx = (note.vx||0) * 0.996;
-          note.vy = (note.vy||0) * 0.996;
-          note.x += note.vx;
-          note.y += note.vy;
-          note.pulsePhase = (note.pulsePhase||0) + 0.008;
-        }
-      }
-      camera.zoom += (camera.targetZoom - camera.zoom) * 0.08;
-      if (followingStarId) {
-        let star = notes.find(n=>n.id===followingStarId);
-        if (star) {
-          camera.x += (-star.x - camera.x) * 0.07;
-          camera.y += (-star.y - camera.y) * 0.07;
-          camera.targetZoom = Math.min(2.6, camera.targetZoom*0.99 + 1.6*0.01);
-        } else { stopFollowing(); }
-      }
-      updateSparks(deltaTime);
-      updateDecayTrails(deltaTime);
-    }
-    
-    function updateComets() {
-      if (Math.random() < 0.0025) {
-        let angle = Math.random() * Math.PI * 2;
-        let speed = 1.8 + Math.random()*2.5;
-        comets.push({
-          x: Math.cos(angle)*2600, y: Math.sin(angle)*2600,
-          vx: -Math.cos(angle)*speed, vy: -Math.sin(angle)*speed,
-          life: 550 + Math.random()*350
-        });
-      }
-      for (let i=comets.length-1; i>=0; i--) {
-        let c = comets[i];
-        c.x += c.vx;
-        c.y += c.vy;
-        c.life--;
-        if (c.life <= 0) comets.splice(i,1);
-      }
-    }
-
-    // ----------------------------- AUTO-NAMING & CLUSTERS -----------------------------
-    function autoNameUnnamedClusters() {
-      for (let cluster of currentClusters) {
-        if (!cluster.name && cluster.starIds.length >= 3) {
-          let existing = namedConstellations.find(c => c.starIds.join(',') === cluster.starIds.join(','));
-          if (!existing) {
-            let randomName = autoNames[Math.floor(Math.random() * autoNames.length)];
-            let newName = randomName;
-            while (namedConstellations.some(c => c.name === newName)) {
-              newName = randomName + " " + (Math.floor(Math.random() * 100) + 1);
+            let localPeerId = localStorage.getItem('constellation_peer_id');
+            if (!localPeerId) {
+                localPeerId = 'peer_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('constellation_peer_id', localPeerId);
             }
-            namedConstellations.push({ starIds: cluster.starIds, name: newName });
-            constellationsCollection.doc(cluster.starIds.join(',')).set({ starIds: cluster.starIds, name: newName });
-            showToast(`New constellation: ${newName}`);
-          }
-        }
-      }
-    }
+            let localPeerName = localStorage.getItem('constellation_peer_name');
 
-    function computeClusters() {
-      const threshold = 215;
-      let visited = new Set();
-      let clusters = [];
-      for (let i=0; i<notes.length; i++) {
-        if (visited.has(i)) continue;
-        let comp = [];
-        let queue = [i];
-        visited.add(i);
-        while (queue.length) {
-          let idx = queue.pop();
-          comp.push(idx);
-          for (let j=0; j<notes.length; j++) {
-            if (visited.has(j)) continue;
-            let d = Math.hypot(notes[idx].x - notes[j].x, notes[idx].y - notes[j].y);
-            if (d < threshold) { visited.add(j); queue.push(j); }
-          }
-        }
-        if (comp.length >= 3) {
-          let cx=0, cy=0;
-          for (let idx of comp) { cx += notes[idx].x; cy += notes[idx].y; }
-          cx /= comp.length; cy /= comp.length;
-          let starIds = comp.map(i=>notes[i].id);
-          let name = null;
-          for (let nc of namedConstellations) {
-            if (nc.starIds.length === starIds.length && nc.starIds.every(id=>starIds.includes(id))) {
-              name = nc.name; break;
+            // ----------------------------- 300+ QUOTE LIBRARY -----------------------------
+            const quoteLibrary = [
+                "the silence between stars",
+                "a breath held too long",
+                "echo of a forgotten galaxy",
+                "where light goes to dream",
+                "dust that remembers",
+                "the shape of an unfinished thought",
+                "a whisper painted in ultraviolet",
+                "gravity of almost",
+                "the color of things not said",
+                "fractal of a lost moment",
+                "stillness shaped like a question",
+                "an orbit around nothing",
+                "the weight of a sigh",
+                "embers of a dying sun",
+                "a language made of shadows",
+                "thread of a nonexistent story",
+                "a pause in the hum of the universe",
+                "the scent of burnt-out stars",
+                "a mirror for ghosts",
+                "the geometry of longing",
+                "a crack in the cosmic egg",
+                "where time goes to untangle",
+                "a map of half-remembered dreams",
+                "the sound of a single photon",
+                "a rift of tender static",
+                "the dust of old prayers",
+                "an unbroken thread of maybe",
+                "a coin lost between dimensions",
+                "the shape of an absence",
+                "a lantern for wandering voids",
+                "a sigh of the cosmic wind",
+                "a tear in the fabric of routine",
+                "the echo of a star's first cry",
+                "a fragment of a forgotten hymn",
+                "the color of three am",
+                "an unfinished constellation",
+                "the ghost of a supernova",
+                "a stray frequency from a dead world",
+                "the memory of a raindrop on a far moon",
+                "a knot of spacetime",
+                "the perfume of ancient nebulae",
+                "a half-open door to elsewhere",
+                "A journey of a thousand miles begins with a single step.",
+                "It is better to light a candle than to curse the darkness.",
+                "The flame that burns twice as bright burns half as long.",
+                "A man who chases two rabbits catches neither.",
+                "Tension is who you think you should be. Relaxation is who you are.",
+                "The best time to plant a tree was twenty years ago. The second best time is now.",
+                "A bird does not sing because it has an answer. It sings because it has a song.",
+                "To know the road ahead, ask those coming back.",
+                "If you want happiness for an hour, take a nap. If you want happiness for a day, go fishing.",
+                "The gem cannot be polished without friction, nor man perfected without trials.",
+                "A book is like a garden carried in the pocket.",
+                "A little impatience will spoil great plans.",
+                "A single conversation with a wise man is better than ten years of study.",
+                "Better a diamond with a flaw than a pebble without one.",
+                "Do not use a cannon to kill a mosquito.",
+                "Fear not the slow pace; fear only the standstill.",
+                "Give a man a fish and you feed him for a day; teach him to fish and you feed him for a lifetime.",
+                "He who asks is a fool for five minutes, but he who does not ask remains a fool forever.",
+                "I hear and I forget. I see and I remember. I do and I understand.",
+                "If you are patient in one moment of anger, you will escape a hundred days of sorrow.",
+                "If you want your children to be clever, tell them fairy tales. If you want them to be more clever, tell them more fairy tales.",
+                "In the middle of difficulty lies opportunity.",
+                "It is easy to get a thousand soldiers but hard to find a good general.",
+                "Learn as if you were going to live forever. Live as if you were going to die tomorrow.",
+                "No matter how high the mountain, the path must be climbed.",
+                "One kind word can warm three winter months.",
+                "Patience is power; with time and patience the mulberry leaf becomes a silk gown.",
+                "The journey is the reward.",
+                "The man who moves a mountain begins by carrying away small stones.",
+                "The person who says it cannot be done should not interrupt the person doing it.",
+                "To forget one's ancestors is to be a stream without a source.",
+                "We open the door to opportunity by walking through it.",
+                "When you drink the water, remember the spring.",
+                "A smile will gain you ten more years of life.",
+                "A single penny can hide a thousand worries.",
+                "Big troubles come from small beginnings.",
+                "Don't curse the darkness; light a candle.",
+                "Even a hare will bite when it is cornered.",
+                "Failure is not falling down but refusing to get up.",
+                "Good medicine tastes bitter.",
+                "He who rides a tiger is afraid to dismount.",
+                "If you are wrong, you need not worry; if you are right, you need not be angry.",
+                "It is better to be a dog in a peaceful time than a man in a chaotic period.",
+                "Keep a green tree in your heart and perhaps a singing bird will come.",
+                "Laughter is the best medicine.",
+                "Make happy those who are near, and those who are far will come.",
+                "Opportunities are for the prepared mind.",
+                "People who live in glass houses should not throw stones.",
+                "Silence is a source of great strength.",
+                "The fish sees the bait, not the hook.",
+                "The frog in the well knows nothing of the great ocean.",
+                "The grass is always greener on the other side of the fence.",
+                "The older the ginger, the hotter the spice.",
+                "Time and tide wait for no man.",
+                "Treat your inferiors as you would your superiors.",
+                "Virtue is not knowing but doing.",
+                "Wealth is not what you have, but what you are.",
+                "What is the use of running when you are on the wrong road?",
+                "When prosperity comes, do not use all of it.",
+                "Wise men are not always silent, but they know when to be.",
+                "You cannot put an old head on young shoulders.",
+                "A frog in a well cannot conceive of the ocean.",
+                "A man without a smiling face must not open a shop.",
+                "A spark can start a fire that burns down an entire forest.",
+                "Better to light a single candle than to curse the darkness.",
+                "Distance tests a horse's strength; time reveals a person's character.",
+                "Everything is difficult before it becomes easy.",
+                "Great souls have wills; feeble ones have only wishes.",
+                "He who knows others is wise; he who knows himself is enlightened.",
+                "If you are honest and truthful, you need not fear the world.",
+                "If you don't want anyone to know, don't do it.",
+                "It is better to be the enemy of a good man than the friend of a bad one.",
+                "It is not the knowing that is difficult, but the doing.",
+                "Let a fox be the judge at a goose trial.",
+                "Misfortune might be a blessing in disguise.",
+                "Never write a letter while you are angry.",
+                "One joy scatters a hundred griefs.",
+                "Patience is a bitter plant but it has sweet fruit.",
+                "Pearls do not float on the sea; they must be sought.",
+                "Rain does not fall on one roof alone.",
+                "Send a man to a tiger and you will not get his bones back.",
+                "The apple never falls far from the tree.",
+                "The bird wishes it were a cloud; the cloud wishes it were a bird.",
+                "The ear that hears the warnings of the wise will rest in safety.",
+                "The falling of one leaf heralds the coming of autumn.",
+                "The greatest conqueror is he who overcomes the enemy without a blow.",
+                "The more you sweat in peace, the less you bleed in war.",
+                "The only way to have a friend is to be one.",
+                "The wise man does not say all that he thinks, but he thinks all that he says.",
+                "There is no general without a soldier.",
+                "Trees that grow slowly bear the best fruit.",
+                "Water can both carry a boat and overturn it.",
+                "What is done by night appears by day.",
+                "When the wind rises, waves follow.",
+                "Worry is the interest paid on trouble before it falls due.",
+                "A bad workman blames his tools.",
+                "A closed mind is like a closed book: just a block of wood.",
+                "A good neighbour is better than a brother far away.",
+                "A small leak will sink a great ship.",
+                "A smile is the shortest distance between two people.",
+                "A good conscience is a constant feast.",
+                "A thorn defends the rose, harming only those who would steal the blossom.",
+                "An ant may well destroy a whole dam.",
+                "As the wind blows, you must set your sail.",
+                "Avoid the crowd of evil; do not even start a conversation with it.",
+                "Be not afraid of growing slowly; be afraid only of standing still.",
+                "Better to be a beast than a man who gossips.",
+                "Better to live in peace than in a palace of strife.",
+                "Calamity is the touchstone of a brave mind.",
+                "Do not fear going forward slowly; fear only to stand still.",
+                "Do not remove a fly from your friend's forehead with a hatchet.",
+                "Even the wise are ignorant in the future.",
+                "Foolish men learn from no one; wise men learn from everyone.",
+                "Give me a fish and I eat for a day; teach me to fish and I eat for a lifetime.",
+                "Go to bed with the lamb and rise with the lark.",
+                "Happiness is not a station you arrive at, but a manner of traveling.",
+                "He who blames others has a long way to go on his journey. He who blames himself is halfway there.",
+                "He who knows that enough is enough will always have enough.",
+                "If you have knowledge, let others light their candles at it.",
+                "In a dark place, we find the light.",
+                "It is better to light a candle than to curse the darkness.",
+                "Keep your face to the sun and you will never see the shadows.",
+                "Let the wise man guard his thoughts for they become words. Guard his words for they become actions.",
+                "No evil is without compensation.",
+                "One cannot manage too many affairs; like pumpkins in the water, one pops up while you try to hold down the other.",
+                "Only when you have tasted the bitter can you appreciate the sweet.",
+                "Patience can overcome any misfortune.",
+                "Success depends on previous preparation, and without such preparation there is sure to be failure.",
+                "The best doctor is the one you do not need.",
+                "The door that you do not open is the one that leads to your destiny.",
+                "The fragrance always stays in the hand that gives the rose.",
+                "The greatest victory is that which requires no battle.",
+                "The less you talk, the more you are listened to.",
+                "The longer the night, the closer the dawn.",
+                "The man who removes a mountain begins by carrying away small stones.",
+                "The softest things in the world overcome the hardest.",
+                "The teacher opens the door, but you must walk through it yourself.",
+                "The water that carries the boat is the same that swallows it.",
+                "There are no shortcuts to any place worth going.",
+                "To be angry is to let others' mistakes punish you.",
+                "To know what you know and what you do not know is the beginning of wisdom.",
+                "To live a long life, eat like a cat, drink like a dog.",
+                "We count our miseries carefully, and accept our blessings grudgingly.",
+                "What you do not want done to yourself, do not do to others.",
+                "When you have only two pennies left, buy a loaf of bread with one and a lily with the other.",
+                "Wise men learn by other men's mistakes; fools by their own.",
+                "You cannot prevent the birds of sorrow from flying over your head, but you can prevent them from building nests in your hair.",
+                "Your mind is like a parachute – it only works when it is open.",
+                "A child's life is like a piece of paper on which everyone who passes leaves a mark.",
+                "A graceful taunt is worth more than a brutal insult.",
+                "A mouse that only has one hole is quickly caught.",
+                "A person who cannot tolerate small misfortunes will never accomplish great things.",
+                "A single sunbeam is enough to drive away many shadows.",
+                "A teacher for a day is a father for a lifetime.",
+                "All the flowers of tomorrow are in the seeds of today.",
+                "Before you embark on a journey of revenge, dig two graves.",
+                "Better to be without a book than to believe it entirely.",
+                "Choose a job you love, and you will never have to work a day in your life.",
+                "Do not confine your children to your own learning, for they were born in another time.",
+                "Don't be afraid of going slowly, be afraid of standing still.",
+                "Even a stone can be worn down by constant dripping.",
+                "Even the weariest river winds somewhere safe to sea.",
+                "Every bird loves to hear himself sing.",
+                "Every person has two educations: one which he receives from others, and one which he gives himself.",
+                "Falling into the mud is not the failure; staying in the mud is.",
+                "Fine words and an insinuating appearance are seldom associated with true virtue.",
+                "Forget injuries, never forget kindnesses.",
+                "Give a man a mask and he will tell you the truth.",
+                "Great doubts are the messengers of deep wisdom.",
+                "He who knows he has enough is rich.",
+                "He who speaks without modesty will find it difficult to make his words good.",
+                "I felt sorry for myself because I had no shoes – until I met a man who had no feet.",
+                "If you are the smartest person in the room, you are in the wrong room.",
+                "If you bow at all, bow low.",
+                "If you do not change direction, you may end up where you are heading.",
+                "If you want to know what a man is like, look at his friends.",
+                "In a quiet harbour you do not learn to sail.",
+                "It does not matter how slowly you go as long as you do not stop.",
+                "It is easier to govern a kingdom than to govern a family.",
+                "It is not the beauty of the building you should look at, but the construction of the foundation.",
+                "Keeping a little ahead of conditions is the secret of success.",
+                "Let the dead past bury its dead.",
+                "Little by little, even a thousand-mile journey is completed.",
+                "Look at a stonecutter hammering away at his rock perhaps a hundred times without as much as a crack showing in it.",
+                "More haste, less speed.",
+                "Never cut what you can untie.",
+                "No one is so old that he cannot live one more year, nor so young that he cannot die today.",
+                "Once bitten by a snake, he is scared all his life at the sight of a rope.",
+                "One generation plants the trees, the next enjoys the shade.",
+                "One never notices what has been done; one can only see what remains to be done.",
+                "Only when you cannot see the shore do you discover the real sailor.",
+                "Poverty is not a disgrace, but being ashamed of it is.",
+                "Real knowledge is to know the extent of one's ignorance.",
+                "Silence is the true friend that never betrays.",
+                "Small holes sink great ships.",
+                "Speak the truth, even if your voice shakes.",
+                "The beginning of wisdom is to call things by their proper name.",
+                "The bird that flies too high is easily shot.",
+                "The cure for anything is salt water: sweat, tears, or the sea.",
+                "The deep well of silence is where wisdom hides.",
+                "The diamond cannot be polished without friction, nor the man perfected without trials.",
+                "The greatest glory in living lies not in never falling, but in rising every time we fall.",
+                "The heart that loves is always young.",
+                "The hero is brave in deeds as well as words.",
+                "The key to happiness is having dreams; the key to success is making them come true.",
+                "The man who asks a question is a fool for a minute; the man who never asks is a fool for life.",
+                "The morning wind spreads its fresh smell. We must get up and take that in, that wind that lets us live.",
+                "The only real failure is the failure to try.",
+                "The person who removes a mountain begins by carrying away small stones.",
+                "The pleasure of doing good is the only one that never wears out.",
+                "The power of the sword is not in the steel but in the hand that wields it.",
+                "The purest treasure mortal times afford is spotless reputation.",
+                "The rose that grows in the mud still smells sweet.",
+                "The secret of getting ahead is getting started.",
+                "The strength of a nation derives from the integrity of the home.",
+                "The superior man thinks always of virtue; the common man thinks of comfort.",
+                "The tongue can paint what the eye cannot see.",
+                "The wise man learns more from a fool than the fool learns from the wise man.",
+                "There are no shortcuts to the top of a mountain – you must climb the whole way.",
+                "There is no medicine for fear.",
+                "Those who cannot remember the past are condemned to repeat it.",
+                "Time is a great teacher, but unfortunately it kills all its pupils.",
+                "To be idle is to be at once useless and uneasy.",
+                "To know the road ahead, ask those coming back.",
+                "To the mind that is still, the whole universe surrenders.",
+                "Trees that are slow to grow bear the best fruit.",
+                "Trust your own instinct. Your mistakes might as well be your own, instead of someone else's.",
+                "Walls have ears, and bottles have mouths.",
+                "We are what we repeatedly do. Excellence, then, is not an act, but a habit.",
+                "We can learn from history, but we cannot live in it.",
+                "When a finger points to the moon, the fool looks at the finger.",
+                "When you realise how perfect everything is, you will tilt your head back and laugh at the sky.",
+                "Where there is love, there is no darkness.",
+                "Wise men talk because they have something to say; fools, because they have to say something.",
+                "Without hard work, nothing grows but weeds.",
+                "You are the sky. Everything else is just the weather.",
+                "You cannot stop the birds of sorrow from flying over your head, but you can stop them from nesting in your hair.",
+                "Your mind is a garden. Your thoughts are the seeds. You can grow flowers, or you can grow weeds.",
+                "A gem is not polished without rubbing, nor a man perfected without trials.",
+                "A hero is born in the midst of danger.",
+                "A light heart lives long.",
+                "A little fire burns up a great deal of grain.",
+                "A man's character is his fate.",
+                "A single rotten apple spoils the whole barrel.",
+                "A smooth sea never made a skilled sailor.",
+                "A thousand cups of wine do not suffice when true friends meet, but half a sentence is too much between strangers.",
+                "All birds find shelter during a rain. But the eagle avoids the rain by flying above the clouds.",
+                "All that you need is in your mind. The rest is just noise."
+            ];
+
+            function getRandomQuote(isSpecial) {
+                if (isSpecial) {
+                    const specials = [
+                        "A star that remembers every sky it ever burned in.",
+                        "The universe blinked, and in that blink, you existed.",
+                        "Somewhere, a clock ticks in a dimension without time.",
+                        "You are the dream of a forgotten god.",
+                        "Every ending is just a prelude to a different silence.",
+                        "This light left its galaxy before you were born.",
+                        "The void doesn't whisper; it sings in frequencies you almost hear.",
+                        "You are not late for the end of the world – you are early for the next one.",
+                        "A single atom of stardust carries the blueprint of eternity.",
+                        "The darkness is not empty; it is full of unspoken things."
+                    ];
+                    return specials[Math.floor(Math.random() * specials.length)];
+                }
+                return quoteLibrary[Math.floor(Math.random() * quoteLibrary.length)];
             }
-          }
-          clusters.push({ starIds, centroid: {x:cx, y:cy}, name });
-        }
-      }
-      currentClusters = clusters;
-    }
 
-    // ----------------------------- FIREBASE & DATA HELPERS -----------------------------
-    function updateCounter() {
-      const total = notes.length + tempStars.length;
-      document.getElementById("counterMeta").innerHTML = `<span class="star-count-icon"></span> ${total === 0 ? "empty sky" : `${total} stars`}`;
-    }
-    function showToast(msg) {
-      let t=document.getElementById("toastMsg");
-      t.innerText=msg;
-      t.classList.add("show");
-      setTimeout(()=>t.classList.remove("show"),2000);
-    }
-    async function saveNoteToFirestore(note) { await notesCollection.doc(note.id).set(note); }
-    async function deleteNoteFromFirestore(id) { await notesCollection.doc(id).delete(); }
-    
-    function createMemory(text="") {
-      let cluster = galacticClusters[Math.floor(Math.random()*galacticClusters.length)];
-      let x = cluster.x + (Math.random()-0.5)*750;
-      let y = cluster.y + (Math.random()-0.5)*750;
-      const note = {
-        id: Date.now() + Math.random().toString(36),
-        created: Date.now(),
-        opened: 0,
-        text: text.trim() === "" ? "a drifting thought" : text,
-        x, y,
-        vx: (Math.random()-0.5)*0.07,
-        vy: (Math.random()-0.5)*0.07,
-        radius: 3.2 + Math.random()*4,
-        pulsePhase: Math.random()*Math.PI*2,
-        creatorId: localPeerId,
-        creatorName: localPeerName,
-        isSun: false,
-        mass: 2 + Math.random() * 5,
-        orbitingSunId: null,
-        orbitRadius: 0, orbitAngle: 0, orbitSpeed: 0, orbitDirection: 1
-      };
-      notes.push(note);
-      saveNoteToFirestore(note);
-      updateCounter();
-      computeClusters();
-      addBirthSparks(x, y);
-      return note;
-    }
+            // ----------------------------- STREAK COUNTER -----------------------------
+            let currentStreak = 0;
 
-    function listenToTempStars() {
-      tempStarsCollection.onSnapshot((snap) => {
-        snap.docChanges().forEach((ch) => {
-          const data = ch.doc.data();
-          if (ch.type === "added") {
-            tempStars.push(data);
-          } else if (ch.type === "modified") {
-            const idx = tempStars.findIndex(s=>s.id===data.id);
-            if (idx !== -1) tempStars[idx] = data;
-          } else if (ch.type === "removed") {
-            const removed = tempStars.find(s=>s.id===ch.doc.id);
-            if (removed) addDecayTrail(removed.x, removed.y);
-            tempStars = tempStars.filter(s=>s.id!==ch.doc.id);
-          }
-        });
-        updateCounter();
-        const now = Date.now();
-        tempStars.forEach(async (s) => {
-          if (s.expiresAt < now) {
-            await deleteTempStar(s.id);
-          }
-        });
-      });
-    }
+            function updateStreakCounter() {
+                const lastVisit = localStorage.getItem('last_visit_date');
+                const today = new Date().toDateString();
+                if (!lastVisit) {
+                    currentStreak = 1;
+                } else if (lastVisit === today) {
+                    currentStreak = parseInt(localStorage.getItem('streak')) || 1;
+                } else {
+                    const lastDate = new Date(lastVisit);
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    if (lastDate.toDateString() === yesterday.toDateString()) {
+                        currentStreak = (parseInt(localStorage.getItem('streak')) || 0) + 1;
+                    } else {
+                        currentStreak = 1;
+                    }
+                }
+                localStorage.setItem('streak', currentStreak);
+                localStorage.setItem('last_visit_date', today);
+                let streakElem = document.getElementById('streakDisplay');
+                if (!streakElem) {
+                    const meta = document.querySelector('.meta');
+                    streakElem = document.createElement('span');
+                    streakElem.id = 'streakDisplay';
+                    meta.appendChild(streakElem);
+                }
+                streakElem.innerText = '[' + currentStreak + ']';
+            }
 
-    function listenToFirestore() {
-      notesCollection.onSnapshot((snap) => {
-        snap.docChanges().forEach((ch) => {
-          if (ch.type === "added" || ch.type === "modified") {
-            let data = ch.doc.data();
-            let idx = notes.findIndex(n=>n.id===data.id);
-            if (idx !== -1) notes[idx] = { ...notes[idx], ...data };
-            else notes.push({ ...data });
-          } else if (ch.type === "removed") {
-            const removed = notes.find(n=>n.id===ch.doc.id);
-            if (removed) addDecayTrail(removed.x, removed.y);
-            notes = notes.filter(n=>n.id !== ch.doc.id);
-          }
-        });
-        updateCounter();
-        computeClusters();
-        autoNameUnnamedClusters();
-      });
-      constellationsCollection.onSnapshot((snap) => {
-        snap.docChanges().forEach((ch) => {
-          let data = ch.doc.data();
-          let existing = namedConstellations.findIndex(c=>c.starIds.join(',')===data.starIds.join(','));
-          if (ch.type === "added" || ch.type === "modified") {
-            if (existing !== -1) namedConstellations[existing] = data;
-            else namedConstellations.push(data);
-          } else if (ch.type === "removed") {
-            namedConstellations = namedConstellations.filter(c=>c.starIds.join(',')!==data.starIds.join(','));
-          }
-        });
-      });
-    }
+            function addStreakBonus() {
+                currentStreak += 1;
+                localStorage.setItem('streak', currentStreak);
+                updateStreakCounter();
+                showToast("+1 streak from the special star!");
+            }
 
-    // ----------------------------- UI & INTERACTIONS (with double-tap to restore UI) -----------------------------
-    function stopFollowing() { followingStarId = null; document.getElementById("releaseBtn").classList.remove("visible"); }
+            // ----------------------------- DAILY RESET NOTIFICATION -----------------------------
+            function checkDailyNotification() {
+                const lastNotif = localStorage.getItem('last_notification_date');
+                const today = new Date().toDateString();
+                if (lastNotif !== today) {
+                    showToast("A new day begins – ephemeral stars have appeared in the sky.");
+                    localStorage.setItem('last_notification_date', today);
+                }
+            }
 
-    function initApp() {
-      initWorld();
-      const canvasElem = document.getElementById("cosmicCanvas");
-      function resize() {
-        w = window.innerWidth; h = window.innerHeight;
-        canvasElem.width = w * devicePixelRatio;
-        canvasElem.height = h * devicePixelRatio;
-        canvasElem.style.width = w + "px";
-        canvasElem.style.height = h + "px";
-        ctx = canvasElem.getContext("2d");
-        ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-      }
-      resize();
-      window.addEventListener("resize", resize);
-      listenToFirestore();
-      listenToTempStars();
-      updateCounter();
-      updateStreakCounter();
-      checkDailyNotification();
-      spawnDailyTempStars();
+            // ----------------------------- TEMPORARY STARS -----------------------------
+            async function spawnDailyTempStars() {
+                const todayStr = new Date().toDateString();
+                const lastSpawn = localStorage.getItem('last_temp_spawn');
+                if (lastSpawn === todayStr) return;
+                const count = 2 + Math.floor(Math.random() * 4);
+                let specialIndex = Math.floor(Math.random() * count);
+                for (let i = 0; i < count; i++) {
+                    const isSpecial = (i === specialIndex);
+                    const expiryDays = 1 + Math.random() * 30;
+                    const expiresAt = Date.now() + expiryDays * 86400000;
+                    const x = (Math.random() - 0.5) * 2500;
+                    const y = (Math.random() - 0.5) * 2500;
+                    const tempStar = {
+                        id: 'temp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                        x,
+                        y,
+                        createdAt: Date.now(),
+                        expiresAt: expiresAt,
+                        message: getRandomQuote(isSpecial),
+                        isSpecial: isSpecial,
+                        rewarded: false,
+                        creatorId: null,
+                        isTemp: true
+                    };
+                    await tempStarsCollection.doc(tempStar.id).set(tempStar);
+                }
+                localStorage.setItem('last_temp_spawn', todayStr);
+                showToast(count + ' ephemeral stars appeared – one is special!');
+            }
 
-      let uiHidden = false;
-      const appDiv = document.getElementById("app");
-      function toggleUI() {
-        uiHidden = !uiHidden;
-        if (uiHidden) appDiv.classList.add("ui-hidden");
-        else appDiv.classList.remove("ui-hidden");
-      }
-      document.getElementById("hudToggle").addEventListener("click", toggleUI);
-      document.getElementById("novaBtn").onclick = () => { let ns = createMemory(""); openEdit(ns.id); };
-      document.getElementById("releaseBtn").onclick = stopFollowing;
+            // ----------------------------- STAR DECAY TRAIL -----------------------------
+            let decayParticles = [];
 
-      function worldPos(px, py) { return { x: (px - w/2)/camera.zoom - camera.x, y: (py - h/2)/camera.zoom - camera.y }; }
-      function hitTest(px, py) {
-        let wp = worldPos(px, py);
-        let best=null, bestD=85;
-        for (let n of notes) {
-          let d = Math.hypot(wp.x - n.x, wp.y - n.y);
-          let thresh = Math.min(85, 38 + (n.radius||3)*2.8);
-          if (d < thresh && d < bestD) { bestD=d; best=n; }
-        }
-        for (let t of tempStars) {
-          let d = Math.hypot(wp.x - t.x, wp.y - t.y);
-          if (d < 25 && d < bestD) { bestD=d; best=t; }
-        }
-        return best;
-      }
-      function hitTestConstellation(px, py) {
-        let wp = worldPos(px, py);
-        for (let cl of currentClusters) {
-          if (cl.starIds.length>=3 && Math.hypot(wp.x-cl.centroid.x, wp.y-cl.centroid.y) < 60) return cl;
-        }
-        return null;
-      }
+            function addDecayTrail(x, y) {
+                for (let i = 0; i < 45; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 0.3 + Math.random() * 1.2;
+                    decayParticles.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: 2 + Math.random() * 3,
+                        size: 1 + Math.random() * 2.5,
+                        color: 'hsl(' + (30 + Math.random() * 40) + ', 80%, 60%)'
+                    });
+                }
+            }
 
-      let previewTimer;
-      async function showPreview(star, cx, cy) {
-        if (previewTimer) clearTimeout(previewTimer);
-        previewStarId = star.id;
-        let creatorInfo = "";
-        let text = "";
-        if (star.isTemp) {
-          if (star.isSpecial && !star.rewarded) {
-            await tempStarsCollection.doc(star.id).update({ rewarded: true });
-            star.rewarded = true;
-            addStreakBonus();
-            addBirthSparks(star.x, star.y);
-          }
-          creatorInfo = star.isSpecial ? `<div class="creator-tag">SPECIAL EPHEMERAL STAR</div>` : `<div class="creator-tag">ephemeral · fades soon</div>`;
-          text = star.message;
-        } else {
-          creatorInfo = (star.creatorName && star.creatorName !== localPeerName) ? `<div class="creator-tag">from ${star.creatorName}</div>` : "";
-          text = star.text.length > 85 ? star.text.slice(0,82)+"…" : star.text;
-        }
-        document.getElementById("etherPreview").innerHTML = creatorInfo + "“" + text + "”";
-        let left = Math.min(Math.max(cx - 120, 12), w - 260);
-        let top = Math.min(Math.max(cy - 80, 28), h - 100);
-        let previewDiv = document.getElementById("etherPreview");
-        previewDiv.style.left = left + "px";
-        previewDiv.style.top = top + "px";
-        previewDiv.classList.add("visible");
-        previewTimer = setTimeout(() => {
-          document.getElementById("etherPreview").classList.remove("visible");
-          previewStarId = null;
-        }, 1300);
-      }
+            function updateDecayTrails(deltaTime) {
+                for (let i = decayParticles.length - 1; i >= 0; i--) {
+                    let p = decayParticles[i];
+                    p.x += p.vx * deltaTime;
+                    p.y += p.vy * deltaTime;
+                    p.life -= deltaTime;
+                    if (p.life <= 0) decayParticles.splice(i, 1);
+                }
+            }
 
-      function openEdit(id) {
-        let star = notes.find(s=>s.id===id);
-        if (!star) return;
-        activeId = id;
-        document.getElementById("editCreator").innerText = star.creatorName ? `created by ${star.creatorName}` : "";
-        document.getElementById("memoryEditor").value = star.text;
-        let modal = document.getElementById("editModal");
-        modal.style.display = "flex";
-        requestAnimationFrame(()=>modal.classList.add("visible"));
-      }
-      function saveEdit() {
-        if (activeId) {
-          let star = notes.find(s=>s.id===activeId);
-          if (star) {
-            star.text = document.getElementById("memoryEditor").value;
-            if (!star.text.trim()) star.text = "a distant echo";
-            saveNoteToFirestore(star);
-          }
-          activeId = null;
-        }
-        closeModal(document.getElementById("editModal"));
-      }
-      function closeModal(m) { m.classList.remove("visible"); setTimeout(()=>m.style.display="none",250); }
-      document.getElementById("saveMemoryBtn").onclick = saveEdit;
-      document.getElementById("cancelEditBtn").onclick = () => closeModal(document.getElementById("editModal"));
-      document.getElementById("deleteMemoryBtn").onclick = () => {
-        if (activeId) { deleteNote(activeId); activeId=null; closeModal(document.getElementById("editModal")); }
-      };
-      document.getElementById("closeViewBtn").onclick = () => closeModal(document.getElementById("viewModal"));
-      document.getElementById("editFromViewBtn").onclick = () => {
-        closeModal(document.getElementById("viewModal"));
-        setTimeout(()=>{ if(activeId) openEdit(activeId); },100);
-      };
+            function deleteNote(id) {
+                const star = notes.find(n => n.id === id);
+                if (star) addDecayTrail(star.x, star.y);
+                notes = notes.filter(n => n.id !== id);
+                deleteNoteFromFirestore(id);
+                updateCounter();
+                computeClusters();
+            }
+            async function deleteTempStar(id) {
+                const star = tempStars.find(s => s.id === id);
+                if (star) addDecayTrail(star.x, star.y);
+                await tempStarsCollection.doc(id).delete();
+                tempStars = tempStars.filter(s => s.id !== id);
+            }
 
-      let currentClusterForName = null;
-      function promptConstellationName(cl) {
-        currentClusterForName = cl;
-        document.getElementById("constellationNameInput").value = cl.name || "";
-        let m = document.getElementById("constellationNameModal");
-        m.style.display = "flex";
-        requestAnimationFrame(()=>m.classList.add("visible"));
-      }
-      document.getElementById("saveConstellationName").onclick = () => {
-        let name = document.getElementById("constellationNameInput").value.trim();
-        if (name && currentClusterForName) {
-          let existing = namedConstellations.findIndex(c=>c.starIds.join(',')===currentClusterForName.starIds.join(','));
-          if (existing !== -1) namedConstellations[existing].name = name;
-          else namedConstellations.push({ starIds: currentClusterForName.starIds, name });
-          constellationsCollection.doc(currentClusterForName.starIds.join(',')).set({ starIds: currentClusterForName.starIds, name });
-          showToast(`Constellation named: ${name}`);
-        }
-        closeModal(document.getElementById("constellationNameModal"));
-        currentClusterForName = null;
-      };
-      document.getElementById("cancelConstellationName").onclick = () => { closeModal(document.getElementById("constellationNameModal")); currentClusterForName=null; };
+            // ----------------------------- SIMPLEX NOISE -----------------------------
+            class SimplexNoise {
+                constructor() {
+                    this.grad3 = [
+                        [1, 1, 0],
+                        [-1, 1, 0],
+                        [1, -1, 0],
+                        [-1, -1, 0],
+                        [1, 0, 1],
+                        [-1, 0, 1],
+                        [1, 0, -1],
+                        [-1, 0, -1],
+                        [0, 1, 1],
+                        [0, -1, 1],
+                        [0, 1, -1],
+                        [0, -1, -1]
+                    ];
+                    const p = [151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103,
+                        30, 69, 142, 8, 99, 37, 240, 21, 10, 23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62,
+                        94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87, 174, 20, 125, 136,
+                        171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166, 77, 146, 158, 231, 83, 111, 229, 122,
+                        60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244, 102, 143, 54, 65, 25, 63, 161, 1,
+                        216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196, 135, 130, 116, 188, 159, 86, 164,
+                        100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123, 5, 202, 38, 147, 118, 126, 255,
+                        82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42, 223, 183, 170, 213, 119,
+                        248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9, 129, 22, 39, 253, 19, 98,
+                        108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228, 251, 34, 242, 193, 238,
+                        210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107, 49, 192, 214, 31, 181,
+                        199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205, 93, 222,
+                        114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180
+                    ];
+                    this.perm = new Uint8Array(512);
+                    for (let i = 0; i < 256; i++) {
+                        this.perm[i] = p[i];
+                        this.perm[256 + i] = p[i];
+                    }
+                }
+                dot(g, x, y, z) { return g[0] * x + g[1] * y + g[2] * z; }
+                noise3(x, y, z) {
+                    let n0 = 0,
+                        n1 = 0,
+                        n2 = 0,
+                        n3 = 0;
+                    let s = (x + y + z) / 3.0;
+                    let i = Math.floor(x + s);
+                    let j = Math.floor(y + s);
+                    let k = Math.floor(z + s);
+                    let t = (i + j + k) / 6.0;
+                    let X0 = i - t;
+                    let Y0 = j - t;
+                    let Z0 = k - t;
+                    let x0 = x - X0;
+                    let y0 = y - Y0;
+                    let z0 = z - Z0;
+                    let i1, j1, k1;
+                    let i2, j2, k2;
+                    if (x0 >= y0) {
+                        if (y0 >= z0) { i1 = 1;
+                            j1 = 0;
+                            k1 = 0;
+                            i2 = 1;
+                            j2 = 1;
+                            k2 = 0; } else if (x0 >= z0) { i1 = 1;
+                            j1 = 0;
+                            k1 = 0;
+                            i2 = 1;
+                            j2 = 0;
+                            k2 = 1; } else { i1 = 0;
+                            j1 = 0;
+                            k1 = 1;
+                            i2 = 1;
+                            j2 = 0;
+                            k2 = 1; }
+                    } else {
+                        if (y0 < z0) { i1 = 0;
+                            j1 = 0;
+                            k1 = 1;
+                            i2 = 0;
+                            j2 = 1;
+                            k2 = 1; } else if (x0 < z0) { i1 = 0;
+                            j1 = 1;
+                            k1 = 0;
+                            i2 = 0;
+                            j2 = 1;
+                            k2 = 1; } else { i1 = 0;
+                            j1 = 1;
+                            k1 = 0;
+                            i2 = 1;
+                            j2 = 1;
+                            k2 = 0; }
+                    }
+                    let x1 = x0 - i1 + 1.0 / 6.0;
+                    let y1 = y0 - j1 + 1.0 / 6.0;
+                    let z1 = z0 - k1 + 1.0 / 6.0;
+                    let x2 = x0 - i2 + 2.0 / 6.0;
+                    let y2 = y0 - j2 + 2.0 / 6.0;
+                    let z2 = z0 - k2 + 2.0 / 6.0;
+                    let x3 = x0 - 1.0;
+                    let y3 = y0 - 1.0;
+                    let z3 = z0 - 1.0;
+                    let ii = i & 255;
+                    let jj = j & 255;
+                    let kk = k & 255;
+                    let perm = this.perm;
+                    let gi0 = perm[ii + perm[jj + perm[kk]]] % 12;
+                    let gi1 = perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]] % 12;
+                    let gi2 = perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]] % 12;
+                    let gi3 = perm[ii + 1 + perm[jj + 1 + perm[kk + 1]]] % 12;
+                    let t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0;
+                    if (t0 < 0) n0 = 0;
+                    else { t0 *= t0;
+                        n0 = t0 * t0 * this.dot(this.grad3[gi0], x0, y0, z0); }
+                    let t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1;
+                    if (t1 < 0) n1 = 0;
+                    else { t1 *= t1;
+                        n1 = t1 * t1 * this.dot(this.grad3[gi1], x1, y1, z1); }
+                    let t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2;
+                    if (t2 < 0) n2 = 0;
+                    else { t2 *= t2;
+                        n2 = t2 * t2 * this.dot(this.grad3[gi2], x2, y2, z2); }
+                    let t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3;
+                    if (t3 < 0) n3 = 0;
+                    else { t3 *= t3;
+                        n3 = t3 * t3 * this.dot(this.grad3[gi3], x3, y3, z3); }
+                    return 32.0 * (n0 + n1 + n2 + n3);
+                }
+            }
+            const noise = new SimplexNoise();
 
-      // Pan & zoom + double-tap to restore UI
-      let isPan = false, panStart={x:0,y:0}, camStart={x:0,y:0};
-      let lastTapTime = 0;
-      let pendingSingleClick = null;
-      let lastMouseUpTime = 0;
+            // ----------------------------- GLOBALS -----------------------------
+            let notes = [];
+            let tempStars = [];
+            let activeId = null;
+            let camera = { x: 0, y: 0, zoom: 1.0, targetZoom: 1.0 };
+            let w, h, ctx;
+            let followingStarId = null;
+            let currentClusters = [];
+            let namedConstellations = [];
+            let galacticClusters = [];
+            let dustClouds = [];
+            let starLayers = [];
+            let flowParticles = [];
+            let nebulaLayers = [];
+            let previewStarId = null;
+            let comets = [];
+            let sparks = [];
+            let time = 0;
+            let frameCount = 0;
+            const SEED_CLUSTERS = [
+                { name: "Pleiades", x: -320, y: -240, color: [100, 115, 160] },
+                { name: "Hyades", x: 390, y: 110, color: [115, 95, 140] },
+                { name: "Beehive", x: 750, y: -490, color: [130, 105, 95] },
+                { name: "Double Cluster", x: -790, y: 510, color: [95, 110, 130] },
+                { name: "Taurus", x: 110, y: -580, color: [85, 80, 115] },
+                { name: "Orion's Sword", x: -170, y: 650, color: [105, 95, 125] }
+            ];
+            const autoNames = [
+                "Veil of Eternity", "Cinder Hearth", "Solace Drift", "Aether's Kiss", "Woven Sorrow",
+                "The Silent Bell", "Forgotten Halo", "Ember Wake", "Strayed Loom", "Votive Remains",
+                "Gilded Ruin", "Pale Urn", "The Unspoken Lyre", "Raven's Compass", "Thistle Crown",
+                "Omen of Dust", "The Still Pyre", "Hollow Sigil", "Weeping Prism", "Last Accord"
+            ];
 
-      canvasElem.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        let t = e.touches[0];
-        let star = hitTest(t.clientX, t.clientY);
-        let cl = hitTestConstellation(t.clientX, t.clientY);
-        if (cl) { promptConstellationName(cl); return; }
-        if (star) {
-          let now = Date.now();
-          if (now - lastTapTime < 300) {
-            if (pendingSingleClick) clearTimeout(pendingSingleClick);
-            if (!star.isTemp) openEdit(star.id);
-            else showToast("ephemeral stars cannot be edited.");
-            lastTapTime = 0;
-          } else {
-            lastTapTime = now;
-            pendingSingleClick = setTimeout(() => {
-              showPreview(star, t.clientX, t.clientY);
-              pendingSingleClick = null;
-            }, 150);
-          }
-        } else {
-          let now = Date.now();
-          if (uiHidden && now - lastTapTime < 300) {
-            toggleUI();
-            lastTapTime = 0;
-            if (pendingSingleClick) clearTimeout(pendingSingleClick);
-            return;
-          }
-          lastTapTime = now;
-          isPan = true;
-          panStart = {x: t.clientX, y: t.clientY};
-          camStart = {x: camera.x, y: camera.y};
-          if (pendingSingleClick) { clearTimeout(pendingSingleClick); pendingSingleClick = null; }
-        }
-      });
-      canvasElem.addEventListener("touchmove", (e) => {
-        if (isPan && e.touches.length===1) {
-          let dx = e.touches[0].clientX - panStart.x;
-          let dy = e.touches[0].clientY - panStart.y;
-          camera.x = camStart.x + dx / camera.zoom;
-          camera.y = camStart.y + dy / camera.zoom;
-        }
-        e.preventDefault();
-        if (pendingSingleClick) { clearTimeout(pendingSingleClick); pendingSingleClick = null; }
-      });
-      canvasElem.addEventListener("touchend", () => { isPan = false; });
-      
-      canvasElem.addEventListener("mousedown", (e) => {
-        let star = hitTest(e.clientX, e.clientY);
-        let cl = hitTestConstellation(e.clientX, e.clientY);
-        if (cl) { promptConstellationName(cl); return; }
-        if (star) {
-          if (e.detail === 2) {
-            if (!star.isTemp) openEdit(star.id);
-            else showToast("ephemeral stars cannot be edited.");
-          } else {
-            showPreview(star, e.clientX, e.clientY);
-          }
-        } else {
-          isPan = true;
-          panStart = {x: e.clientX, y: e.clientY};
-          camStart = {x: camera.x, y: camera.y};
-        }
-      });
-      window.addEventListener("mousemove", (e) => {
-        if (isPan) {
-          let dx = e.clientX - panStart.x;
-          let dy = e.clientY - panStart.y;
-          camera.x = camStart.x + dx / camera.zoom;
-          camera.y = camStart.y + dy / camera.zoom;
-        }
-      });
-      window.addEventListener("mouseup", () => { isPan = false; });
-      
-      canvasElem.addEventListener("dblclick", (e) => {
-        let star = hitTest(e.clientX, e.clientY);
-        let cl = hitTestConstellation(e.clientX, e.clientY);
-        if (!star && !cl && uiHidden) {
-          toggleUI();
-        }
-      });
+            const flowGrid = { cellSize: 90, cols: 60, rows: 60, angles: new Float64Array(60 * 60) };
 
-      canvasElem.addEventListener("wheel", (e) => {
-        e.preventDefault();
-        let delta = e.deltaY > 0 ? 0.92 : 1.08;
-        camera.targetZoom = Math.min(2.6, Math.max(0.42, camera.targetZoom * delta));
-      }, { passive: false });
+            function updateFlowField(t) {
+                const angles = flowGrid.angles;
+                const cols = flowGrid.cols;
+                const rows = flowGrid.rows;
+                const cellSize = flowGrid.cellSize;
+                for (let i = 0; i < cols; i++) {
+                    for (let j = 0; j < rows; j++) {
+                        let x = (i - cols / 2) * cellSize;
+                        let y = (j - rows / 2) * cellSize;
+                        angles[i + j * cols] = noise.noise3(x * 0.0018, y * 0.0018, t * 0.0004) * Math.PI * 5;
+                    }
+                }
+            }
 
-      let lastTimestamp = 0;
-      function animateLoop(now) {
-        let delta = Math.min(0.033, (now - lastTimestamp) / 1000);
-        lastTimestamp = now;
-        time = now;
-        updateFlowField(time);
-        updateOrganic(time);
-        updateFlowParticles();
-        updateComets();
-        updateNebulaColors();
-        simulateMotion(delta);
-        render();
-        requestAnimationFrame(animateLoop);
-      }
-      requestAnimationFrame(animateLoop);
-    }
+            function getFlowAngle(px, py) {
+                let cx = Math.floor((px + 3000) / flowGrid.cellSize) % flowGrid.cols;
+                let cy = Math.floor((py + 3000) / flowGrid.cellSize) % flowGrid.rows;
+                if (cx < 0 || cy < 0 || cx >= flowGrid.cols || cy >= flowGrid.rows) return 0;
+                return flowGrid.angles[cx + cy * flowGrid.cols] || 0;
+            }
 
-    // Name modal
-    if (!localPeerName || localPeerName === 'me') {
-      document.getElementById('nameModal').style.display = 'flex';
-      requestAnimationFrame(() => document.getElementById('nameModal').classList.add('visible'));
-      document.getElementById('saveNameBtn').onclick = () => {
-        let name = document.getElementById('nameInput').value.trim();
-        if (!name) name = 'stargazer';
-        startApp(name);
-      };
-    } else {
-      initApp();
-    }
+            // ----------------------------- INIT BACKGROUND -----------------------------
+            function createStarLayer(count, spread, minSize, maxSize, minBright, maxBright, colorRange, parallax) {
+                let layer = [];
+                for (let i = 0; i < count; i++) {
+                    layer.push({
+                        x: (Math.random() - 0.5) * spread,
+                        y: (Math.random() - 0.5) * spread,
+                        size: minSize + Math.random() * (maxSize - minSize),
+                        brightness: minBright + Math.random() * (maxBright - minBright),
+                        colorTemp: [
+                            colorRange[0] + Math.random() * (colorRange[1] - colorRange[0]),
+                            colorRange[2] + Math.random() * (colorRange[3] - colorRange[2]),
+                            colorRange[4] + Math.random() * (colorRange[5] - colorRange[4])
+                        ],
+                        parallax,
+                        phase: Math.random() * Math.PI * 2
+                    });
+                }
+                return layer;
+            }
 
-    function startApp(name) {
-      localPeerName = name;
-      localStorage.setItem('constellation_peer_name', name);
-      document.getElementById('nameModal').classList.remove('visible');
-      setTimeout(() => document.getElementById('nameModal').style.display = 'none', 350);
-      initApp();
-    }
-  })();
-</script>
+            function initWorld() {
+                starLayers = [
+                    createStarLayer(800, 6500, 0.2, 0.7, 0.3, 0.6, [200, 255, 220, 255, 240, 255], 0.05),
+                    createStarLayer(1000, 5500, 0.3, 1.0, 0.4, 0.7, [180, 255, 200, 255, 220, 255], 0.12),
+                    createStarLayer(700, 4500, 0.5, 1.5, 0.5, 0.8, [150, 240, 180, 240, 200, 240], 0.25),
+                    createStarLayer(500, 3500, 0.8, 2.2, 0.6, 0.9, [120, 220, 150, 220, 180, 240], 0.45),
+                    createStarLayer(400, 2800, 1.2, 2.8, 0.7, 1.0, [100, 200, 130, 200, 160, 220], 0.7),
+                    createStarLayer(250, 2000, 1.8, 3.5, 0.8, 1.0, [80, 180, 110, 180, 140, 200], 1.0)
+                ];
+                nebulaLayers = [];
+                const baseColors = [
+                    [
+                        [80, 60, 150],
+                        [120, 80, 180],
+                        [160, 100, 210]
+                    ],
+                    [
+                        [60, 90, 140],
+                        [90, 120, 170],
+                        [130, 150, 200]
+                    ],
+                    [
+                        [140, 70, 100],
+                        [180, 100, 130],
+                        [220, 130, 160]
+                    ],
+                    [
+                        [40, 100, 80],
+                        [70, 130, 110],
+                        [110, 160, 140]
+                    ],
+                    [
+                        [160, 80, 60],
+                        [200, 110, 90],
+                        [240, 140, 120]
+                    ]
+                ];
+                for (let i = 0; i < 40; i++) {
+                    let colorset = baseColors[Math.floor(Math.random() * baseColors.length)];
+                    nebulaLayers.push({
+                        x: (Math.random() - 0.5) * 3800,
+                        y: (Math.random() - 0.5) * 3800,
+                        radius: 180 + Math.random() * 420,
+                        baseColor1: [colorset[0][0], colorset[0][1], colorset[0][2]],
+                        baseColor2: [colorset[1][0], colorset[1][1], colorset[1][2]],
+                        baseColor3: [colorset[2][0], colorset[2][1], colorset[2][2]],
+                        color1: [colorset[0][0], colorset[0][1], colorset[0][2]],
+                        color2: [colorset[1][0], colorset[1][1], colorset[1][2]],
+                        color3: [colorset[2][0], colorset[2][1], colorset[2][2]],
+                        pulseSpeed: 0.001 + Math.random() * 0.002,
+                        phase: Math.random() * Math.PI * 2
+                    });
+                }
+                dustClouds = [];
+                for (let i = 0; i < 180; i++) {
+                    const particleCount = 35 + Math.floor(Math.random() * 70);
+                    const particlesArr = new Array(particleCount);
+                    for (let j = 0; j < particleCount; j++) {
+                        particlesArr[j] = {
+                            offsetX: (Math.random() - 0.5) * 240,
+                            offsetY: (Math.random() - 0.5) * 240,
+                            size: Math.random() * 4 + 1,
+                            alpha: Math.random() * 0.45 + 0.1
+                        };
+                    }
+                    dustClouds.push({
+                        x: (Math.random() - 0.5) * 4500,
+                        y: (Math.random() - 0.5) * 4500,
+                        particles: particlesArr,
+                        color: [120 + Math.random() * 135, 140 + Math.random() * 115, 180 + Math.random() * 75]
+                    });
+                }
+                flowParticles = [];
+                for (let i = 0; i < 600; i++) {
+                    flowParticles.push({
+                        x: (Math.random() - 0.5) * 5000,
+                        y: (Math.random() - 0.5) * 5000,
+                        vx: (Math.random() - 0.5) * 0.4,
+                        vy: (Math.random() - 0.5) * 0.4,
+                        life: Math.random() * 100,
+                        size: 1 + Math.random() * 3
+                    });
+                }
+                galacticClusters = JSON.parse(JSON.stringify(SEED_CLUSTERS));
+                flowGrid.angles.fill(0);
+            }
+
+            function updateNebulaColors() {
+                const nebulae = nebulaLayers;
+                const allNotes = notes;
+                const noteCount = allNotes.length;
+                for (let ni = 0; ni < nebulae.length; ni++) {
+                    const neb = nebulae[ni];
+                    let influenceR = 0,
+                        influenceG = 0,
+                        influenceB = 0,
+                        totalWeight = 0;
+                    for (let si = 0; si < noteCount; si++) {
+                        const star = allNotes[si];
+                        const dx = star.x - neb.x;
+                        const dy = star.y - neb.y;
+                        const dist = Math.hypot(dx, dy);
+                        if (dist < 300) {
+                            const weight = (1 - dist / 300) * (star.mass || 2);
+                            const age = Math.max(0, Date.now() - star.created);
+                            const day = 86400000;
+                            const week = day * 7;
+                            let r, g, b;
+                            if (age < week) { r = 120;
+                                g = 180;
+                                b = 255; } else if (age < week * 4) { r = 255;
+                                g = 200;
+                                b = 120; } else { r = 255;
+                                g = 120;
+                                b = 100; }
+                            influenceR += r * weight;
+                            influenceG += g * weight;
+                            influenceB += b * weight;
+                            totalWeight += weight;
+                        }
+                    }
+                    if (totalWeight > 0.1) {
+                        const tR = influenceR / totalWeight;
+                        const tG = influenceG / totalWeight;
+                        const tB = influenceB / totalWeight;
+                        neb.color1[0] = Math.floor(neb.baseColor1[0] * 0.3 + tR * 0.7);
+                        neb.color1[1] = Math.floor(neb.baseColor1[1] * 0.3 + tG * 0.7);
+                        neb.color1[2] = Math.floor(neb.baseColor1[2] * 0.3 + tB * 0.7);
+                        neb.color2[0] = Math.floor(neb.baseColor2[0] * 0.3 + tR * 0.7);
+                        neb.color2[1] = Math.floor(neb.baseColor2[1] * 0.3 + tG * 0.7);
+                        neb.color2[2] = Math.floor(neb.baseColor2[2] * 0.3 + tB * 0.7);
+                        neb.color3[0] = Math.floor(neb.baseColor3[0] * 0.3 + tR * 0.7);
+                        neb.color3[1] = Math.floor(neb.baseColor3[1] * 0.3 + tG * 0.7);
+                        neb.color3[2] = Math.floor(neb.baseColor3[2] * 0.3 + tB * 0.7);
+                    } else {
+                        neb.color1[0] = neb.baseColor1[0];
+                        neb.color1[1] = neb.baseColor1[1];
+                        neb.color1[2] = neb.baseColor1[2];
+                        neb.color2[0] = neb.baseColor2[0];
+                        neb.color2[1] = neb.baseColor2[1];
+                        neb.color2[2] = neb.baseColor2[2];
+                        neb.color3[0] = neb.baseColor3[0];
+                        neb.color3[1] = neb.baseColor3[1];
+                        neb.color3[2] = neb.baseColor3[2];
+                    }
+                }
+            }
+
+            function updateOrganic(t) {
+                const layers = starLayers;
+                for (let li = 0; li < layers.length; li++) {
+                    const layer = layers[li];
+                    for (let si = 0; si < layer.length; si++) {
+                        const s = layer[si];
+                        const angle = noise.noise3(s.x * 0.0003, s.y * 0.0003, t * 0.00025) * Math.PI * 2;
+                        const speed = 0.12;
+                        s.x += Math.cos(angle) * speed;
+                        s.y += Math.sin(angle) * speed;
+                        if (s.x > 3600) s.x = -3600;
+                        if (s.x < -3600) s.x = 3600;
+                        if (s.y > 2800) s.y = -2800;
+                        if (s.y < -2800) s.y = 2800;
+                    }
+                }
+                const clouds = dustClouds;
+                for (let ci = 0; ci < clouds.length; ci++) {
+                    const cloud = clouds[ci];
+                    const angle = noise.noise3(cloud.x * 0.0012, cloud.y * 0.0012, t * 0.00018) * Math.PI * 2;
+                    const speed = 0.18;
+                    cloud.x += Math.cos(angle) * speed;
+                    cloud.y += Math.sin(angle) * speed;
+                    if (cloud.x > 3600) cloud.x = -3600;
+                    if (cloud.x < -3600) cloud.x = 3600;
+                    if (cloud.y > 3600) cloud.y = -3600;
+                    if (cloud.y < -3600) cloud.y = 3600;
+                }
+                const nebulae = nebulaLayers;
+                for (let ni = 0; ni < nebulae.length; ni++) {
+                    const neb = nebulae[ni];
+                    const angle = noise.noise3(neb.x * 0.0005, neb.y * 0.0005, t * 0.0001) * Math.PI * 2;
+                    neb.x += Math.cos(angle) * 0.08;
+                    neb.y += Math.sin(angle) * 0.08;
+                    if (neb.x > 3200) neb.x = -3200;
+                    if (neb.x < -3200) neb.x = 3200;
+                    if (neb.y > 3200) neb.y = -3200;
+                    if (neb.y < -3200) neb.y = 3200;
+                    neb.phase = (neb.phase || 0) + 0.005;
+                }
+            }
+
+            function updateFlowParticles() {
+                const particles = flowParticles;
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    const angle = getFlowAngle(p.x, p.y);
+                    p.vx += Math.cos(angle) * 0.035;
+                    p.vy += Math.sin(angle) * 0.035;
+                    const spd = Math.hypot(p.vx, p.vy);
+                    if (spd > 2.8) { p.vx *= 0.97;
+                        p.vy *= 0.97; }
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (Math.abs(p.x) > 4200 || Math.abs(p.y) > 4200) {
+                        p.x = (Math.random() - 0.5) * 4800;
+                        p.y = (Math.random() - 0.5) * 4800;
+                        p.vx = (Math.random() - 0.5) * 0.5;
+                        p.vy = (Math.random() - 0.5) * 0.5;
+                    }
+                    p.life = (p.life + 0.4) % 100;
+                }
+            }
+
+            // ----------------------------- STAR VISUAL PRE-COMPUTATION -----------------------------
+            function refreshStarVisuals(star, now) {
+                if (!star._vis) {
+                    star._vis = {
+                        sizeFactor: 1.0,
+                        coreColor: "#ffddaa",
+                        glowColor: "rgba(255,221,170,0.5)",
+                        pulseSpeed: 0.008,
+                        isWhiteDwarf: false,
+                        pulseFactor: 0.8
+                    };
+                }
+                const v = star._vis;
+                const age = now - star.created;
+                const day = 86400000;
+                const week = day * 7;
+                const month = day * 30;
+                const mass = star.mass || 2.5;
+
+                if (mass < 1.5 && age > month) {
+                    v.sizeFactor = 0.55;
+                    v.coreColor = "#ffffff";
+                    v.glowColor = "rgba(255,255,255,0.8)";
+                    v.pulseSpeed = 0.02;
+                    v.isWhiteDwarf = true;
+                } else if (age < day * 3) {
+                    v.sizeFactor = 0.8;
+                    v.coreColor = "#c0e0ff";
+                    v.glowColor = "rgba(180,220,255,0.7)";
+                    v.pulseSpeed = 0.015;
+                    v.isWhiteDwarf = false;
+                } else if (age > month) {
+                    v.sizeFactor = 1.4;
+                    v.coreColor = "#ffaa77";
+                    v.glowColor = "rgba(255,170,119,0.6)";
+                    v.pulseSpeed = 0.005;
+                    v.isWhiteDwarf = false;
+                } else {
+                    v.sizeFactor = 1.0;
+                    v.coreColor = "#ffddaa";
+                    v.glowColor = "rgba(255,221,170,0.5)";
+                    v.pulseSpeed = 0.008;
+                    v.isWhiteDwarf = false;
+                }
+                const phase = (star.pulsePhase || 0) + now * v.pulseSpeed;
+                const raw = Math.sin(phase);
+                v.pulseFactor = 0.6 + 0.5 * raw * raw;
+            }
+
+            function prepareFrameData(now) {
+                const allNotes = notes;
+                for (let i = 0; i < allNotes.length; i++) {
+                    refreshStarVisuals(allNotes[i], now);
+                }
+            }
+
+            function getStarVisuals(star) {
+                if (!star._vis) refreshStarVisuals(star, Date.now());
+                return star._vis;
+            }
+
+            function getPulseFactor(star, customSpeed) {
+                const speed = customSpeed !== null ? customSpeed : (star._vis ? star._vis.pulseSpeed : 0.008);
+                const phase = (star.pulsePhase || 0) + time * speed;
+                const raw = Math.sin(phase);
+                return 0.6 + 0.5 * raw * raw;
+            }
+
+            function addBirthSparks(x, y) {
+                for (let i = 0; i < 60; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 0.5 + Math.random() * 2.5;
+                    sparks.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: 0.8 + Math.random() * 1.2,
+                        color: 'hsl(' + (30 + Math.random() * 60) + ', 100%, 60%)'
+                    });
+                }
+            }
+
+            function updateSparks(deltaTime) {
+                for (let i = sparks.length - 1; i >= 0; i--) {
+                    const s = sparks[i];
+                    s.x += s.vx * deltaTime;
+                    s.y += s.vy * deltaTime;
+                    s.life -= deltaTime * 1.5;
+                    if (s.life <= 0) sparks.splice(i, 1);
+                }
+            }
+
+            // ----------------------------- RENDERING -----------------------------
+            let bloomCanvas = document.createElement('canvas');
+            let blurCanvas = document.createElement('canvas');
+
+            function applyBloom(ctxMain, w, h) {
+                try {
+                    bloomCanvas.width = w;
+                    bloomCanvas.height = h;
+                    let tempCtx = bloomCanvas.getContext('2d');
+                    tempCtx.drawImage(ctxMain.canvas, 0, 0);
+                    blurCanvas.width = w;
+                    blurCanvas.height = h;
+                    let blurCtx = blurCanvas.getContext('2d');
+                    blurCtx.filter = 'blur(10px)';
+                    blurCtx.drawImage(bloomCanvas, 0, 0);
+                    ctxMain.globalCompositeOperation = 'lighter';
+                    ctxMain.drawImage(blurCanvas, 0, 0);
+                    ctxMain.globalCompositeOperation = 'source-over';
+                } catch (e) {}
+            }
+
+            function render() {
+                if (!ctx) return;
+                ctx.clearRect(0, 0, w, h);
+                const grad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.9);
+                grad.addColorStop(0, "#02021a");
+                grad.addColorStop(0.5, "#010110");
+                grad.addColorStop(1, "#000005");
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+
+                ctx.save();
+                ctx.translate(w / 2, h / 2);
+                ctx.scale(camera.zoom, camera.zoom);
+                ctx.translate(camera.x, camera.y);
+
+                // Nebulas
+                const nebulae = nebulaLayers;
+                for (let ni = 0; ni < nebulae.length; ni++) {
+                    const neb = nebulae[ni];
+                    const pulse = 0.7 + 0.3 * Math.sin(time * 0.002 * neb.pulseSpeed + neb.phase);
+                    const rad = neb.radius * (0.9 + 0.1 * Math.sin(time * 0.001 + neb.phase));
+                    const gradN = ctx.createRadialGradient(neb.x, neb.y, rad * 0.2, neb.x, neb.y, rad);
+                    gradN.addColorStop(0, 'rgba(' + neb.color1[0] + ', ' + neb.color1[1] + ', ' + neb.color1[2] +
+                        ', ' + (0.1 * pulse) + ')');
+                    gradN.addColorStop(0.5, 'rgba(' + neb.color2[0] + ', ' + neb.color2[1] + ', ' + neb.color2[2] +
+                        ', ' + (0.06 * pulse) + ')');
+                    gradN.addColorStop(1, 'rgba(' + neb.color3[0] + ', ' + neb.color3[1] + ', ' + neb.color3[2] +
+                        ', 0)');
+                    ctx.fillStyle = gradN;
+                    ctx.beginPath();
+                    ctx.arc(neb.x, neb.y, rad, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Star layers
+                const layers = starLayers;
+                for (let li = 0; li < layers.length; li++) {
+                    const layer = layers[li];
+                    for (let si = 0; si < layer.length; si++) {
+                        const s = layer[si];
+                        const px = s.x - camera.x * s.parallax * 0.1;
+                        const py = s.y - camera.y * s.parallax * 0.1;
+                        const twinkle = 0.65 + 0.35 * Math.sin(time * 0.004 + s.phase);
+                        ctx.fillStyle = 'rgba(' + s.colorTemp[0] + ', ' + s.colorTemp[1] + ', ' + s.colorTemp[2] +
+                            ', ' + (s.brightness * twinkle * 0.8) + ')';
+                        ctx.beginPath();
+                        ctx.arc(px, py, s.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                // Dust
+                const clouds = dustClouds;
+                for (let ci = 0; ci < clouds.length; ci++) {
+                    const cloud = clouds[ci];
+                    const particles = cloud.particles;
+                    const c0 = cloud.color[0],
+                        c1 = cloud.color[1],
+                        c2 = cloud.color[2];
+                    for (let pi = 0; pi < particles.length; pi++) {
+                        const p = particles[pi];
+                        const px = cloud.x + p.offsetX;
+                        const py = cloud.y + p.offsetY;
+                        const alpha = p.alpha * (0.5 + 0.5 * Math.sin(time * 0.001 + px * 0.02));
+                        ctx.fillStyle = 'rgba(' + c0 + ', ' + c1 + ', ' + c2 + ', ' + (alpha * 0.6) + ')';
+                        ctx.beginPath();
+                        ctx.arc(px, py, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                // Flow particles
+                const fParticles = flowParticles;
+                for (let i = 0; i < fParticles.length; i++) {
+                    const p = fParticles[i];
+                    const alpha = 0.25 + 0.2 * Math.sin(p.life * 0.2);
+                    ctx.fillStyle = 'rgba(210, 230, 255, ' + (alpha * 0.6) + ')';
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * 0.7, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Orbit lines
+                ctx.save();
+                const allNotes = notes;
+                for (let i = 0; i < allNotes.length; i++) {
+                    const sun = allNotes[i];
+                    if (!sun.isSun) continue;
+                    ctx.setLineDash([6, 10]);
+                    ctx.lineDashOffset = time * 0.007;
+                    for (let j = 0; j < allNotes.length; j++) {
+                        const planet = allNotes[j];
+                        if (planet.orbitingSunId === sun.id) {
+                            ctx.beginPath();
+                            ctx.arc(sun.x, sun.y, planet.orbitRadius, 0, Math.PI * 2);
+                            ctx.strokeStyle = "rgba(170, 200, 250, 0.45)";
+                            ctx.stroke();
+                        }
+                    }
+                }
+                ctx.restore();
+
+                // Galactic clusters
+                const gClusters = galacticClusters;
+                for (let gi = 0; gi < gClusters.length; gi++) {
+                    const gc = gClusters[gi];
+                    const gradGlow = ctx.createRadialGradient(gc.x, gc.y, 20, gc.x, gc.y, 400);
+                    gradGlow.addColorStop(0, 'rgba(' + gc.color[0] + ', ' + gc.color[1] + ', ' + gc.color[2] +
+                        ', 0.1)');
+                    gradGlow.addColorStop(1, "rgba(0,0,0,0)");
+                    ctx.fillStyle = gradGlow;
+                    ctx.beginPath();
+                    ctx.arc(gc.x, gc.y, 400, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (camera.zoom > 0.55) {
+                        ctx.font = Math.max(11, 16 * camera.zoom) + 'px "Segoe UI", system-ui, sans-serif';
+                        ctx.fillStyle = 'rgba(230, 240, 255, ' + (0.6 * Math.min(1, (camera.zoom - 0.45) / 0.4)) +
+                            ')';
+                        ctx.shadowBlur = 6;
+                        ctx.shadowColor = "rgba(100,150,255,0.4)";
+                        ctx.fillText(gc.name, gc.x - 40, gc.y - 60);
+                        ctx.shadowBlur = 0;
+                    }
+                }
+
+                // Permanent stars
+                for (let i = 0; i < allNotes.length; i++) {
+                    const star = allNotes[i];
+                    const v = star._vis || getStarVisuals(star);
+                    const pulseFactor = v.pulseFactor;
+                    let baseSize = (star.radius || 3.2) * v.sizeFactor;
+                    let size = Math.max(2.0, baseSize + 0.6 * pulseFactor);
+                    if (star.isSun) size = (star.radius || 6) + 1.0 * pulseFactor;
+
+                    const glow = ctx.createRadialGradient(star.x, star.y, size * 0.6, star.x, star.y, size * 7);
+                    glow.addColorStop(0, v.glowColor);
+                    glow.addColorStop(1, "rgba(0,0,0,0)");
+                    ctx.fillStyle = glow;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, size * 7, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    const inner = ctx.createRadialGradient(star.x - 2, star.y - 2, 1, star.x, star.y, size * 1.8);
+                    inner.addColorStop(0, v.coreColor);
+                    inner.addColorStop(0.5, v.isWhiteDwarf ? "#ffe8cc" : "#ffdd99");
+                    inner.addColorStop(1, "rgba(0,0,0,0)");
+                    ctx.fillStyle = inner;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, size * 1.4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = v.isWhiteDwarf ? "#ffffff" : "#fffde0";
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = v.isWhiteDwarf ? "rgba(255,255,255,0.8)" : "rgba(255,220,100,0.6)";
+                    ctx.beginPath();
+                    ctx.arc(star.x - 0.8, star.y - 0.8, size * 0.35, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    if (previewStarId === star.id) {
+                        ctx.beginPath();
+                        ctx.arc(star.x, star.y, size * 3.8, 0, Math.PI * 2);
+                        ctx.strokeStyle = "rgba(255, 245, 200, 0.8)";
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                }
+
+                // Temporary stars
+                const tStars = tempStars;
+                for (let i = 0; i < tStars.length; i++) {
+                    const star = tStars[i];
+                    const pulse = 0.8 + 0.2 * Math.sin(time * (star.isSpecial ? 0.0025 : 0.003));
+                    const size = (star.isSpecial ? 5.5 : 4) + pulse * 1.2;
+                    const glowColor = star.isSpecial ? "rgba(255, 200, 80, 0.9)" : "rgba(255, 220, 140, 0.7)";
+                    const coreColor = star.isSpecial ? "#ffcc66" : "#ffdd99";
+                    const glow = ctx.createRadialGradient(star.x, star.y, size * 0.5, star.x, star.y, size * 6);
+                    glow.addColorStop(0, glowColor);
+                    glow.addColorStop(1, "rgba(255, 180, 80, 0)");
+                    ctx.fillStyle = glow;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, size * 6, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = coreColor;
+                    ctx.shadowBlur = 12;
+                    ctx.shadowColor = star.isSpecial ? "rgba(255, 200, 80, 0.9)" : "rgba(255, 200, 100, 0.8)";
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, size * 0.8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, size * 1.3 + pulse * 0.5, 0, Math.PI * 2);
+                    ctx.strokeStyle = star.isSpecial ? "rgba(255, 200, 80, 0.9)" : "rgba(255, 220, 120, 0.8)";
+                    ctx.lineWidth = 1.8;
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                }
+
+                // Comets
+                const cometArr = comets;
+                for (let i = 0; i < cometArr.length; i++) {
+                    const c = cometArr[i];
+                    const tailX = c.x - c.vx * 70;
+                    const tailY = c.y - c.vy * 70;
+                    const gradC = ctx.createLinearGradient(c.x, c.y, tailX, tailY);
+                    gradC.addColorStop(0, "rgba(255,255,210,0.8)");
+                    gradC.addColorStop(1, "rgba(180,140,80,0)");
+                    ctx.beginPath();
+                    ctx.moveTo(c.x, c.y);
+                    ctx.lineTo(tailX, tailY);
+                    ctx.strokeStyle = gradC;
+                    ctx.lineWidth = 2.5;
+                    ctx.stroke();
+                    ctx.fillStyle = "#ffffcc";
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+
+                // Sparks & decay trails (screen-space)
+                for (let i = 0; i < sparks.length; i++) {
+                    const s = sparks[i];
+                    const sparkScreenX = (s.x + camera.x) * camera.zoom + w / 2;
+                    const sparkScreenY = (s.y + camera.y) * camera.zoom + h / 2;
+                    ctx.fillStyle = s.color;
+                    ctx.beginPath();
+                    ctx.arc(sparkScreenX, sparkScreenY, 2 * s.life, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                for (let i = 0; i < decayParticles.length; i++) {
+                    const p = decayParticles[i];
+                    const px = (p.x + camera.x) * camera.zoom + w / 2;
+                    const py = (p.y + camera.y) * camera.zoom + h / 2;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(px, py, p.size * (p.life * 0.6 + 0.3), 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                applyBloom(ctx, w, h);
+            }
+
+            // ----------------------------- SIMULATION -----------------------------
+            function simulateMotion(deltaTime) {
+                const allNotes = notes;
+                for (let i = 0; i < allNotes.length; i++) {
+                    const note = allNotes[i];
+                    if (!note.isSun) {
+                        note.vx = (note.vx || 0) * 0.996;
+                        note.vy = (note.vy || 0) * 0.996;
+                        note.x += note.vx;
+                        note.y += note.vy;
+                        note.pulsePhase = (note.pulsePhase || 0) + 0.008;
+                    }
+                }
+                camera.zoom += (camera.targetZoom - camera.zoom) * 0.08;
+                if (followingStarId) {
+                    const star = allNotes.find(n => n.id === followingStarId);
+                    if (star) {
+                        camera.x += (-star.x - camera.x) * 0.07;
+                        camera.y += (-star.y - camera.y) * 0.07;
+                        camera.targetZoom = Math.min(2.6, camera.targetZoom * 0.99 + 1.6 * 0.01);
+                    } else { stopFollowing(); }
+                }
+                updateSparks(deltaTime);
+                updateDecayTrails(deltaTime);
+            }
+
+            function updateComets() {
+                if (Math.random() < 0.0025) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 1.8 + Math.random() * 2.5;
+                    comets.push({
+                        x: Math.cos(angle) * 2600,
+                        y: Math.sin(angle) * 2600,
+                        vx: -Math.cos(angle) * speed,
+                        vy: -Math.sin(angle) * speed,
+                        life: 550 + Math.random() * 350
+                    });
+                }
+                for (let i = comets.length - 1; i >= 0; i--) {
+                    const c = comets[i];
+                    c.x += c.vx;
+                    c.y += c.vy;
+                    c.life--;
+                    if (c.life <= 0) comets.splice(i, 1);
+                }
+            }
+
+            // ----------------------------- AUTO-NAMING & CLUSTERS -----------------------------
+            function autoNameUnnamedClusters() {
+                const clusters = currentClusters;
+                for (let ci = 0; ci < clusters.length; ci++) {
+                    const cluster = clusters[ci];
+                    if (!cluster.name && cluster.starIds.length >= 3) {
+                        const existing = namedConstellations.find(c => c.starIds.join(',') === cluster.starIds.join(
+                            ','));
+                        if (!existing) {
+                            let randomName = autoNames[Math.floor(Math.random() * autoNames.length)];
+                            let newName = randomName;
+                            while (namedConstellations.some(c => c.name === newName)) {
+                                newName = randomName + " " + (Math.floor(Math.random() * 100) + 1);
+                            }
+                            namedConstellations.push({ starIds: cluster.starIds, name: newName });
+                            constellationsCollection.doc(cluster.starIds.join(',')).set({ starIds: cluster.starIds,
+                                name: newName });
+                            showToast("New constellation: " + newName);
+                        }
+                    }
+                }
+            }
+
+            function computeClusters() {
+                const allNotes = notes;
+                const threshold = 215;
+                const visited = new Set();
+                const clusters = [];
+                for (let i = 0; i < allNotes.length; i++) {
+                    if (visited.has(i)) continue;
+                    const comp = [];
+                    const queue = [i];
+                    visited.add(i);
+                    while (queue.length) {
+                        const idx = queue.pop();
+                        comp.push(idx);
+                        for (let j = 0; j < allNotes.length; j++) {
+                            if (visited.has(j)) continue;
+                            const d = Math.hypot(allNotes[idx].x - allNotes[j].x, allNotes[idx].y - allNotes[j].y);
+                            if (d < threshold) { visited.add(j);
+                                queue.push(j); }
+                        }
+                    }
+                    if (comp.length >= 3) {
+                        let cx = 0,
+                            cy = 0;
+                        for (let k = 0; k < comp.length; k++) { cx += allNotes[comp[k]].x;
+                            cy += allNotes[comp[k]].y; }
+                        cx /= comp.length;
+                        cy /= comp.length;
+                        const starIds = comp.map(k => allNotes[k].id);
+                        let name = null;
+                        for (let nc = 0; nc < namedConstellations.length; nc++) {
+                            const ncItem = namedConstellations[nc];
+                            if (ncItem.starIds.length === starIds.length && ncItem.starIds.every(id => starIds
+                                    .includes(id))) {
+                                name = ncItem.name;
+                                break;
+                            }
+                        }
+                        clusters.push({ starIds, centroid: { x: cx, y: cy }, name });
+                    }
+                }
+                currentClusters = clusters;
+            }
+
+            // ----------------------------- FIREBASE & DATA HELPERS -----------------------------
+            function updateCounter() {
+                const total = notes.length + tempStars.length;
+                const counterMeta = document.getElementById("counterMeta");
+                if (counterMeta) {
+                    counterMeta.innerHTML =
+                        '<span class="star-count-icon"></span> ' + (total === 0 ? "empty sky" : total + " stars");
+                }
+            }
+
+            function showToast(msg) {
+                const t = document.getElementById("toastMsg");
+                if (!t) return;
+                t.innerText = msg;
+                t.classList.add("show");
+                setTimeout(() => t.classList.remove("show"), 2000);
+            }
+            async function saveNoteToFirestore(note) { await notesCollection.doc(note.id).set(note); }
+            async function deleteNoteFromFirestore(id) { await notesCollection.doc(id).delete(); }
+
+            function createMemory(text) {
+                const cluster = galacticClusters[Math.floor(Math.random() * galacticClusters.length)];
+                const x = cluster.x + (Math.random() - 0.5) * 750;
+                const y = cluster.y + (Math.random() - 0.5) * 750;
+                const note = {
+                    id: Date.now() + Math.random().toString(36),
+                    created: Date.now(),
+                    opened: 0,
+                    text: (text || "").trim() === "" ? "a drifting thought" : text,
+                    x,
+                    y,
+                    vx: (Math.random() - 0.5) * 0.07,
+                    vy: (Math.random() - 0.5) * 0.07,
+                    radius: 3.2 + Math.random() * 4,
+                    pulsePhase: Math.random() * Math.PI * 2,
+                    creatorId: localPeerId,
+                    creatorName: localPeerName,
+                    isSun: false,
+                    mass: 2 + Math.random() * 5,
+                    orbitingSunId: null,
+                    orbitRadius: 0,
+                    orbitAngle: 0,
+                    orbitSpeed: 0,
+                    orbitDirection: 1
+                };
+                notes.push(note);
+                saveNoteToFirestore(note);
+                updateCounter();
+                computeClusters();
+                addBirthSparks(x, y);
+                return note;
+            }
+
+            function listenToTempStars() {
+                tempStarsCollection.onSnapshot((snap) => {
+                    snap.docChanges().forEach((ch) => {
+                        const data = ch.doc.data();
+                        if (ch.type === "added") {
+                            tempStars.push(data);
+                        } else if (ch.type === "modified") {
+                            const idx = tempStars.findIndex(s => s.id === data.id);
+                            if (idx !== -1) tempStars[idx] = data;
+                        } else if (ch.type === "removed") {
+                            const removed = tempStars.find(s => s.id === ch.doc.id);
+                            if (removed) addDecayTrail(removed.x, removed.y);
+                            tempStars = tempStars.filter(s => s.id !== ch.doc.id);
+                        }
+                    });
+                    updateCounter();
+                    const now = Date.now();
+                    tempStars.forEach(async (s) => {
+                        if (s.expiresAt < now) {
+                            await deleteTempStar(s.id);
+                        }
+                    });
+                });
+            }
+
+            function listenToFirestore() {
+                notesCollection.onSnapshot((snap) => {
+                    snap.docChanges().forEach((ch) => {
+                        if (ch.type === "added" || ch.type === "modified") {
+                            let data = ch.doc.data();
+                            let idx = notes.findIndex(n => n.id === data.id);
+                            if (idx !== -1) notes[idx] = { ...notes[idx], ...data };
+                            else notes.push({ ...data });
+                        } else if (ch.type === "removed") {
+                            const removed = notes.find(n => n.id === ch.doc.id);
+                            if (removed) addDecayTrail(removed.x, removed.y);
+                            notes = notes.filter(n => n.id !== ch.doc.id);
+                        }
+                    });
+                    updateCounter();
+                    computeClusters();
+                    autoNameUnnamedClusters();
+                });
+                constellationsCollection.onSnapshot((snap) => {
+                    snap.docChanges().forEach((ch) => {
+                        let data = ch.doc.data();
+                        let existing = namedConstellations.findIndex(c => c.starIds.join(',') === data.starIds.join(
+                            ','));
+                        if (ch.type === "added" || ch.type === "modified") {
+                            if (existing !== -1) namedConstellations[existing] = data;
+                            else namedConstellations.push(data);
+                        } else if (ch.type === "removed") {
+                            namedConstellations = namedConstellations.filter(c => c.starIds.join(',') !== data.starIds
+                                .join(','));
+                        }
+                    });
+                });
+            }
+
+            // ----------------------------- UI & INTERACTIONS -----------------------------
+            function stopFollowing() { followingStarId = null;
+                document.getElementById("releaseBtn").classList.remove("visible"); }
+
+            function initApp() {
+                initWorld();
+                const canvasElem = document.getElementById("cosmicCanvas");
+
+                function resize() {
+                    w = window.innerWidth;
+                    h = window.innerHeight;
+                    canvasElem.width = w * devicePixelRatio;
+                    canvasElem.height = h * devicePixelRatio;
+                    canvasElem.style.width = w + "px";
+                    canvasElem.style.height = h + "px";
+                    ctx = canvasElem.getContext("2d");
+                    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+                }
+                resize();
+                window.addEventListener("resize", resize);
+                listenToFirestore();
+                listenToTempStars();
+                updateCounter();
+                updateStreakCounter();
+                checkDailyNotification();
+                spawnDailyTempStars();
+
+                // Cache DOM references
+                const appDiv = document.getElementById("app");
+                const hudToggle = document.getElementById("hudToggle");
+                const novaBtn = document.getElementById("novaBtn");
+                const releaseBtn = document.getElementById("releaseBtn");
+                const etherPreview = document.getElementById("etherPreview");
+                const editModal = document.getElementById("editModal");
+                const viewModal = document.getElementById("viewModal");
+                const constellationNameModal = document.getElementById("constellationNameModal");
+                const memoryEditor = document.getElementById("memoryEditor");
+                const editCreator = document.getElementById("editCreator");
+                const viewCreator = document.getElementById("viewCreator");
+                const memoryViewer = document.getElementById("memoryViewer");
+                const constellationNameInput = document.getElementById("constellationNameInput");
+
+                let uiHidden = false;
+
+                function toggleUI() {
+                    uiHidden = !uiHidden;
+                    if (uiHidden) appDiv.classList.add("ui-hidden");
+                    else appDiv.classList.remove("ui-hidden");
+                }
+                hudToggle.addEventListener("click", toggleUI);
+                novaBtn.onclick = () => { let ns = createMemory("");
+                    openEdit(ns.id); };
+                releaseBtn.onclick = stopFollowing;
+
+                function worldPos(px, py) { return { x: (px - w / 2) / camera.zoom - camera.x, y: (py - h / 2) /
+                        camera.zoom - camera.y }; }
+
+                function hitTest(px, py) {
+                    const wp = worldPos(px, py);
+                    let best = null,
+                        bestD = 85;
+                    const allNotes = notes;
+                    for (let i = 0; i < allNotes.length; i++) {
+                        const n = allNotes[i];
+                        const d = Math.hypot(wp.x - n.x, wp.y - n.y);
+                        const thresh = Math.min(85, 38 + (n.radius || 3) * 2.8);
+                        if (d < thresh && d < bestD) { bestD = d;
+                            best = n; }
+                    }
+                    const tStars = tempStars;
+                    for (let i = 0; i < tStars.length; i++) {
+                        const t = tStars[i];
+                        const d = Math.hypot(wp.x - t.x, wp.y - t.y);
+                        if (d < 25 && d < bestD) { bestD = d;
+                            best = t; }
+                    }
+                    return best;
+                }
+
+                function hitTestConstellation(px, py) {
+                    const wp = worldPos(px, py);
+                    const clusters = currentClusters;
+                    for (let i = 0; i < clusters.length; i++) {
+                        const cl = clusters[i];
+                        if (cl.starIds.length >= 3 && Math.hypot(wp.x - cl.centroid.x, wp.y - cl.centroid.y) < 60)
+                            return cl;
+                    }
+                    return null;
+                }
+
+                let previewTimer;
+
+                async function showPreview(star, cx, cy) {
+                    if (previewTimer) clearTimeout(previewTimer);
+                    previewStarId = star.id;
+                    let creatorInfo = "";
+                    let text = "";
+                    if (star.isTemp) {
+                        if (star.isSpecial && !star.rewarded) {
+                            await tempStarsCollection.doc(star.id).update({ rewarded: true });
+                            star.rewarded = true;
+                            addStreakBonus();
+                            addBirthSparks(star.x, star.y);
+                        }
+                        creatorInfo = star.isSpecial ? '<div class="creator-tag">SPECIAL EPHEMERAL STAR</div>' :
+                            '<div class="creator-tag">ephemeral · fades soon</div>';
+                        text = star.message;
+                    } else {
+                        creatorInfo = (star.creatorName && star.creatorName !== localPeerName) ?
+                            '<div class="creator-tag">from ' + star.creatorName + '</div>' : "";
+                        text = star.text.length > 85 ? star.text.slice(0, 82) + "…" : star.text;
+                    }
+                    etherPreview.innerHTML = creatorInfo + "“" + text + "”";
+                    const left = Math.min(Math.max(cx - 120, 12), w - 260);
+                    const top = Math.min(Math.max(cy - 80, 28), h - 100);
+                    etherPreview.style.left = left + "px";
+                    etherPreview.style.top = top + "px";
+                    etherPreview.classList.add("visible");
+                    previewTimer = setTimeout(() => {
+                        etherPreview.classList.remove("visible");
+                        previewStarId = null;
+                    }, 1300);
+                }
+
+                function openEdit(id) {
+                    const star = notes.find(s => s.id === id);
+                    if (!star) return;
+                    activeId = id;
+                    editCreator.innerText = star.creatorName ? 'created by ' + star.creatorName : "";
+                    memoryEditor.value = star.text;
+                    editModal.style.display = "flex";
+                    requestAnimationFrame(() => editModal.classList.add("visible"));
+                }
+
+                function saveEdit() {
+                    if (activeId) {
+                        const star = notes.find(s => s.id === activeId);
+                        if (star) {
+                            star.text = memoryEditor.value;
+                            if (!star.text.trim()) star.text = "a distant echo";
+                            saveNoteToFirestore(star);
+                        }
+                        activeId = null;
+                    }
+                    closeModal(editModal);
+                }
+
+                function closeModal(m) { m.classList.remove("visible");
+                    setTimeout(() => m.style.display = "none", 250); }
+                document.getElementById("saveMemoryBtn").onclick = saveEdit;
+                document.getElementById("cancelEditBtn").onclick = () => closeModal(editModal);
+                document.getElementById("deleteMemoryBtn").onclick = () => {
+                    if (activeId) { deleteNote(activeId);
+                        activeId = null;
+                        closeModal(editModal); }
+                };
+                document.getElementById("closeViewBtn").onclick = () => closeModal(viewModal);
+                document.getElementById("editFromViewBtn").onclick = () => {
+                    closeModal(viewModal);
+                    setTimeout(() => { if (activeId) openEdit(activeId); }, 100);
+                };
+
+                let currentClusterForName = null;
+
+                function promptConstellationName(cl) {
+                    currentClusterForName = cl;
+                    constellationNameInput.value = cl.name || "";
+                    constellationNameModal.style.display = "flex";
+                    requestAnimationFrame(() => constellationNameModal.classList.add("visible"));
+                }
+                document.getElementById("saveConstellationName").onclick = () => {
+                    const name = constellationNameInput.value.trim();
+                    if (name && currentClusterForName) {
+                        let existing = namedConstellations.findIndex(c => c.starIds.join(',') ===
+                            currentClusterForName.starIds.join(','));
+                        if (existing !== -1) namedConstellations[existing].name = name;
+                        else namedConstellations.push({ starIds: currentClusterForName.starIds, name });
+                        constellationsCollection.doc(currentClusterForName.starIds.join(',')).set({
+                            starIds: currentClusterForName.starIds,
+                            name
+                        });
+                        showToast("Constellation named: " + name);
+                    }
+                    closeModal(constellationNameModal);
+                    currentClusterForName = null;
+                };
+                document.getElementById("cancelConstellationName").onclick = () => { closeModal(
+                        constellationNameModal);
+                    currentClusterForName = null; };
+
+                // Pan & zoom + double-tap
+                let isPan = false,
+                    panStart = { x: 0, y: 0 },
+                    camStart = { x: 0, y: 0 };
+                let lastTapTime = 0;
+                let pendingSingleClick = null;
+
+                canvasElem.addEventListener("touchstart", (e) => {
+                    e.preventDefault();
+                    const t = e.touches[0];
+                    const star = hitTest(t.clientX, t.clientY);
+                    const cl = hitTestConstellation(t.clientX, t.clientY);
+                    if (cl) { promptConstellationName(cl); return; }
+                    if (star) {
+                        const now = Date.now();
+                        if (now - lastTapTime < 300) {
+                            if (pendingSingleClick) clearTimeout(pendingSingleClick);
+                            if (!star.isTemp) openEdit(star.id);
+                            else showToast("ephemeral stars cannot be edited.");
+                            lastTapTime = 0;
+                        } else {
+                            lastTapTime = now;
+                            pendingSingleClick = setTimeout(() => {
+                                showPreview(star, t.clientX, t.clientY);
+                                pendingSingleClick = null;
+                            }, 150);
+                        }
+                    } else {
+                        const now = Date.now();
+                        if (uiHidden && now - lastTapTime < 300) {
+                            toggleUI();
+                            lastTapTime = 0;
+                            if (pendingSingleClick) clearTimeout(pendingSingleClick);
+                            return;
+                        }
+                        lastTapTime = now;
+                        isPan = true;
+                        panStart = { x: t.clientX, y: t.clientY };
+                        camStart = { x: camera.x, y: camera.y };
+                        if (pendingSingleClick) { clearTimeout(pendingSingleClick);
+                            pendingSingleClick = null; }
+                    }
+                });
+                canvasElem.addEventListener("touchmove", (e) => {
+                    if (isPan && e.touches.length === 1) {
+                        const dx = e.touches[0].clientX - panStart.x;
+                        const dy = e.touches[0].clientY - panStart.y;
+                        camera.x = camStart.x + dx / camera.zoom;
+                        camera.y = camStart.y + dy / camera.zoom;
+                    }
+                    e.preventDefault();
+                    if (pendingSingleClick) { clearTimeout(pendingSingleClick);
+                        pendingSingleClick = null; }
+                });
+                canvasElem.addEventListener("touchend", () => { isPan = false; });
+
+                canvasElem.addEventListener("mousedown", (e) => {
+                    const star = hitTest(e.clientX, e.clientY);
+                    const cl = hitTestConstellation(e.clientX, e.clientY);
+                    if (cl) { promptConstellationName(cl); return; }
+                    if (star) {
+                        if (e.detail === 2) {
+                            if (!star.isTemp) openEdit(star.id);
+                            else showToast("ephemeral stars cannot be edited.");
+                        } else {
+                            showPreview(star, e.clientX, e.clientY);
+                        }
+                    } else {
+                        isPan = true;
+                        panStart = { x: e.clientX, y: e.clientY };
+                        camStart = { x: camera.x, y: camera.y };
+                    }
+                });
+                window.addEventListener("mousemove", (e) => {
+                    if (isPan) {
+                        const dx = e.clientX - panStart.x;
+                        const dy = e.clientY - panStart.y;
+                        camera.x = camStart.x + dx / camera.zoom;
+                        camera.y = camStart.y + dy / camera.zoom;
+                    }
+                });
+                window.addEventListener("mouseup", () => { isPan = false; });
+
+                canvasElem.addEventListener("dblclick", (e) => {
+                    const star = hitTest(e.clientX, e.clientY);
+                    const cl = hitTestConstellation(e.clientX, e.clientY);
+                    if (!star && !cl && uiHidden) {
+                        toggleUI();
+                    }
+                });
+
+                canvasElem.addEventListener("wheel", (e) => {
+                    e.preventDefault();
+                    const delta = e.deltaY > 0 ? 0.92 : 1.08;
+                    camera.targetZoom = Math.min(2.6, Math.max(0.42, camera.targetZoom * delta));
+                }, { passive: false });
+
+                let lastTimestamp = 0;
+
+                function animateLoop(now) {
+                    let delta = Math.min(0.033, (now - lastTimestamp) / 1000);
+                    lastTimestamp = now;
+                    time = now;
+                    frameCount++;
+
+                    // Throttled updates (no visual compromise)
+                    if (frameCount % 4 === 0) updateFlowField(time);
+                    if (frameCount % 6 === 0) updateNebulaColors();
+
+                    updateOrganic(time);
+                    updateFlowParticles();
+                    updateComets();
+                    prepareFrameData(now);
+                    simulateMotion(delta);
+                    render();
+                    requestAnimationFrame(animateLoop);
+                }
+                requestAnimationFrame(animateLoop);
+            }
+
+            // Name modal
+            if (!localPeerName || localPeerName === 'me') {
+                const nameModal = document.getElementById('nameModal');
+                nameModal.style.display = 'flex';
+                requestAnimationFrame(() => nameModal.classList.add('visible'));
+                document.getElementById('saveNameBtn').onclick = () => {
+                    let name = document.getElementById('nameInput').value.trim();
+                    if (!name) name = 'stargazer';
+                    startApp(name);
+                };
+            } else {
+                initApp();
+            }
+
+            function startApp(name) {
+                localPeerName = name;
+                localStorage.setItem('constellation_peer_name', name);
+                const nameModal = document.getElementById('nameModal');
+                nameModal.classList.remove('visible');
+                setTimeout(() => nameModal.style.display = 'none', 350);
+                initApp();
+            }
+        })();
+    </script>
 </body>
 </html>
